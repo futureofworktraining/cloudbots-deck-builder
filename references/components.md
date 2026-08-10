@@ -133,6 +133,28 @@ Warianty:
 
 `.card-foot` przykleja się do dołu karty — dzięki temu w rzędzie kart stopki są w jednej linii.
 
+### Karta z numerem-znakiem wodnym
+
+```html
+<div class="card card--ghost">
+  <span class="card-ghost" aria-hidden="true">01</span>
+  <p class="card-lead">Przeprojektuj proces, zamiast doklejać agenta do starego obiegu.</p>
+  <div class="card-foot"><span class="card-num">Workflow</span><br>
+    Najsilniejszy związek z realnym wpływem na biznes.</div>
+</div>
+```
+
+Numer wchodzi w tło karty jako duża cyfra w kolorze akcentu przy 14% krycia; treść niesie
+`.card-lead` (akapit wiodący, jaśniejszy od `.card-text`), a etykieta schodzi do stopki.
+
+Sięgaj po ten wariant tylko wtedy, gdy kolejność coś znaczy — etapy procesu, kroki wdrożenia,
+uszeregowany ranking. Trzy równorzędne tezy ponumerowane 01/02/03 udają sekwencję, której nie ma.
+
+Cyfra ma się mieścić w kadrze karty w całości. Wypuszczona poza krawędź jest nieodróżnialna
+od przycięcia przez `overflow:hidden`, więc czyta się jak błąd, nie jak decyzja.
+Rynnę `padding-right` dostaje wyłącznie `.card-lead` — niższe wiersze biorą pełną szerokość,
+bo cyfra siedzi tylko przy górnej krawędzi.
+
 ---
 
 ## 4. Lista punktowana
@@ -367,7 +389,7 @@ spis treści z samymi tytułami nie niesie informacji, którą menu już podaje.
 
 ```html
 <div class="contact">
-  <img class="contact-photo" src="zdjecie.jpg" alt="Imię Nazwisko">
+  <svg class="contact-mark" viewBox="0 0 240 275" aria-label="CloudBots">…</svg>
   <div class="contact-lines">
     <span>Imię Nazwisko · rola</span>
     <a href="mailto:…">adres@cloudbots.eu</a>
@@ -377,8 +399,12 @@ spis treści z samymi tytułami nie niesie informacji, którą menu już podaje.
 </div>
 ```
 
-`.contact-photo` obcina zdjęcie kadrem heksagonalnym. Bez zdjęcia zostaw `<div>` —
-dostanie gradient mięta/błękit.
+Domyślnie w lewej kolumnie stoi znak firmowy (`.contact-mark`) — ten sam inline SVG
+co na okładce. Sam jest heksagonem, więc trzyma sygnaturę bez pustego kadru.
+
+Ze zdjęciem prelegenta podmień `<svg>` na `<img class="contact-photo" src="zdjecie.jpg"
+alt="Imię Nazwisko">` — `.contact-photo` obetnie je kadrem heksagonalnym. Nie zostawiaj
+pustego `<div class="contact-photo">`: gradient bez zdjęcia czyta się jak błąd ładowania.
 
 ---
 

@@ -403,6 +403,17 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 }
 .card.is-quiet{border-top-color:var(--line);}
 .card.is-quiet .card-num{color:var(--ink-3);}
+/* karta z numerem-znakiem wodnym — tylko dla treści, w której kolejność coś znaczy
+   (etapy procesu, kroki wdrożenia). Do listy równorzędnych tez numer nie pasuje. */
+.card--ghost{position:relative;overflow:hidden;}
+.card-ghost{
+  position:absolute;top:8px;right:12px;pointer-events:none;user-select:none;
+  font-family:var(--ff-display);font-size:88px;font-weight:500;line-height:.8;
+  letter-spacing:-.05em;color:var(--accent);opacity:.14;
+}
+/* rynna tylko pod pierwszym akapitem — niższe wiersze biorą pełną szerokość karty */
+.card--ghost .card-lead{padding-right:74px;}
+.card-lead{font-size:var(--fs-body);line-height:1.6;color:var(--ink-1);}
 
 /* lista punktowana — blok, nie grid: inline <strong> nie może stać się osobnym elementem */
 .blist{display:block;}
@@ -562,7 +573,9 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 
 /* kontakt */
 .contact{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(26px,3.6vw,64px);align-items:center;}
-/* podmień <div> na <img class="contact-photo" src="…"> — kadr heksagonalny obetnie zdjęcie */
+/* domyślnie stoi tu znak firmowy — sam jest heksagonem, więc trzyma kompozycję
+   bez pustego kadru. Ze zdjęciem: podmień <svg> na <img class="contact-photo" src="…">. */
+.contact-mark{width:clamp(96px,9vw,150px);height:auto;}
 .contact-photo{width:clamp(120px,12vw,190px);aspect-ratio:1;object-fit:cover;
   background:linear-gradient(150deg,rgba(169,245,214,.22),rgba(132,220,241,.14));
   border:0;clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
@@ -589,15 +602,19 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .legend b{color:var(--ink-0);font-weight:500;margin-left:auto;padding-left:14px;font-variant-numeric:tabular-nums;}
 
 /* słupki pionowe */
+/* --h liczy się od szerokości kolumny, więc w splicie 62/38 sufit 250px robił wykres
+   wyższy od sąsiada o kilkadziesiąt px — 180px trzyma go w jednym rzędzie z .c-meter.
+   gap musi być zerowy: oś to border-top na .bx, a odstęp kolumny wycinał ją na odcinki.
+   Odstęp między słupkami i tak robi max-width bara, nie gap. */
 .c-bars{
-  --h:clamp(140px,32cqw,250px);
+  --h:clamp(110px,20cqw,180px);
   display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);
-  gap:clamp(7px,1.5cqw,20px);align-items:end;
+  gap:0;align-items:end;
 }
 .c-bars .b{display:grid;grid-template-rows:auto var(--h) auto;justify-items:center;gap:7px;min-width:0;}
 .c-bars .bv{font-family:var(--ff-mono);font-size:clamp(11px,2cqw,16px);font-weight:600;color:var(--ink-0);align-self:end;}
 /* max-width: przy czterech słupkach na całą szerokość kolumny bez tego robią się bloki */
-.c-bars .bar{align-self:end;width:100%;max-width:clamp(40px,11cqw,120px);height:var(--v,50%);
+.c-bars .bar{align-self:end;width:100%;max-width:clamp(34px,7.5cqw,84px);height:var(--v,50%);
   background:var(--c,var(--dv-1));transition:height .8s var(--ease);}
 .c-bars .bx{font-family:var(--ff-mono);font-size:clamp(9.5px,1.6cqw,13px);letter-spacing:.08em;color:var(--ink-3);
   text-align:center;line-height:1.35;border-top:1px solid var(--line);padding-top:7px;width:100%;}
@@ -1404,7 +1421,11 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
       </div>
 
       <div class="contact" data-step="1">
-        <div class="contact-photo" aria-hidden="true"></div>
+        <svg class="contact-mark" viewBox="0 0 240 275" aria-label="CloudBots">
+          <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#A9F5D6" opacity=".7"/>
+          <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" transform="translate(80,45)" fill="#84DCF1" opacity=".7"/>
+          <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" transform="translate(0,90)" fill="#84F1F1" opacity=".7"/>
+        </svg>
         <div class="contact-lines">
           <div><strong>Krzysztof Karaszewski</strong></div>
           <div data-en="Founder · CloudBots">Założyciel · CloudBots</div>
@@ -1788,6 +1809,26 @@ deck.addEventListener('wheel', e=>{
     setTimeout(()=>{ wheelLock = false; }, 240);
   }
 },{passive:false});
+
+/* ── kliknięcie w slajd: naprzód jak w PowerPoincie ─────────────────────── */
+/* Cztery warunki, bez których deck w trybie dokumentu przestaje być dokumentem:
+   nie reagujemy na sterowanie i linki, na koniec zaznaczania tekstu,
+   na przeciągnięcie i na klik inny niż lewym. Alt+klik cofa — shift+klik
+   odpada, bo w przeglądarce rozszerza zaznaczenie tekstu. */
+const NO_CLICK = 'a,button,input,select,textarea,summary,label,[data-video],[data-go],'
+               + '[contenteditable],.topbar,.drawer,.drawer-tab,.drawer-scrim,.vprog,.arrows,.lightbox';
+/* hadSel czytamy w pointerdown, bo mousedown zdąży wyczyścić zaznaczenie,
+   zanim dojdzie click — inaczej klik kasujący zaznaczenie przewijałby slajd. */
+let downX = 0, downY = 0, hadSel = false;
+deck.addEventListener('pointerdown', e=>{ downX = e.clientX; downY = e.clientY; hadSel = !!String(getSelection()); });
+deck.addEventListener('click', e=>{
+  if(e.button !== 0 || e.ctrlKey || e.metaKey) return;
+  if(body.classList.contains('drawer-open') || lb.classList.contains('is-open')) return;
+  if(e.target.closest(NO_CLICK)) return;
+  if(Math.abs(e.clientX - downX) > 6 || Math.abs(e.clientY - downY) > 6) return;  /* przeciągnięcie */
+  if(hadSel || String(getSelection())) return;                                   /* zaznaczanie tekstu */
+  step(e.altKey ? -1 : 1);
+});
 
 /* ── klawiatura ─────────────────────────────────────────────────────────── */
 addEventListener('keydown', e=>{
