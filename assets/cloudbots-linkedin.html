@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CloudBots · grafiki na LinkedIn</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Exo+2:wght@600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   CLOUDBOTS · GRAFIKI NA LINKEDIN
+   Dziewięć płócien w formatach, które LinkedIn faktycznie obsługuje:
+     1080×1350  4:5  — post pojedynczy i slajd karuzeli (największy zasięg
+                       w feedzie, zajmuje najwięcej pionu na telefonie)
+     1080×1080  1:1  — post kwadratowy
+     1200×628   1.91:1 — grafika pod linkiem
+     1584×396   — baner profilu firmowego
+   Tekst musi być czytelny na miniaturze telefonu — stąd minimalny stopień
+   pisma 26 px przy 1080 px szerokości. Nic mniejszego nie wchodzi.
+   Eksport: scripts/render.py --file cloudbots-linkedin.html
+   Instrukcja: references/linkedin.md
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  --cb-primary:#00CED1; --cb-primary-700:#00b8b8; --cb-mint:#A9F5D6;
+  --cb-cyan:#84DCF1; --cb-turq:#84F1F1; --cb-cyan-deep:#0891b2;
+  --ff-display:'Space Grotesk',system-ui,sans-serif;
+  --ff-body:'Inter',system-ui,sans-serif;
+  --ff-mono:'JetBrains Mono',Consolas,monospace;
+  --ff-logo:'Exo 2',var(--ff-display);
+  --hex:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+}
+*,*::before,*::after{box-sizing:border-box;}
+body{margin:0;background:#1b1d24;color:#c2c5d2;font-family:var(--ff-body);-webkit-font-smoothing:antialiased;}
+
+.page{padding:44px 34px 100px;max-width:1500px;margin:0 auto;}
+.page > h1{font-family:var(--ff-display);font-size:32px;font-weight:500;letter-spacing:-.025em;color:#f4f1e8;margin:0 0 6px;}
+.page > p.sub{margin:0 0 40px;color:#8a8f9e;max-width:70ch;line-height:1.6;}
+.slot{margin-bottom:56px;}
+.slot-head{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:14px;
+  padding-bottom:11px;border-bottom:1px solid rgba(255,255,255,.09);}
+.slot-head h2{font-family:var(--ff-display);font-size:18px;font-weight:500;color:#f4f1e8;margin:0;}
+.slot-head code{font-family:var(--ff-mono);font-size:12px;color:var(--cb-primary);letter-spacing:.05em;}
+.slot-head .dim{font-family:var(--ff-mono);font-size:11.5px;color:#6b7080;letter-spacing:.1em;margin-left:auto;}
+.slot-note{font-size:13.5px;color:#6b7080;line-height:1.55;margin:0 0 16px;max-width:80ch;}
+.row{display:flex;gap:22px;align-items:flex-start;}
+.row > .holder{flex:1 1 0;min-width:0;}
+.holder{overflow:hidden;}
+.holder > .canvas{transform-origin:top left;}
+
+/* ── płótno ───────────────────────────────────────────────────────────── */
+.canvas{position:relative;overflow:hidden;display:flex;flex-direction:column;
+  --bg-0:#08090f; --bg-1:#0e1019;
+  --ink-0:#f4f1e8; --ink-1:#c2c5d2; --ink-2:#7b819a; --ink-3:#606779;
+  --line:rgba(255,255,255,.12); --line-2:rgba(255,255,255,.06);
+  --accent:var(--cb-primary);
+  background:var(--bg-0);color:var(--ink-1);}
+.canvas.light{
+  --bg-0:#F8FAFC; --bg-1:#ffffff;
+  --ink-0:#0f1729; --ink-1:#243043; --ink-2:#475569; --ink-3:#7b8a9d;
+  --line:rgba(15,23,41,.13); --line-2:rgba(15,23,41,.06);
+  --accent:var(--cb-cyan-deep);}
+.canvas.brand{
+  --bg-0:#04141a; --ink-0:#ffffff; --ink-1:rgba(255,255,255,.86);
+  --ink-2:rgba(255,255,255,.62); --ink-3:rgba(255,255,255,.42);
+  --line:rgba(255,255,255,.18); --line-2:rgba(255,255,255,.09);
+  background:radial-gradient(ellipse 120% 90% at 84% 6%,#0d3b44 0%,#04141a 62%);}
+
+.f-45   {width:1080px;height:1350px;padding:76px 76px 62px;}
+.f-sq   {width:1080px;height:1080px;padding:76px 76px 62px;}
+.f-link {width:1200px;height:628px;padding:58px 64px 50px;}
+.f-banner{width:1584px;height:396px;padding:52px 68px;}
+
+.canvas::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:3;opacity:.045;
+  mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");}
+.canvas.light::after{opacity:.025;mix-blend-mode:multiply;}
+.canvas > *{position:relative;z-index:1;}
+
+/* pasek marki u góry — jedyny element wspólny wszystkim formatom */
+.bar{position:absolute;top:0;left:0;right:0;height:8px;z-index:2;
+  background:linear-gradient(90deg,var(--cb-mint),var(--cb-cyan),var(--cb-primary));}
+
+.hex-deco{position:absolute;z-index:0;background:var(--cb-primary);opacity:.06;clip-path:var(--hex);pointer-events:none;}
+.canvas.brand .hex-deco{opacity:.1;}
+
+.li-eyebrow{font-family:var(--ff-mono);font-size:19px;font-weight:500;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--accent);margin:0;display:flex;align-items:center;gap:13px;}
+.canvas.brand .li-eyebrow{color:var(--cb-turq);}
+.li-eyebrow::before{content:'';width:13px;height:15px;background:currentColor;flex:0 0 auto;clip-path:var(--hex);}
+.f-link .li-eyebrow{font-size:16px;}
+
+.li-body{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:30px;padding:52px 0;}
+.f-link .li-body{padding:34px 0;}
+/* w kadrze 4:5 krótka treść wyśrodkowana zostawia dwa równe puste pasy i traci
+   napięcie — kotwiczymy ją nisko, pustka zbiera się u góry jako oddech */
+.li-body.low{justify-content:flex-end;}
+
+.li-h{font-family:var(--ff-display);font-weight:500;letter-spacing:-.035em;line-height:1.05;
+  color:var(--ink-0);margin:0;font-size:78px;}
+.li-h.sm{font-size:60px;}
+.f-sq .li-h{font-size:70px;}
+.f-link .li-h{font-size:54px;}
+.li-h em{font-style:normal;color:var(--accent);}
+.canvas.brand .li-h em{color:var(--cb-turq);}
+
+.li-p{margin:0;font-size:28px;line-height:1.5;color:var(--ink-2);font-weight:300;max-width:38ch;}
+.f-link .li-p{font-size:23px;}
+
+/* stopka: logo + uchwyt. Zawsze na dole, zawsze ta sama. */
+.li-foot{display:flex;align-items:center;justify-content:space-between;gap:26px;
+  padding-top:24px;border-top:1px solid var(--line);}
+.mark{display:flex;align-items:center;gap:14px;}
+.mark svg{height:40px;width:auto;display:block;}
+.f-link .mark svg,.f-banner .mark svg{height:34px;}
+.mark .wm{font-family:var(--ff-logo);font-size:26px;font-weight:600;letter-spacing:.1em;color:var(--ink-0);}
+.f-link .mark .wm{font-size:22px;}
+.li-cta{font-family:var(--ff-mono);font-size:19px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);text-align:right;line-height:1.4;}
+.f-link .li-cta{font-size:16px;}
+
+/* ── liczba-bomba ─────────────────────────────────────────────────────── */
+.big{font-family:var(--ff-display);font-size:250px;font-weight:600;letter-spacing:-.055em;
+  line-height:.86;color:var(--accent);margin:0;}
+.canvas.brand .big{background:linear-gradient(150deg,var(--cb-mint),var(--cb-turq) 46%,var(--cb-primary));
+  -webkit-background-clip:text;background-clip:text;color:transparent;}
+.big-unit{font-size:.36em;letter-spacing:-.02em;}
+.big-lab{font-family:var(--ff-display);font-size:44px;font-weight:500;letter-spacing:-.025em;
+  line-height:1.2;color:var(--ink-0);margin:22px 0 0;}
+
+/* ── cytat ────────────────────────────────────────────────────────────── */
+.quote{font-family:var(--ff-display);font-size:58px;font-weight:400;letter-spacing:-.03em;
+  line-height:1.22;color:var(--ink-0);margin:0;position:relative;padding-left:44px;}
+.quote::before{content:'';position:absolute;left:0;top:12px;bottom:12px;width:4px;background:var(--accent);}
+.who{display:flex;align-items:center;gap:20px;}
+.who .ph{width:74px;height:84px;flex:0 0 auto;clip-path:var(--hex);
+  background:linear-gradient(150deg,var(--cb-mint),var(--cb-cyan-deep));}
+.who .wn{font-family:var(--ff-display);font-size:27px;font-weight:500;color:var(--ink-0);letter-spacing:-.015em;}
+.who .wr{font-family:var(--ff-mono);font-size:17px;letter-spacing:.09em;color:var(--ink-3);margin-top:4px;}
+
+/* ── lista punktów ────────────────────────────────────────────────────── */
+.plist{display:flex;flex-direction:column;gap:0;}
+.plist .pi{display:grid;grid-template-columns:66px 1fr;gap:22px;align-items:start;
+  padding:26px 0;border-bottom:1px solid var(--line-2);}
+.plist .pi:last-child{border-bottom:0;}
+.plist .pn{font-family:var(--ff-mono);font-size:24px;font-weight:600;color:var(--accent);
+  letter-spacing:.04em;padding-top:5px;}
+.plist .pt{font-family:var(--ff-display);font-size:36px;font-weight:500;letter-spacing:-.025em;
+  color:var(--ink-0);line-height:1.2;margin:0;}
+.plist .pd{font-size:24px;line-height:1.5;color:var(--ink-2);margin:9px 0 0;}
+
+/* ── karuzela ─────────────────────────────────────────────────────────── */
+.pager{position:absolute;bottom:0;left:0;right:0;height:6px;background:var(--line-2);z-index:2;}
+.pager i{position:absolute;inset:0 auto 0 0;width:var(--v,33%);background:var(--accent);}
+.swipe{font-family:var(--ff-mono);font-size:19px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent);display:flex;align-items:center;gap:12px;}
+.swipe svg{width:26px;height:26px;}
+
+/* ── porównanie „mit / fakt" ──────────────────────────────────────────── */
+.mf{display:flex;flex-direction:column;gap:26px;}
+.mf .box{padding:34px 36px;border-left:5px solid var(--ink-3);background:var(--bg-1);}
+.mf .box.is-hi{border-left-color:var(--accent);
+  background:linear-gradient(160deg,rgba(0,206,209,.14),rgba(0,206,209,.02));}
+.canvas.light .mf .box.is-hi{background:linear-gradient(160deg,rgba(8,145,178,.11),rgba(8,145,178,.015));}
+.mf .bl{font-family:var(--ff-mono);font-size:19px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 14px;}
+.mf .box.is-hi .bl{color:var(--accent);}
+.mf .bt{font-family:var(--ff-display);font-size:38px;font-weight:500;letter-spacing:-.025em;
+  line-height:1.22;color:var(--ink-0);margin:0;}
+
+/* ── baner profilu ────────────────────────────────────────────────────── */
+.f-banner{flex-direction:row;align-items:center;justify-content:space-between;gap:60px;}
+.f-banner .bh{font-family:var(--ff-display);font-size:52px;font-weight:500;letter-spacing:-.035em;
+  line-height:1.1;color:var(--ink-0);margin:0 0 14px;}
+.f-banner .bp{font-family:var(--ff-mono);font-size:19px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--cb-turq);margin:0;}
+.f-banner .bside{display:flex;flex-direction:column;align-items:flex-end;gap:16px;flex:0 0 auto;}
+.f-banner .bside svg{height:76px;width:auto;}
+/* prawa część banera bywa przykryta zdjęciem profilowym na desktopie —
+   ważne treści trzymamy w lewej połowie, po prawej zostaje sam znak */
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Grafiki na LinkedIn</h1>
+  <p class="sub">Dziewięć płócien w formatach, które LinkedIn realnie obsługuje. Najmniejszy stopień pisma to 26 px przy 1080 px szerokości — poniżej tekst znika na miniaturze w telefonie. Eksport 2× przez <code>scripts/render.py</code>.</p>
+
+  <!-- ══ 1 · LICZBA ═════════════════════════════════════════════════════ -->
+  <section class="slot">
+    <div class="slot-head"><h2>Liczba-bomba</h2><code>.big</code><span class="dim">1080 × 1350 · 4:5</span></div>
+    <p class="slot-note">Do postu, który stoi na jednej danej. Liczba jest całym obrazkiem, opis mieści się w jednym zdaniu, resztę dopowiada tekst posta.</p>
+    <div class="holder">
+      <div class="canvas f-45 brand" data-render="li-liczba">
+        <span class="bar"></span>
+        <div class="hex-deco" style="width:400px;height:462px;top:190px;right:56px"></div>
+        <p class="li-eyebrow">Discovery 2025</p>
+        <div class="li-body low">
+          <p class="big">9<span class="big-unit">/100</span></p>
+          <p class="big-lab">procesów zgłoszonych do automatyzacji trafia na produkcję.</p>
+          <p class="li-p">Reszta odpada na braku właściciela i danych — nie na technologii.</p>
+        </div>
+        <div class="li-foot">
+          <div class="mark">
+            <svg viewBox="0 0 240 275" fill="none" aria-hidden="true">
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#A9F5D6" opacity=".7"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84DCF1" opacity=".7" transform="translate(80,45)"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84F1F1" opacity=".5" transform="translate(0,90)"/>
+            </svg>
+            <span class="wm">CLOUDBOTS</span>
+          </div>
+          <p class="li-cta">Pełne dane<br>w komentarzu</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 2 · TEZA ═══════════════════════════════════════════════════════ -->
+  <section class="slot">
+    <div class="slot-head"><h2>Teza</h2><code>.li-h</code><span class="dim">1080 × 1080 · 1:1</span></div>
+    <p class="slot-note">Jedno zdanie, które ma zatrzymać scroll. Wyróżnienie tylko na jednym słowie — dwa wyróżnienia znoszą się nawzajem.</p>
+    <div class="holder">
+      <div class="canvas f-sq" data-render="li-teza">
+        <span class="bar"></span>
+        <p class="li-eyebrow">Opinia</p>
+        <div class="li-body">
+          <h2 class="li-h">Twój agent nie ma<br>problemu z modelem.<br>Ma problem z <em>danymi</em>.</h2>
+          <p class="li-p">Zmiana modelu to jeden wieczór. Uporządkowanie źródeł prawdy to jeden kwartał — i to ona decyduje o wyniku.</p>
+        </div>
+        <div class="li-foot">
+          <div class="mark">
+            <svg viewBox="0 0 240 275" fill="none" aria-hidden="true">
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#A9F5D6" opacity=".7"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84DCF1" opacity=".7" transform="translate(80,45)"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84F1F1" opacity=".5" transform="translate(0,90)"/>
+            </svg>
+            <span class="wm">CLOUDBOTS</span>
+          </div>
+          <p class="li-cta">cloudbots.eu</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 3 · LISTA ══════════════════════════════════════════════════════ -->
+  <section class="slot">
+    <div class="slot-head"><h2>Lista punktów</h2><code>.plist</code><span class="dim">1080 × 1350 · 4:5</span></div>
+    <p class="slot-note">Maksymalnie cztery pozycje. Piąta zbija stopień pisma poniżej progu czytelności na telefonie — wtedy rób karuzelę.</p>
+    <div class="holder">
+      <div class="canvas f-45 light" data-render="li-lista">
+        <span class="bar"></span>
+        <p class="li-eyebrow">Zanim wdrożysz</p>
+        <div class="li-body">
+          <h2 class="li-h sm">Cztery pytania,<br>które oszczędzą<br>ci kwartał</h2>
+          <div class="plist">
+            <div class="pi"><span class="pn">01</span><div>
+              <h3 class="pt">Kto jest właścicielem procesu?</h3>
+              <p class="pd">Nie działu. Konkretnej osoby, która zdecyduje o zmianie reguły.</p></div></div>
+            <div class="pi"><span class="pn">02</span><div>
+              <h3 class="pt">Skąd wiesz, że agent ma rację?</h3>
+              <p class="pd">Zbiór ewaluacyjny na prawdziwych sprawach, nie demo na trzech przykładach.</p></div></div>
+            <div class="pi"><span class="pn">03</span><div>
+              <h3 class="pt">Gdzie kończy się jego uprawnienie?</h3>
+              <p class="pd">Próg pewności, powyżej którego sprawę przejmuje człowiek.</p></div></div>
+            <div class="pi"><span class="pn">04</span><div>
+              <h3 class="pt">Co się stanie, gdy się pomyli?</h3>
+              <p class="pd">Log decyzji, rollback i osoba, która to zauważy tego samego dnia.</p></div></div>
+          </div>
+        </div>
+        <div class="li-foot">
+          <div class="mark">
+            <svg viewBox="0 0 240 275" fill="none" aria-hidden="true">
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#A9F5D6" opacity=".7"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84DCF1" opacity=".7" transform="translate(80,45)"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84F1F1" opacity=".5" transform="translate(0,90)"/>
+            </svg>
+            <span class="wm">CLOUDBOTS</span>
+          </div>
+          <p class="li-cta">Zapisz na później</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 4 · CYTAT ══════════════════════════════════════════════════════ -->
+  <section class="slot">
+    <div class="slot-head"><h2>Cytat</h2><code>.quote</code><span class="dim">1080 × 1080 · 1:1</span></div>
+    <p class="slot-note">Zdjęcie autora wstaw w miejsce <code>.ph</code> — heksagon zostaje jako maska. Bez zdjęcia gradient działa jako zastępnik.</p>
+    <div class="holder">
+      <div class="canvas f-sq light" data-render="li-cytat">
+        <span class="bar"></span>
+        <p class="li-eyebrow">Case study · retail</p>
+        <div class="li-body low">
+          <blockquote class="quote">Przestaliśmy pytać, czy AI zadziała. Zaczęliśmy pytać, który proces jest na nią gotowy.</blockquote>
+          <div class="who">
+            <span class="ph"></span>
+            <span><span class="wn">Anna Kowalska</span><br><span class="wr">DYREKTORKA OPERACYJNA</span></span>
+          </div>
+        </div>
+        <div class="li-foot">
+          <div class="mark">
+            <svg viewBox="0 0 240 275" fill="none" aria-hidden="true">
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#A9F5D6" opacity=".7"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84DCF1" opacity=".7" transform="translate(80,45)"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84F1F1" opacity=".5" transform="translate(0,90)"/>
+            </svg>
+            <span class="wm">CLOUDBOTS</span>
+          </div>
+          <p class="li-cta">Case study<br>w komentarzu</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 5 · MIT / FAKT ═════════════════════════════════════════════════ -->
+  <section class="slot">
+    <div class="slot-head"><h2>Mit i fakt</h2><code>.mf</code><span class="dim">1080 × 1350 · 4:5</span></div>
+    <p class="slot-note">Format polemiczny. Mit zawsze u góry i wyszarzony, fakt pod spodem z akcentem — kolejność odwrotna czyta się jak potwierdzenie mitu.</p>
+    <div class="holder">
+      <div class="canvas f-45" data-render="li-mitfakt">
+        <span class="bar"></span>
+        <div class="hex-deco" style="width:300px;height:346px;top:150px;right:60px"></div>
+        <p class="li-eyebrow">Prostujemy</p>
+        <div class="li-body low">
+          <h2 class="li-h sm">Agent AI zastąpi<br>zespół obsługi?</h2>
+          <div class="mf">
+            <div class="box">
+              <p class="bl">Mit</p>
+              <p class="bt">„Wdrażamy agenta, więc redukujemy etaty w obsłudze klienta."</p>
+            </div>
+            <div class="box is-hi">
+              <p class="bl">Fakt</p>
+              <p class="bt">Agent przejmuje kwalifikację i przepisywanie danych. Zespół dostaje czas na sprawy, które wcześniej czekały tydzień.</p>
+            </div>
+          </div>
+        </div>
+        <div class="li-foot">
+          <div class="mark">
+            <svg viewBox="0 0 240 275" fill="none" aria-hidden="true">
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#A9F5D6" opacity=".7"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84DCF1" opacity=".7" transform="translate(80,45)"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84F1F1" opacity=".5" transform="translate(0,90)"/>
+            </svg>
+            <span class="wm">CLOUDBOTS</span>
+          </div>
+          <p class="li-cta">Co myślisz?<br>Napisz w komentarzu</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 6 · KARUZELA ═══════════════════════════════════════════════════ -->
+  <section class="slot">
+    <div class="slot-head"><h2>Karuzela</h2><code>.pager</code><span class="dim">3 × 1080 × 1350 · PDF</span></div>
+    <p class="slot-note">LinkedIn przyjmuje karuzelę jako PDF — <code>render.py --pdf li-kar-*</code> składa te płótna w jeden dokument w kolejności numerów. Okładka, treść, wezwanie. Pasek postępu na dole mówi czytelnikowi, ile zostało.</p>
+    <div class="row">
+
+      <div class="holder">
+        <div class="canvas f-45 brand" data-render="li-kar-1">
+          <span class="bar"></span>
+          <div class="hex-deco" style="width:380px;height:439px;top:230px;right:52px"></div>
+          <p class="li-eyebrow">Karuzela · 1 z 3</p>
+          <div class="li-body low">
+            <h2 class="li-h">Dlaczego<br>pilot AI<br>umiera po<br>demie</h2>
+            <p class="li-p">Trzy powody, które widzimy w co drugim projekcie.</p>
+          </div>
+          <div class="li-foot">
+            <div class="mark">
+              <svg viewBox="0 0 240 275" fill="none" aria-hidden="true">
+                <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#A9F5D6" opacity=".7"/>
+                <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84DCF1" opacity=".7" transform="translate(80,45)"/>
+                <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84F1F1" opacity=".5" transform="translate(0,90)"/>
+              </svg>
+              <span class="wm">CLOUDBOTS</span>
+            </div>
+            <span class="swipe">Przesuń
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </div>
+          <span class="pager"><i style="--v:33.3%"></i></span>
+        </div>
+      </div>
+
+      <div class="holder">
+        <div class="canvas f-45" data-render="li-kar-2">
+          <span class="bar"></span>
+          <p class="li-eyebrow">Powód 02</p>
+          <div class="li-body low">
+            <h2 class="li-h sm">Demo działało<br>na trzech<br>przykładach</h2>
+            <p class="li-p">Na produkcji przychodzi setka spraw dziennie i połowa wygląda inaczej niż wszystko, co widziałeś w trakcie budowy.</p>
+            <p class="li-p" style="color:var(--accent);max-width:34ch">Zbiór ewaluacyjny buduj w tygodniu pierwszym, nie po pierwszej awarii.</p>
+          </div>
+          <div class="li-foot">
+            <div class="mark">
+              <svg viewBox="0 0 240 275" fill="none" aria-hidden="true">
+                <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#A9F5D6" opacity=".7"/>
+                <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84DCF1" opacity=".7" transform="translate(80,45)"/>
+                <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84F1F1" opacity=".5" transform="translate(0,90)"/>
+              </svg>
+              <span class="wm">CLOUDBOTS</span>
+            </div>
+            <span class="swipe">Dalej
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </div>
+          <span class="pager"><i style="--v:66.6%"></i></span>
+        </div>
+      </div>
+
+      <div class="holder">
+        <div class="canvas f-45 light" data-render="li-kar-3">
+          <span class="bar"></span>
+          <p class="li-eyebrow">Karuzela · 3 z 3</p>
+          <div class="li-body low">
+            <h2 class="li-h sm">Sprawdź swój<br>pilot w 30 minut</h2>
+            <p class="li-p">Bezpłatna konsultacja: przechodzimy przez wasz proces i mówimy wprost, czy jest gotowy na agenta — czy najpierw trzeba uporządkować dane.</p>
+            <p class="li-p" style="color:var(--accent);font-weight:500;max-width:30ch">Napisz „PILOT" w komentarzu albo wejdź na cloudbots.eu</p>
+          </div>
+          <div class="li-foot">
+            <div class="mark">
+              <svg viewBox="0 0 240 275" fill="none" aria-hidden="true">
+                <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#A9F5D6" opacity=".7"/>
+                <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84DCF1" opacity=".7" transform="translate(80,45)"/>
+                <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84F1F1" opacity=".5" transform="translate(0,90)"/>
+              </svg>
+              <span class="wm">CLOUDBOTS</span>
+            </div>
+            <p class="li-cta">cloudbots.eu</p>
+          </div>
+          <span class="pager"><i style="--v:100%"></i></span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ 7 · POD LINK ═══════════════════════════════════════════════════ -->
+  <section class="slot">
+    <div class="slot-head"><h2>Grafika pod link</h2><code>.f-link</code><span class="dim">1200 × 628 · 1.91:1</span></div>
+    <p class="slot-note">Format og:image — pojawia się też przy udostępnieniu w Slacku i mailu. Niski kadr, więc jedno zdanie i data. Bez akapitów.</p>
+    <div class="holder">
+      <div class="canvas f-link brand" data-render="li-link">
+        <span class="bar"></span>
+        <div class="hex-deco" style="width:290px;height:335px;top:120px;right:70px"></div>
+        <p class="li-eyebrow">Webinar · 24 września</p>
+        <div class="li-body">
+          <h2 class="li-h">Agent na produkcji:<br>co mierzyć od pierwszego dnia</h2>
+        </div>
+        <div class="li-foot">
+          <div class="mark">
+            <svg viewBox="0 0 240 275" fill="none" aria-hidden="true">
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#A9F5D6" opacity=".7"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84DCF1" opacity=".7" transform="translate(80,45)"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84F1F1" opacity=".5" transform="translate(0,90)"/>
+            </svg>
+            <span class="wm">CLOUDBOTS</span>
+          </div>
+          <p class="li-cta">Rejestracja · cloudbots.eu/webinar</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 8 · BANER ══════════════════════════════════════════════════════ -->
+  <section class="slot">
+    <div class="slot-head"><h2>Baner profilu firmowego</h2><code>.f-banner</code><span class="dim">1584 × 396</span></div>
+    <p class="slot-note">Na desktopie logo profilu przykrywa lewy dolny róg, a na telefonie przycinane są boki. Treść trzymamy w środkowym pasie, z zapasem 120 px od dołu po lewej.</p>
+    <div class="holder">
+      <div class="canvas f-banner brand" data-render="li-baner">
+        <span class="bar"></span>
+        <div class="hex-deco" style="width:300px;height:345px;top:26px;right:300px"></div>
+        <div style="padding-left:260px">
+          <h2 class="bh">Agenci AI, które wchodzą na produkcję.</h2>
+          <p class="bp">Discovery · Wdrożenia · Szkolenia</p>
+        </div>
+        <div class="bside">
+          <svg viewBox="0 0 240 275" fill="none" aria-hidden="true">
+            <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#A9F5D6" opacity=".7"/>
+            <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84DCF1" opacity=".7" transform="translate(80,45)"/>
+            <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84F1F1" opacity=".5" transform="translate(0,90)"/>
+          </svg>
+          <p class="li-cta" style="color:rgba(255,255,255,.5)">cloudbots.eu</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+function fitPreviews(){
+  if(document.body.classList.contains('raw')) return;
+  document.querySelectorAll('.holder').forEach(h=>{
+    const c = h.firstElementChild;
+    const k = Math.min(1, h.clientWidth / c.offsetWidth);
+    c.style.transform = `scale(${k})`;
+    h.style.height = (c.offsetHeight * k) + 'px';
+  });
+}
+addEventListener('load', fitPreviews);
+addEventListener('resize', fitPreviews);
+</script>
+</body>
+</html>

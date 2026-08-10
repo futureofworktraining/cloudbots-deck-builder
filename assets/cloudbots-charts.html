@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CloudBots · biblioteka wykresów</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   CLOUDBOTS · BIBLIOTEKA WYKRESÓW
+   Ten sam kod CSS co w szablonie decku. Plik jest samodzielny: możesz go użyć
+   jako galerii do wyboru typu wykresu albo jako generatora pojedynczych PNG
+   (scripts/render.py eksportuje każdy element z data-render).
+   Markup każdego wykresu opisuje references/charts.md.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  --cb-primary:#00CED1; --cb-mint:#A9F5D6; --cb-cyan:#84DCF1; --cb-cyan-deep:#0891b2;
+  --d-bg-0:#08090f; --d-bg-1:#0e1019; --d-bg-2:#161927;
+  --d-ink-0:#f4f1e8; --d-ink-1:#c2c5d2; --d-ink-2:#7b819a; --d-ink-3:#4a4f63;
+  --l-bg-0:#F8FAFC; --l-bg-1:#f1f5f9; --l-bg-2:#ffffff;
+  --l-ink-0:#0f1729; --l-ink-1:#243043; --l-ink-2:#475569; --l-ink-3:#7b8a9d;
+
+  --ff-display:'Space Grotesk',system-ui,sans-serif;
+  --ff-body:'Inter',system-ui,sans-serif;
+  --ff-mono:'JetBrains Mono',Consolas,monospace;
+  --fs-small:14px; --ease:cubic-bezier(.16,1,.3,1);
+
+  --bg-0:var(--d-bg-0); --bg-1:var(--d-bg-1); --bg-2:var(--d-bg-2);
+  --ink-0:var(--d-ink-0); --ink-1:var(--d-ink-1); --ink-2:var(--d-ink-2); --ink-3:var(--d-ink-3);
+  --line:rgba(255,255,255,.10); --line-2:rgba(255,255,255,.05);
+  --accent:var(--cb-primary);
+  --dv-1:var(--cb-primary); --dv-2:var(--cb-cyan); --dv-3:var(--cb-mint);
+  --dv-4:#5B7FE0; --dv-5:#F2B441; --dv-rest:#5b6379;
+  --dv-pos:#10B981; --dv-neg:#E15566; --dv-track:rgba(255,255,255,.10);
+}
+body.light{
+  --bg-0:var(--l-bg-0); --bg-1:var(--l-bg-1); --bg-2:var(--l-bg-2);
+  --ink-0:var(--l-ink-0); --ink-1:var(--l-ink-1); --ink-2:var(--l-ink-2); --ink-3:var(--l-ink-3);
+  --line:rgba(15,23,41,.11); --line-2:rgba(15,23,41,.055);
+  --accent:var(--cb-cyan-deep);
+  --dv-2:#0E7490; --dv-rest:#94A3B8; --dv-track:rgba(15,23,41,.10);
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+body{margin:0;background:var(--bg-0);color:var(--ink-1);font-family:var(--ff-body);font-size:15px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;transition:background .3s,color .3s;}
+h1{font-family:var(--ff-display);font-size:34px;font-weight:500;letter-spacing:-.025em;color:var(--ink-0);margin:0 0 6px;}
+h2{font-family:var(--ff-display);font-size:19px;font-weight:500;color:var(--ink-0);margin:0;letter-spacing:-.01em;}
+p{margin:0;}
+
+.page{max-width:1360px;margin:0 auto;padding:46px 34px 90px;}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;
+  padding-bottom:26px;border-bottom:1px solid var(--line);margin-bottom:34px;}
+.head p{color:var(--ink-2);max-width:66ch;}
+.themebtn{font-family:var(--ff-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  padding:9px 15px;background:none;border:1px solid var(--line);color:var(--ink-2);cursor:pointer;}
+.themebtn:hover{border-color:var(--accent);color:var(--accent);}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:26px;}
+.demo{background:var(--bg-1);border:1px solid var(--line);padding:24px 26px 26px;display:flex;flex-direction:column;gap:16px;}
+.demo--wide{grid-column:1/-1;}
+.demo-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;border-bottom:1px solid var(--line-2);padding-bottom:12px;}
+.demo-cls{font-family:var(--ff-mono);font-size:12px;letter-spacing:.1em;color:var(--accent);}
+.demo-why{font-size:13px;color:var(--ink-3);line-height:1.55;}
+
+/* ══ WYKRESY — identyczne z szablonem decku ══════════════════════════════ */
+.viz{container-type:inline-size;width:100%;max-width:100%;min-width:0;}
+.viz-cap{margin-top:10px;font-family:var(--ff-mono);font-size:12px;letter-spacing:.06em;color:var(--ink-3);line-height:1.55;}
+
+.legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-family:var(--ff-mono);font-size:13px;color:var(--ink-2);}
+.legend--col{flex-direction:column;gap:9px;}
+.legend i{display:inline-flex;align-items:center;gap:8px;font-style:normal;}
+.legend i::before{content:'';width:11px;height:12px;background:var(--c,var(--dv-1));flex:0 0 auto;
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
+.legend b{color:var(--ink-0);font-weight:500;margin-left:auto;padding-left:14px;font-variant-numeric:tabular-nums;}
+
+.c-bars{--h:clamp(140px,32cqw,250px);display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);
+  gap:clamp(7px,1.5cqw,20px);align-items:end;}
+.c-bars .b{display:grid;grid-template-rows:auto var(--h) auto;justify-items:center;gap:7px;min-width:0;}
+.c-bars .bv{font-family:var(--ff-mono);font-size:clamp(11px,2cqw,16px);font-weight:600;color:var(--ink-0);align-self:end;}
+.c-bars .bar{align-self:end;width:100%;max-width:clamp(40px,11cqw,120px);height:var(--v,50%);
+  background:var(--c,var(--dv-1));transition:height .8s var(--ease);}
+.c-bars .bx{font-family:var(--ff-mono);font-size:clamp(9.5px,1.6cqw,13px);letter-spacing:.08em;color:var(--ink-3);
+  text-align:center;line-height:1.35;border-top:1px solid var(--line);padding-top:7px;width:100%;}
+.c-bars .b.is-rest .bar{background:var(--dv-rest);}
+.c-bars .b.is-hi .bar{background:linear-gradient(180deg,var(--cb-primary),var(--cb-cyan-deep));}
+
+.c-rank{display:flex;flex-direction:column;gap:clamp(6px,1.1cqw,13px);}
+.c-rank .r{display:grid;grid-template-columns:auto minmax(0,var(--lbl,26%)) minmax(0,1fr) auto;gap:clamp(8px,1.4cqw,16px);align-items:center;}
+.c-rank .rn{font-family:var(--ff-mono);font-size:clamp(10px,1.5cqw,13px);color:var(--ink-3);letter-spacing:.06em;}
+.c-rank .rl{font-size:clamp(11px,1.6cqw,15px);color:var(--ink-1);line-height:1.3;overflow-wrap:anywhere;text-align:right;}
+.c-rank .rt{height:clamp(16px,2.6cqw,28px);background:var(--dv-track);position:relative;}
+.c-rank .rf{position:absolute;inset:0 auto 0 0;width:var(--v,50%);background:var(--c,var(--dv-1));transition:width .8s var(--ease);}
+.c-rank .rv{font-family:var(--ff-mono);font-size:clamp(11px,1.8cqw,16px);font-weight:600;color:var(--ink-0);
+  font-variant-numeric:tabular-nums;min-width:3.2em;text-align:right;}
+.c-rank .r.is-rest .rf{background:var(--dv-rest);}
+.c-rank .r.is-neg .rf{background:var(--dv-neg);}
+
+.c-meter{display:flex;flex-direction:column;gap:clamp(10px,1.6cqw,18px);}
+.c-meter .m{display:flex;flex-direction:column;gap:6px;}
+.c-meter .mh{display:flex;justify-content:space-between;align-items:baseline;gap:14px;font-size:clamp(11px,1.6cqw,15px);color:var(--ink-1);}
+.c-meter .mh b{font-family:var(--ff-mono);font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums;}
+.c-meter .mt{height:5px;background:var(--dv-track);position:relative;}
+.c-meter .mf{position:absolute;inset:0 auto 0 0;width:var(--v,50%);background:var(--c,var(--dv-1));transition:width .8s var(--ease);}
+
+.c-pie{--p:clamp(130px,52cqw,230px);width:var(--p);height:var(--p);border-radius:50%;}
+.c-donut{position:relative;--p:clamp(130px,52cqw,230px);width:var(--p);height:var(--p);}
+.c-donut::before{content:'';position:absolute;inset:0;border-radius:50%;background:var(--ring);}
+.c-donut::after{content:'';position:absolute;inset:22%;border-radius:50%;background:var(--bg-1);}
+.c-donut .dc{position:absolute;inset:0;display:grid;place-content:center;text-align:center;z-index:1;gap:2px;}
+.c-donut .dv{font-family:var(--ff-display);font-size:clamp(24px,9cqw,44px);font-weight:600;letter-spacing:-.03em;color:var(--ink-0);line-height:1;}
+.c-donut .dl{font-family:var(--ff-mono);font-size:clamp(9px,2.2cqw,12px);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);}
+
+.c-gauge{width:100%;height:auto;display:block;}
+.c-gauge .gt{stroke:var(--dv-track);}
+.c-gauge .gf{stroke:var(--dv-1);transition:stroke-dashoffset 1s var(--ease);}
+.c-gauge .gv{fill:var(--ink-0);font-family:var(--ff-display);font-size:34px;font-weight:600;text-anchor:middle;letter-spacing:-.03em;}
+.c-gauge .gl{fill:var(--ink-3);font-family:var(--ff-mono);font-size:10px;letter-spacing:.16em;text-anchor:middle;}
+
+.c-delta{display:grid;grid-template-columns:1fr auto 1fr;gap:clamp(12px,2.4cqw,30px);align-items:end;}
+.c-delta .d{display:grid;grid-template-rows:auto clamp(90px,22cqw,170px) auto;justify-items:center;gap:8px;}
+.c-delta .dv{font-family:var(--ff-mono);font-size:clamp(13px,2.6cqw,22px);font-weight:600;color:var(--ink-0);align-self:end;}
+.c-delta .db{align-self:end;width:100%;max-width:130px;height:var(--v,50%);background:var(--c,var(--dv-rest));}
+.c-delta .d.is-after .db{background:linear-gradient(180deg,var(--cb-primary),var(--cb-cyan-deep));}
+.c-delta .dl{font-family:var(--ff-mono);font-size:clamp(9.5px,1.7cqw,13px);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);}
+.c-delta .darrow{align-self:center;display:flex;flex-direction:column;align-items:center;gap:4px;padding-bottom:clamp(24px,6cqw,50px);}
+.c-delta .darrow span{font-family:var(--ff-mono);font-size:clamp(12px,2.2cqw,19px);font-weight:600;color:var(--accent);white-space:nowrap;}
+.c-delta .darrow svg{width:clamp(20px,4cqw,34px);height:auto;color:var(--accent);}
+
+.c-heat{display:grid;gap:3px;}
+.c-heat .hc{aspect-ratio:1.6;display:grid;place-items:center;font-family:var(--ff-mono);font-size:clamp(9px,1.5cqw,13px);font-variant-numeric:tabular-nums;}
+.c-heat .hh{background:none!important;color:var(--ink-3);letter-spacing:.09em;text-transform:uppercase;font-size:clamp(8.5px,1.3cqw,11.5px);}
+/* Rampa podana wprost dla obu motywów, nie przez przezroczystość. Ten sam
+   kolor z alfą daje nad czernią i nad bielą dwa różne kolory tła, a liczba na
+   kafelku musi być czytelna w obu — przy alfie zawsze któryś stopień wypada.
+   Tła siedzą w zmiennych --hm-0…5, żeby legenda pod mapą brała je stąd,
+   a nie powtarzała wartości u siebie i nie rozjeżdżała się przy korekcie. */
+:root{--hm-0:#0f151b;--hm-1:#123037;--hm-2:#14525a;--hm-3:#0e7f86;--hm-4:#04b0b3;--hm-5:#00CED1;}
+body.light{--hm-0:#eef4f6;--hm-1:#d5edf0;--hm-2:#a9e0e5;--hm-3:#5fc9cf;--hm-4:#12b3b8;--hm-5:#00949a;}
+.hm-0{background:var(--hm-0);color:#7a8496;}
+.hm-1{background:var(--hm-1);color:#a7bcc0;}
+.hm-2{background:var(--hm-2);color:#e3f6f8;}
+.hm-3{background:var(--hm-3);color:#eafcfd;}
+.hm-4{background:var(--hm-4);color:#04141a;}
+.hm-5{background:var(--hm-5);color:#04141a;font-weight:600;}
+body.light .hm-0{color:#77879a;}
+body.light .hm-1{color:#2f4d55;}
+body.light .hm-2{color:#123c43;}
+body.light .hm-3{color:#06272c;}
+body.light .hm-4{color:#04141a;}
+body.light .hm-5{color:#ffffff;}
+
+.c-units{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--u,14px),var(--u,14px)));gap:clamp(3px,.7cqw,6px);align-content:start;}
+.c-units i{display:block;width:var(--u,14px);height:calc(var(--u,14px)*1.12);background:var(--dv-track);
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
+.c-units i.on{background:var(--c,var(--dv-1));}
+
+.c-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(clamp(120px,26cqw,190px),1fr));gap:clamp(10px,1.6cqw,20px);}
+.c-kpi .k{display:flex;flex-direction:column;gap:4px;padding:clamp(12px,1.8cqw,20px);border:1px solid var(--line);border-left:3px solid var(--accent);}
+.c-kpi .kv{font-family:var(--ff-display);font-size:clamp(24px,5.4cqw,44px);font-weight:600;line-height:1;letter-spacing:-.035em;color:var(--ink-0);}
+.c-kpi .kl{font-size:clamp(11px,1.6cqw,14px);color:var(--ink-2);line-height:1.4;}
+.c-kpi .kd{font-family:var(--ff-mono);font-size:clamp(10px,1.4cqw,12.5px);letter-spacing:.08em;color:var(--ink-3);}
+.c-kpi .kd.up{color:var(--dv-pos);} .c-kpi .kd.down{color:var(--dv-neg);}
+
+.c-line{width:100%;height:auto;display:block;overflow:visible;}
+.c-line .ax{stroke:var(--line);stroke-width:1;}
+.c-line .gl{stroke:var(--line-2);stroke-width:1;}
+.c-line .ln{fill:none;stroke:var(--dv-1);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round;}
+.c-line .ln2{fill:none;stroke:var(--dv-rest);stroke-width:2;stroke-dasharray:5 4;}
+.c-line .pt{fill:var(--dv-1);}
+.c-line .lb{fill:var(--ink-3);font-family:var(--ff-mono);font-size:11px;letter-spacing:.06em;}
+
+.c-stack{display:flex;height:clamp(26px,4.4cqw,44px);width:100%;overflow:hidden;}
+.c-stack i{height:100%;width:var(--v,25%);background:var(--c,var(--dv-1));display:grid;place-items:center;
+  font-family:var(--ff-mono);font-size:clamp(9px,1.5cqw,12.5px);font-weight:600;color:#04141a;font-style:normal;}
+
+/* tabela z mikrosłupkiem */
+.tbl{width:100%;border-collapse:collapse;font-size:14px;}
+.tbl th{padding:0 14px 10px 0;text-align:left;font-family:var(--ff-mono);font-size:11px;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);border-bottom:1px solid var(--line);}
+.tbl td{padding:10px 14px 10px 0;border-bottom:1px solid var(--line-2);color:var(--ink-2);vertical-align:middle;}
+.tbl .t-name{color:var(--ink-0);font-weight:500;white-space:nowrap;}
+.tbl .t-price{font-family:var(--ff-mono);color:var(--accent);text-align:right;padding-right:0;white-space:nowrap;}
+.micro{display:block;height:6px;background:var(--dv-track);position:relative;min-width:90px;}
+.micro i{position:absolute;inset:0 auto 0 0;width:var(--v,50%);background:var(--dv-1);}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="head">
+    <div>
+      <h1>Biblioteka wykresów</h1>
+      <p>Trzynaście typów, jeden system kolorów. Każdy wykres siedzi w <code>.viz</code> — kontenerze zapytań — więc ten sam markup działa w wąskiej kolumnie splitu i na całą szerokość slajdu. Markup: <code>references/charts.md</code>.</p>
+    </div>
+    <button class="themebtn" id="themebtn">Motyw jasny</button>
+  </div>
+
+  <div class="grid">
+
+    <!-- 01 -->
+    <figure class="demo" data-render="chart-bars">
+      <div class="demo-head"><h2>Słupki pionowe</h2><span class="demo-cls">.c-bars</span></div>
+      <div class="viz">
+        <div class="c-bars">
+          <div class="b"><span class="bv">3</span><i class="bar" style="--v:19%"></i><span class="bx">2023</span></div>
+          <div class="b"><span class="bv">7</span><i class="bar" style="--v:44%"></i><span class="bx">2024</span></div>
+          <div class="b"><span class="bv">11</span><i class="bar" style="--v:69%"></i><span class="bx">2025</span></div>
+          <div class="b is-hi"><span class="bv">16</span><i class="bar" style="--v:100%"></i><span class="bx">2026*</span></div>
+        </div>
+        <p class="viz-cap">Projekty rocznie. *prognoza z podpisanych umów.</p>
+      </div>
+      <p class="demo-why">Szereg czasowy do sześciu punktów. Powyżej sześciu przejdź na linię.</p>
+    </figure>
+
+    <!-- 02 -->
+    <figure class="demo" data-render="chart-rank">
+      <div class="demo-head"><h2>Ranking poziomy</h2><span class="demo-cls">.c-rank</span></div>
+      <div class="viz">
+        <div class="c-rank">
+          <div class="r"><span class="rn">01</span><span class="rl">Brak zbioru ewaluacyjnego</span><span class="rt"><i class="rf" style="--v:88%"></i></span><span class="rv">88%</span></div>
+          <div class="r"><span class="rn">02</span><span class="rl">Niezdefiniowana granica narzędzi</span><span class="rt"><i class="rf" style="--v:71%"></i></span><span class="rv">71%</span></div>
+          <div class="r"><span class="rn">03</span><span class="rl">Brak ścieżki wdrożenia</span><span class="rt"><i class="rf" style="--v:64%"></i></span><span class="rv">64%</span></div>
+          <div class="r is-rest"><span class="rn">04</span><span class="rl">Pozostałe</span><span class="rt"><i class="rf" style="--v:23%"></i></span><span class="rv">23%</span></div>
+        </div>
+        <p class="viz-cap">Blokery wskazane w 24 warsztatach. Odpowiedzi wielokrotne.</p>
+      </div>
+      <p class="demo-why">Kategorie z długimi nazwami. Zawsze sortuj malejąco, „pozostałe” na końcu.</p>
+    </figure>
+
+    <!-- 03 -->
+    <figure class="demo" data-render="chart-meter">
+      <div class="demo-head"><h2>Mierniki udziału</h2><span class="demo-cls">.c-meter</span></div>
+      <div class="viz">
+        <div class="c-meter">
+          <div class="m"><span class="mh"><span>Usługi finansowe</span><b>42%</b></span><span class="mt"><i class="mf" style="--v:42%"></i></span></div>
+          <div class="m"><span class="mh"><span>Retail i e-commerce</span><b>26%</b></span><span class="mt"><i class="mf" style="--v:26%;--c:var(--dv-2)"></i></span></div>
+          <div class="m"><span class="mh"><span>Logistyka</span><b>19%</b></span><span class="mt"><i class="mf" style="--v:19%;--c:var(--dv-3)"></i></span></div>
+          <div class="m"><span class="mh"><span>Pozostałe</span><b>13%</b></span><span class="mt"><i class="mf" style="--v:13%;--c:var(--dv-rest)"></i></span></div>
+        </div>
+        <p class="viz-cap">Udział sektorów w przychodzie, 2025.</p>
+      </div>
+      <p class="demo-why">Lżejszy od rankingu — nadaje się na drugi wykres na slajdzie.</p>
+    </figure>
+
+    <!-- 04 -->
+    <figure class="demo" data-render="chart-donut">
+      <div class="demo-head"><h2>Pierścień</h2><span class="demo-cls">.c-donut</span></div>
+      <div style="display:flex;gap:34px;align-items:center;flex-wrap:wrap">
+        <div class="viz" style="flex:0 0 auto;width:210px">
+          <div class="c-donut" style="--ring:conic-gradient(var(--dv-1) 0 62%, var(--dv-2) 62% 84%, var(--dv-rest) 84% 100%)">
+            <span class="dc"><span class="dv">62%</span><span class="dl">wdrożone</span></span>
+          </div>
+        </div>
+        <div class="viz" style="flex:1 1 180px">
+          <div class="legend legend--col">
+            <i style="--c:var(--dv-1)">Wdrożone <b>62%</b></i>
+            <i style="--c:var(--dv-2)">W budowie <b>22%</b></i>
+            <i style="--c:var(--dv-rest)">Zatrzymane <b>16%</b></i>
+          </div>
+        </div>
+      </div>
+      <p class="demo-why">Jedna liczba w środku niesie przekaz, reszta to kontekst. Maksymalnie cztery udziały.</p>
+    </figure>
+
+    <!-- 05 -->
+    <figure class="demo" data-render="chart-gauge">
+      <div class="demo-head"><h2>Wskaźnik półkolisty</h2><span class="demo-cls">.c-gauge</span></div>
+      <div class="viz" style="max-width:300px;margin:0 auto">
+        <!-- łuk: r=80, długość półokręgu = π·80 ≈ 251,3; offset = 251,3 · (1 − wartość) -->
+        <svg class="c-gauge" viewBox="0 0 200 128" role="img" aria-label="94 procent">
+          <path class="gt" d="M20 108 A80 80 0 0 1 180 108" fill="none" stroke-width="14" stroke-linecap="round"/>
+          <path class="gf" d="M20 108 A80 80 0 0 1 180 108" fill="none" stroke-width="14" stroke-linecap="round"
+                stroke-dasharray="251.3" stroke-dashoffset="15.1"/>
+          <text class="gv" x="100" y="98">94%</text>
+          <text class="gl" x="100" y="120">SKUTECZNOŚĆ AGENTA</text>
+        </svg>
+      </div>
+      <p class="demo-why">Jedna wartość względem pełnej skali. Do SLA, pokrycia, skuteczności.</p>
+    </figure>
+
+    <!-- 06 -->
+    <figure class="demo" data-render="chart-delta">
+      <div class="demo-head"><h2>Przed → po</h2><span class="demo-cls">.c-delta</span></div>
+      <div class="viz">
+        <div class="c-delta">
+          <div class="d"><span class="dv">500 h</span><i class="db" style="--v:100%"></i><span class="dl">przed</span></div>
+          <div class="darrow"><span>−84%</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          <div class="d is-after"><span class="dv">80 h</span><i class="db" style="--v:16%"></i><span class="dl">po</span></div>
+        </div>
+        <p class="viz-cap">Czas wytwarzania modułu RPA, przed i po agentic coding.</p>
+      </div>
+      <p class="demo-why">Najmocniejszy wykres na slajdzie z efektem. Dwie wartości, jedna różnica.</p>
+    </figure>
+
+    <!-- 07 -->
+    <figure class="demo demo--wide" data-render="chart-line">
+      <div class="demo-head"><h2>Linia z obszarem</h2><span class="demo-cls">.c-line</span></div>
+      <div class="viz">
+        <!-- Układ współrzędnych: x 60→940, y 20→220. Wartość v w skali 0–100 → y = 220 − v·2 -->
+        <svg class="c-line" viewBox="0 0 960 260" role="img" aria-label="Wykres liniowy">
+          <defs>
+            <linearGradient id="cbArea" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#00CED1" stop-opacity=".28"/>
+              <stop offset="100%" stop-color="#00CED1" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <line class="gl" x1="60" y1="20"  x2="940" y2="20"/>
+          <line class="gl" x1="60" y1="70"  x2="940" y2="70"/>
+          <line class="gl" x1="60" y1="120" x2="940" y2="120"/>
+          <line class="gl" x1="60" y1="170" x2="940" y2="170"/>
+          <line class="ax" x1="60" y1="220" x2="940" y2="220"/>
+          <path fill="url(#cbArea)" d="M60,190 L236,166 L412,120 L588,96 L764,54 L940,32 L940,220 L60,220 Z"/>
+          <polyline class="ln2" points="60,196 236,186 412,176 588,166 764,156 940,146"/>
+          <polyline class="ln"  points="60,190 236,166 412,120 588,96 764,54 940,32"/>
+          <circle class="pt" cx="60"  cy="190" r="4"/><circle class="pt" cx="236" cy="166" r="4"/>
+          <circle class="pt" cx="412" cy="120" r="4"/><circle class="pt" cx="588" cy="96"  r="4"/>
+          <circle class="pt" cx="764" cy="54"  r="4"/><circle class="pt" cx="940" cy="32"  r="5"/>
+          <text class="lb" x="60"  y="242">STY</text><text class="lb" x="236" y="242">MAR</text>
+          <text class="lb" x="412" y="242">MAJ</text><text class="lb" x="588" y="242">LIP</text>
+          <text class="lb" x="764" y="242">WRZ</text><text class="lb" x="905" y="242">LIS</text>
+        </svg>
+        <div class="legend" style="margin-top:12px">
+          <i style="--c:var(--dv-1)">Przebiegi agenta</i>
+          <i style="--c:var(--dv-rest)">Baseline ręczny</i>
+        </div>
+      </div>
+      <p class="demo-why">Powyżej sześciu punktów w czasie. Linia przerywana to zawsze punkt odniesienia, nie druga seria równorzędna.</p>
+    </figure>
+
+    <!-- 08 -->
+    <figure class="demo" data-render="chart-stack">
+      <div class="demo-head"><h2>Pasek 100%</h2><span class="demo-cls">.c-stack</span></div>
+      <div class="viz">
+        <div class="c-stack">
+          <i style="--v:46%;--c:var(--dv-1)">46%</i>
+          <i style="--v:27%;--c:var(--dv-2)">27%</i>
+          <i style="--v:15%;--c:var(--dv-3)">15%</i>
+          <i style="--v:12%;--c:var(--dv-rest)"></i>
+        </div>
+        <div class="legend" style="margin-top:12px">
+          <i style="--c:var(--dv-1)">Discovery</i><i style="--c:var(--dv-2)">Budowa</i>
+          <i style="--c:var(--dv-3)">Szkolenia</i><i style="--c:var(--dv-rest)">Doradztwo</i>
+        </div>
+        <p class="viz-cap">Struktura przychodu, 2025.</p>
+      </div>
+      <p class="demo-why">Zamiast kołowego, gdy udziały mają się sumować do całości i zostawić miejsce na slajdzie.</p>
+    </figure>
+
+    <!-- 09 -->
+    <figure class="demo demo--wide" data-render="chart-heat">
+      <div class="demo-head"><h2>Mapa ciepła</h2><span class="demo-cls">.c-heat</span></div>
+      <div class="viz">
+        <div class="c-heat" style="grid-template-columns:150px repeat(6,minmax(0,1fr))">
+          <span class="hc hh"></span>
+          <span class="hc hh">Prompt Chain</span><span class="hc hh">RAG</span><span class="hc hh">Asystent</span>
+          <span class="hc hh">AI + RPA</span><span class="hc hh">Agent</span><span class="hc hh">Multi-agent</span>
+
+          <span class="hc hh" style="justify-items:start;text-align:left">Finanse</span>
+          <span class="hc hm-5">5</span><span class="hc hm-4">4</span><span class="hc hm-4">4</span>
+          <span class="hc hm-3">3</span><span class="hc hm-2">2</span><span class="hc hm-0">0</span>
+
+          <span class="hc hh" style="justify-items:start;text-align:left">Retail</span>
+          <span class="hc hm-4">4</span><span class="hc hm-5">5</span><span class="hc hm-3">3</span>
+          <span class="hc hm-4">4</span><span class="hc hm-2">2</span><span class="hc hm-1">1</span>
+
+          <span class="hc hh" style="justify-items:start;text-align:left">Logistyka</span>
+          <span class="hc hm-3">3</span><span class="hc hm-2">2</span><span class="hc hm-2">2</span>
+          <span class="hc hm-5">5</span><span class="hc hm-3">3</span><span class="hc hm-1">1</span>
+
+          <span class="hc hh" style="justify-items:start;text-align:left">Produkcja</span>
+          <span class="hc hm-2">2</span><span class="hc hm-1">1</span><span class="hc hm-1">1</span>
+          <span class="hc hm-4">4</span><span class="hc hm-2">2</span><span class="hc hm-0">0</span>
+        </div>
+        <div class="legend" style="margin-top:14px">
+          <i style="--c:var(--hm-1)">rzadko</i>
+          <i style="--c:var(--hm-3)">czasem</i>
+          <i style="--c:var(--hm-5)">standard</i>
+        </div>
+        <p class="viz-cap">Dojrzałość wzorca architektonicznego w sektorze, skala 0–5.</p>
+      </div>
+      <p class="demo-why">Dwie osie kategorii i jedna wartość. Klasa <code>.hm-0</code>…<code>.hm-5</code> zamiast koloru inline — inaczej tekst zniknie na drugim motywie.</p>
+    </figure>
+
+    <!-- 10 -->
+    <figure class="demo" data-render="chart-units">
+      <div class="demo-head"><h2>Piktogram</h2><span class="demo-cls">.c-units</span></div>
+      <div class="viz">
+        <div class="c-units" style="--u:17px">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <p class="viz-cap">18 z 25 procesów przeszło ocenę wykonalności.</p>
+      </div>
+      <p class="demo-why">Proporcja policzalnych rzeczy. Siatka zawija się sama — nie wypycha kontenera.</p>
+    </figure>
+
+    <!-- 11 -->
+    <figure class="demo" data-render="chart-kpi">
+      <div class="demo-head"><h2>Kafle KPI</h2><span class="demo-cls">.c-kpi</span></div>
+      <div class="viz">
+        <div class="c-kpi">
+          <div class="k"><span class="kv">9</span><span class="kl">agentów na produkcji</span><span class="kd up">+4 r/r</span></div>
+          <div class="k"><span class="kv">94%</span><span class="kl">zgodność z decyzją człowieka</span><span class="kd up">+7 pp</span></div>
+          <div class="k"><span class="kv">2,1 s</span><span class="kl">mediana czasu odpowiedzi</span><span class="kd down">−0,4 s</span></div>
+        </div>
+      </div>
+      <p class="demo-why">Trzy do pięciu liczb bez porównania między sobą. Zmiana zawsze ze znakiem i okresem.</p>
+    </figure>
+
+    <!-- 12 -->
+    <figure class="demo" data-render="chart-pie">
+      <div class="demo-head"><h2>Kołowy</h2><span class="demo-cls">.c-pie</span></div>
+      <div style="display:flex;gap:34px;align-items:center;flex-wrap:wrap">
+        <div class="viz" style="flex:0 0 auto;width:190px">
+          <div class="c-pie" style="background:conic-gradient(var(--dv-1) 0 46%,var(--dv-2) 46% 73%,var(--dv-3) 73% 88%,var(--dv-rest) 88% 100%)"></div>
+        </div>
+        <div class="viz" style="flex:1 1 170px">
+          <div class="legend legend--col">
+            <i style="--c:var(--dv-1)">Discovery <b>46%</b></i>
+            <i style="--c:var(--dv-2)">Budowa <b>27%</b></i>
+            <i style="--c:var(--dv-3)">Szkolenia <b>15%</b></i>
+            <i style="--c:var(--dv-rest)">Doradztwo <b>12%</b></i>
+          </div>
+        </div>
+      </div>
+      <p class="demo-why">Wartości zawsze w legendzie, nigdy na wycinkach — na wycinku nie zmieszczą się czytelnie.</p>
+    </figure>
+
+    <!-- 13 -->
+    <figure class="demo" data-render="chart-table">
+      <div class="demo-head"><h2>Tabela z mikrosłupkiem</h2><span class="demo-cls">.tbl + .micro</span></div>
+      <table class="tbl">
+        <thead><tr><th>Proces</th><th>Pokrycie</th><th class="t-price">Oszczędność</th></tr></thead>
+        <tbody>
+          <tr><td class="t-name">Rejestracja faktur</td><td><span class="micro"><i style="--v:92%"></i></span></td><td class="t-price">340 h/mies.</td></tr>
+          <tr><td class="t-name">Obsługa reklamacji</td><td><span class="micro"><i style="--v:64%"></i></span></td><td class="t-price">180 h/mies.</td></tr>
+          <tr><td class="t-name">Onboarding dostawcy</td><td><span class="micro"><i style="--v:38%"></i></span></td><td class="t-price">75 h/mies.</td></tr>
+        </tbody>
+      </table>
+      <p class="demo-why">Gdy potrzebujesz i liczby, i porównania. Mikrosłupek zastępuje osobny wykres.</p>
+    </figure>
+
+  </div>
+</div>
+
+<script>
+document.getElementById('themebtn').addEventListener('click', e=>{
+  document.body.classList.toggle('light');
+  e.target.textContent = document.body.classList.contains('light') ? 'Motyw ciemny' : 'Motyw jasny';
+});
+</script>
+</body>
+</html>

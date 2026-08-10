@@ -1,0 +1,16 @@
+# katalogi robocze skryptów — zrzuty kontrolne i eksporty
+_shots/
+_render/
+_export/
+_exp/
+_png/
+_r/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# systemowe
+Thumbs.db
+.DS_Store

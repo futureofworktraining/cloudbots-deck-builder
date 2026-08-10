@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CloudBots · [TYTUŁ PREZENTACJI]</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Exo+2:wght@600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   CLOUDBOTS DECK — szablon prezentacji
+   System wizualny: Kingfisher / cloudbots.eu
+   Silnik: scroll-snap + IntersectionObserver, menu wysuwane z lewej krawędzi
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. TOKENY ────────────────────────────────────────────────────────────── */
+:root{
+  /* marka */
+  --cb-primary:#00CED1; --cb-primary-700:#00b8b8;
+  --cb-mint:#A9F5D6;    --cb-cyan:#84DCF1;  --cb-turq:#84F1F1;
+  --cb-cyan-deep:#0891b2; --cb-softblue:#E0F2FE;
+
+  /* motyw ciemny */
+  --d-bg-0:#08090f; --d-bg-1:#0e1019; --d-bg-2:#161927;
+  --d-ink-0:#f4f1e8; --d-ink-1:#c2c5d2; --d-ink-2:#7b819a; --d-ink-3:#4a4f63;
+  --d-line:rgba(255,255,255,.10); --d-line-2:rgba(255,255,255,.05);
+
+  /* motyw jasny */
+  --l-bg-0:#F8FAFC; --l-bg-1:#f1f5f9; --l-bg-2:#ffffff;
+  --l-ink-0:#0f1729; --l-ink-1:#243043; --l-ink-2:#475569; --l-ink-3:#7b8a9d;
+  --l-line:rgba(15,23,41,.11); --l-line-2:rgba(15,23,41,.055);
+
+  /* aliasy przełączane przez .slide--dark / .slide--light */
+  --bg-0:var(--d-bg-0); --bg-1:var(--d-bg-1); --bg-2:var(--d-bg-2);
+  --ink-0:var(--d-ink-0); --ink-1:var(--d-ink-1); --ink-2:var(--d-ink-2); --ink-3:var(--d-ink-3);
+  --line:var(--d-line); --line-2:var(--d-line-2);
+  --accent:var(--cb-primary); --accent-soft:var(--cb-cyan);
+
+  /* typografia */
+  --ff-display:'Space Grotesk',system-ui,-apple-system,sans-serif;
+  --ff-body:'Inter',system-ui,-apple-system,sans-serif;
+  --ff-mono:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+  --ff-logo:'Exo 2',var(--ff-display);
+
+  --fs-display-xl:clamp(42px,4.1vw,74px);
+  --fs-display-l:clamp(30px,2.85vw,50px);
+  --fs-display-m:clamp(24px,2.1vw,36px);
+  --fs-display-s:clamp(19px,1.5vw,26px);
+  --fs-lead:clamp(15px,1.15vw,20px);
+  --fs-body:clamp(13.5px,.98vw,17px);
+  --fs-small:clamp(12px,.85vw,14.5px);
+  --fs-mono:clamp(12px,.9vw,15.5px);
+
+  /* rytm */
+  --pad-y:clamp(22px,3vh,40px); --pad-x:clamp(34px,4.2vw,76px);
+  --gap:clamp(16px,1.6vw,28px);
+  --ease:cubic-bezier(.16,1,.3,1);
+
+  /* skala danych — kolory serii wykresów */
+  --dv-1:var(--cb-primary); --dv-2:#0E7490; --dv-3:var(--cb-mint);
+  --dv-4:#5B7FE0; --dv-5:#F2B441; --dv-rest:#94A3B8;
+  --dv-pos:#10B981; --dv-neg:#E15566;
+  --dv-track:rgba(148,163,184,.20);
+}
+.slide--dark{
+  --bg-0:var(--d-bg-0); --bg-1:var(--d-bg-1); --bg-2:var(--d-bg-2);
+  --ink-0:var(--d-ink-0); --ink-1:var(--d-ink-1); --ink-2:var(--d-ink-2); --ink-3:var(--d-ink-3);
+  --line:var(--d-line); --line-2:var(--d-line-2);
+  --accent:var(--cb-primary); --accent-soft:var(--cb-cyan);
+  --dv-2:var(--cb-cyan); --dv-rest:#5b6379; --dv-track:rgba(255,255,255,.10);
+}
+.slide--light{
+  --bg-0:var(--l-bg-0); --bg-1:var(--l-bg-1); --bg-2:var(--l-bg-2);
+  --ink-0:var(--l-ink-0); --ink-1:var(--l-ink-1); --ink-2:var(--l-ink-2); --ink-3:var(--l-ink-3);
+  --line:var(--l-line); --line-2:var(--l-line-2);
+  --accent:var(--cb-cyan-deep); --accent-soft:var(--cb-primary);
+  --dv-2:#0E7490; --dv-rest:#94A3B8; --dv-track:rgba(15,23,41,.10);
+}
+
+/* ── 2. BAZA ──────────────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;}
+body{
+  font-family:var(--ff-body);font-size:var(--fs-body);line-height:1.62;
+  background:var(--d-bg-0);color:var(--d-ink-0);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  overflow:hidden;
+}
+h1,h2,h3,h4,p{margin:0;}
+em{font-style:normal;color:var(--accent);}
+strong{font-weight:600;color:var(--ink-0);}
+a{color:inherit;}
+::selection{background:var(--cb-primary);color:#04141a;}
+
+/* ziarno — jedyna warstwa, która nie zmienia się między slajdami */
+.grain{
+  position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.04;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+body.is-light .grain{opacity:.025;mix-blend-mode:multiply;}
+
+/* ── 3. DECK I SLAJD ──────────────────────────────────────────────────────── */
+.deck{
+  width:100vw;height:100vh;overflow-y:scroll;overflow-x:hidden;
+  scroll-snap-type:y mandatory;scroll-behavior:smooth;
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+.deck::-webkit-scrollbar{display:none;}
+
+.slide{
+  position:relative;width:100vw;height:100vh;min-height:660px;
+  scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;
+  display:flex;flex-direction:column;
+  padding:var(--pad-y) var(--pad-x);
+  background:var(--bg-0);color:var(--ink-1);
+}
+.slide--dark{
+  background:
+    radial-gradient(ellipse 120% 90% at 50% -10%, var(--d-bg-2) 0%, transparent 62%),
+    radial-gradient(ellipse 80% 60% at 90% 110%, rgba(0,206,209,.10) 0%, transparent 60%),
+    var(--d-bg-0);
+}
+.slide--light{
+  background:
+    radial-gradient(ellipse 90% 70% at 100% 0%, var(--cb-softblue) 0%, transparent 58%),
+    radial-gradient(ellipse 70% 60% at 0% 100%, rgba(0,206,209,.09) 0%, transparent 58%),
+    var(--l-bg-0);
+}
+
+/* scena — tu mieszka treść, tu działa autoskalowanie */
+.stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;}
+.stage>*{
+  width:100%;
+  transform:scale(var(--fit,1));transform-origin:center center;
+  transition:transform .22s var(--ease);
+}
+
+/* chrome — górna i dolna belka slajdu */
+.chrome-top,.chrome-bottom{
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  flex:0 0 auto;font-family:var(--ff-mono);font-size:var(--fs-small);
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
+}
+/* prawa rezerwa: kreska postępu kończy się przed sterowaniem, stopka przed strzałkami */
+.chrome-top{padding-bottom:clamp(14px,1.8vh,26px);padding-right:clamp(150px,26vw,430px);}
+.chrome-bottom{padding-top:clamp(14px,1.8vh,26px);padding-right:clamp(80px,7vw,112px);}
+.chrome-tag{display:inline-flex;align-items:center;gap:9px;}
+.chrome-tag-dot{
+  width:9px;height:10px;background:var(--accent);
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+}
+.chrome-progress{flex:1;height:1px;background:var(--line);position:relative;max-width:40%;}
+.chrome-progress::after{
+  content:'';position:absolute;inset:0 auto 0 0;width:var(--p,0%);
+  background:var(--accent);transition:width .5s var(--ease);
+}
+
+/* ── 4. HEKSAGONY — sygnatura marki ───────────────────────────────────────── */
+.hex{clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
+.hex-deco{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0;}
+.hex-deco>span{
+  position:absolute;display:block;
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  background:linear-gradient(140deg,var(--cb-mint),var(--cb-cyan));
+  opacity:.10;animation:hexfloat 13s ease-in-out infinite;
+}
+.slide--light .hex-deco>span{opacity:.16;}
+@keyframes hexfloat{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-22px) rotate(4deg);}}
+@media (prefers-reduced-motion:reduce){.hex-deco>span{animation:none;}}
+
+/* siatka tła — druga warstwa atmosfery, dyskretna */
+.grid-deco{
+  position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.05;
+  background-image:linear-gradient(var(--ink-2) 1px,transparent 1px),
+                   linear-gradient(90deg,var(--ink-2) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse 70% 70% at 50% 50%,#000 20%,transparent 75%);
+}
+.stage,.chrome-top,.chrome-bottom{position:relative;z-index:1;}
+
+/* ── 5. MENU WYSUWANE ─────────────────────────────────────────────────────── */
+/* Domyślnie schowane. Uchwyt przy lewej krawędzi; szuflada wjeżdża NAD slajd,
+   nie przesuwa treści — dzięki temu autoskalowanie nie przelicza się przy
+   każdym otwarciu. */
+.drawer-tab{
+  position:fixed;left:0;top:50%;z-index:120;
+  transform:translateY(-50%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;
+  width:38px;height:148px;padding:0;border:0;cursor:pointer;
+  background:rgba(8,9,15,.86);backdrop-filter:blur(14px);
+  border:1px solid var(--d-line);border-left:0;border-radius:0 4px 4px 0;
+  box-shadow:inset 3px 0 0 var(--cb-primary), 0 8px 30px rgba(0,0,0,.35);
+  color:var(--cb-primary);
+  transition:transform .40s var(--ease),background .25s,color .25s;
+}
+body.is-light .drawer-tab{
+  background:rgba(255,255,255,.94);border-color:var(--l-line);color:var(--cb-cyan-deep);
+  box-shadow:inset 3px 0 0 var(--cb-cyan-deep), 0 8px 26px rgba(15,23,41,.10);
+}
+.drawer-tab:hover{background:var(--cb-primary);color:#04141a;}
+.drawer-tab-bars{display:block;width:15px;height:9px;border-top:1.5px solid currentColor;border-bottom:1.5px solid currentColor;position:relative;}
+.drawer-tab-bars::after{content:'';position:absolute;left:0;top:3px;width:100%;height:1.5px;background:currentColor;}
+.drawer-tab-label{
+  font-family:var(--ff-mono);font-size:10px;font-weight:600;letter-spacing:.28em;
+  writing-mode:vertical-rl;text-orientation:mixed;
+}
+body.drawer-open .drawer-tab{transform:translateY(-50%) translateX(var(--drawer-w));}
+
+.drawer{
+  --drawer-w:326px;
+  position:fixed;left:0;top:0;z-index:118;
+  width:var(--drawer-w);height:100vh;
+  transform:translateX(-100%);transition:transform .40s var(--ease);
+  display:flex;flex-direction:column;
+  background:rgba(8,9,15,.92);backdrop-filter:blur(22px);
+  border-right:1px solid var(--d-line);
+  color:var(--d-ink-1);
+}
+body.is-light .drawer{background:rgba(248,250,252,.94);border-right-color:var(--l-line);color:var(--l-ink-1);}
+body.drawer-open .drawer{transform:none;}
+body{--drawer-w:326px;}
+
+.drawer-head{padding:26px 24px 20px;border-bottom:1px solid var(--d-line);}
+body.is-light .drawer-head{border-bottom-color:var(--l-line);}
+.drawer-logo{display:flex;align-items:center;gap:11px;}
+.drawer-logo svg{width:26px;height:auto;flex:0 0 auto;}
+.drawer-logo b{font-family:var(--ff-logo);font-size:15px;font-weight:600;letter-spacing:.16em;color:var(--d-ink-0);}
+body.is-light .drawer-logo b{color:var(--l-ink-0);}
+.drawer-client{
+  margin-top:12px;font-family:var(--ff-mono);font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--cb-primary);
+}
+body.is-light .drawer-client{color:var(--cb-cyan-deep);}
+
+.drawer-nav{flex:1;min-height:0;overflow-y:auto;padding:14px 0 18px;scrollbar-width:thin;}
+.drawer-nav::-webkit-scrollbar{width:4px;}
+.drawer-nav::-webkit-scrollbar-thumb{background:var(--cb-primary);opacity:.4;}
+.dgroup{
+  padding:16px 24px 7px;font-family:var(--ff-mono);font-size:10px;font-weight:600;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--d-ink-3);
+}
+body.is-light .dgroup{color:var(--l-ink-3);}
+.ditem{
+  display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:baseline;
+  width:100%;padding:9px 24px;border:0;background:none;cursor:pointer;text-align:left;
+  color:inherit;font-family:var(--ff-body);font-size:14px;line-height:1.42;
+  border-left:2px solid transparent;transition:background .16s,color .16s,border-color .16s;
+}
+.ditem .dn{font-family:var(--ff-mono);font-size:11px;color:var(--d-ink-3);letter-spacing:.06em;}
+body.is-light .ditem .dn{color:var(--l-ink-3);}
+.ditem:hover{background:rgba(0,206,209,.08);}
+.ditem.is-current{border-left-color:var(--cb-primary);background:rgba(0,206,209,.11);color:var(--d-ink-0);font-weight:500;}
+body.is-light .ditem.is-current{color:var(--l-ink-0);}
+.ditem.is-current .dn{color:var(--cb-primary);}
+body.is-light .ditem.is-current .dn{color:var(--cb-cyan-deep);}
+
+.drawer-foot{
+  padding:16px 24px 22px;border-top:1px solid var(--d-line);
+  font-family:var(--ff-mono);font-size:10.5px;line-height:1.9;letter-spacing:.05em;color:var(--d-ink-3);
+}
+body.is-light .drawer-foot{border-top-color:var(--l-line);color:var(--l-ink-3);}
+.drawer-foot kbd{
+  font-family:inherit;font-size:10px;padding:1px 5px;margin-right:5px;
+  border:1px solid var(--d-line);border-radius:3px;color:var(--cb-primary);
+}
+body.is-light .drawer-foot kbd{border-color:var(--l-line);color:var(--cb-cyan-deep);}
+
+.drawer-scrim{
+  position:fixed;inset:0;z-index:116;background:rgba(4,7,12,.42);
+  opacity:0;pointer-events:none;transition:opacity .34s var(--ease);backdrop-filter:blur(1px);
+}
+body.drawer-open .drawer-scrim{opacity:1;pointer-events:auto;}
+
+/* ── 6. TOPBAR — sterowanie ───────────────────────────────────────────────── */
+.topbar{
+  position:fixed;top:16px;right:18px;z-index:110;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:min(70vw,760px);
+}
+.tb{
+  display:inline-flex;align-items:center;gap:6px;
+  height:30px;padding:0 11px;border:1px solid var(--d-line);border-radius:2px;
+  background:rgba(8,9,15,.64);backdrop-filter:blur(14px);color:var(--d-ink-2);
+  font-family:var(--ff-mono);font-size:11px;font-weight:500;letter-spacing:.09em;
+  text-transform:uppercase;cursor:pointer;white-space:nowrap;
+  transition:color .18s,border-color .18s,background .18s;
+}
+body.is-light .tb{background:rgba(255,255,255,.74);border-color:var(--l-line);color:var(--l-ink-2);}
+.tb:hover{color:var(--cb-primary);border-color:var(--cb-primary);}
+body.is-light .tb:hover{color:var(--cb-cyan-deep);border-color:var(--cb-cyan-deep);}
+.tb.is-on{color:#04141a;background:var(--cb-primary);border-color:var(--cb-primary);}
+.tb-sep{width:1px;height:18px;background:var(--d-line);margin:0 3px;}
+body.is-light .tb-sep{background:var(--l-line);}
+/* sterowanie drugiego rzędu — schowane, żeby rama slajdu została cicha */
+.tb-extra{display:none;}
+body.tb-open .tb-extra{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+.tb-ring{width:13px;height:13px;transform:rotate(-90deg);}
+.tb-ring circle{fill:none;stroke-width:2.5;}
+.tb-ring .r-bg{stroke:currentColor;opacity:.25;}
+.tb-ring .r-fg{stroke:currentColor;stroke-dasharray:34;stroke-dashoffset:var(--o,34);transition:stroke-dashoffset .95s linear;}
+
+/* ukryj sterowanie przy eksporcie i wydruku */
+body.is-clean .topbar,body.is-clean .drawer-tab,body.is-clean .vprog,
+body.is-clean .arrows,body.is-clean .drawer,body.is-clean .drawer-scrim{display:none!important;}
+
+/* ── 7. PASEK POSTĘPU I STRZAŁKI ──────────────────────────────────────────── */
+.vprog{
+  position:fixed;top:50%;right:20px;transform:translateY(-50%);z-index:100;
+  display:flex;flex-direction:column;gap:4px;width:3px;height:clamp(200px,32vh,330px);
+}
+.vprog i{flex:1;background:var(--d-line);cursor:pointer;transition:background .3s,transform .3s;}
+body.is-light .vprog i{background:var(--l-line);}
+.vprog i:hover{transform:scaleX(2.4);}
+.vprog i.is-done{background:var(--d-ink-3);}
+body.is-light .vprog i.is-done{background:var(--l-ink-3);}
+.vprog i.is-current{background:var(--cb-primary);transform:scaleX(2.6);}
+
+.arrows{position:fixed;right:20px;bottom:22px;z-index:100;display:flex;gap:6px;}
+.arrows button{
+  width:34px;height:34px;display:grid;place-items:center;cursor:pointer;
+  border:1px solid var(--d-line);background:rgba(8,9,15,.6);backdrop-filter:blur(12px);
+  color:var(--d-ink-2);border-radius:2px;transition:color .18s,border-color .18s;
+}
+body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(--l-line);color:var(--l-ink-2);}
+.arrows button:hover{color:var(--cb-primary);border-color:var(--cb-primary);}
+.arrows svg{width:14px;height:14px;}
+
+/* ── 8. TYPOGRAFIA SLAJDU ─────────────────────────────────────────────────── */
+.eyebrow{
+  display:inline-flex;align-items:center;gap:11px;
+  font-family:var(--ff-mono);font-size:var(--fs-mono);font-weight:500;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--accent);
+}
+.eyebrow::before{content:'';width:32px;height:1px;background:currentColor;opacity:.6;flex:0 0 auto;}
+.eyebrow--plain::before{display:none;}
+
+.h-display{
+  font-family:var(--ff-display);font-size:var(--fs-display-xl);font-weight:500;
+  line-height:1.03;letter-spacing:-.028em;color:var(--ink-0);text-wrap:balance;
+}
+.h-title{
+  font-family:var(--ff-display);font-size:var(--fs-display-l);font-weight:500;
+  line-height:1.12;letter-spacing:-.022em;color:var(--ink-0);text-wrap:balance;
+}
+.h-title--s{font-size:var(--fs-display-m);}
+.h-sub{font-size:var(--fs-lead);line-height:1.55;color:var(--ink-2);max-width:76ch;font-weight:300;}
+.lead{font-size:var(--fs-lead);line-height:1.62;color:var(--ink-1);max-width:70ch;}
+.note{font-size:var(--fs-small);line-height:1.62;color:var(--ink-3);max-width:100ch;}
+
+.head-row{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(20px,3vw,56px);
+  align-items:start;
+}
+.head-meta{
+  font-family:var(--ff-mono);font-size:var(--fs-small);line-height:1.95;
+  letter-spacing:.05em;color:var(--ink-3);text-align:right;white-space:nowrap;padding-top:6px;
+}
+.head-meta strong{color:var(--accent);font-weight:500;}
+
+/* ── 9. UKŁADY ────────────────────────────────────────────────────────────── */
+.stack{display:flex;flex-direction:column;gap:var(--gap);}
+.stack--tight{gap:clamp(11px,1.1vw,18px);}
+.stack--loose{gap:clamp(22px,2.6vw,44px);}
+
+.split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(26px,3.4vw,64px);align-items:start;}
+.split--38{grid-template-columns:minmax(0,.62fr) minmax(0,1fr);}
+.split--62{grid-template-columns:minmax(0,1fr) minmax(0,.62fr);}
+.split--center{align-items:center;}
+.split-col{display:flex;flex-direction:column;gap:clamp(13px,1.4vw,22px);min-width:0;}
+
+.cards{display:grid;gap:clamp(13px,1.4vw,22px);align-items:stretch;}
+.cards--2{grid-template-columns:repeat(2,minmax(0,1fr));}
+.cards--3{grid-template-columns:repeat(3,minmax(0,1fr));}
+.cards--4{grid-template-columns:repeat(4,minmax(0,1fr));}
+.cards--5{grid-template-columns:repeat(5,minmax(0,1fr));}
+
+/* ── 10. KOMPONENTY ───────────────────────────────────────────────────────── */
+/* karta */
+.card{
+  display:flex;flex-direction:column;gap:9px;min-width:0;
+  padding:clamp(15px,1.5vw,24px);background:var(--bg-2);
+  border:1px solid var(--line);border-top:3px solid var(--accent);
+}
+.slide--dark .card{background:rgba(255,255,255,.032);}
+.card-num{
+  font-family:var(--ff-mono);font-size:var(--fs-small);font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--accent);
+}
+.card-title{font-family:var(--ff-display);font-size:var(--fs-display-s);font-weight:500;line-height:1.24;letter-spacing:-.015em;color:var(--ink-0);}
+.card-title--s{font-size:calc(var(--fs-display-s)*.84);}
+.card-text{font-size:var(--fs-body);line-height:1.6;color:var(--ink-2);}
+.card-foot{
+  margin-top:auto;padding-top:11px;border-top:1px solid var(--line-2);
+  font-family:var(--ff-mono);font-size:calc(var(--fs-small)*.94);line-height:1.6;
+  letter-spacing:.05em;color:var(--ink-3);
+}
+.card.is-accent{border-color:var(--accent);background:linear-gradient(160deg,rgba(0,206,209,.10),transparent 70%),var(--bg-2);}
+.card.is-dark{
+  background:var(--d-bg-1);border-color:var(--d-line);
+  --ink-0:var(--d-ink-0);--ink-1:var(--d-ink-1);--ink-2:var(--d-ink-1);--ink-3:var(--d-ink-2);
+  --line:var(--d-line);--line-2:var(--d-line-2);--accent:var(--cb-primary);
+  color:var(--d-ink-1);
+}
+.card.is-quiet{border-top-color:var(--line);}
+.card.is-quiet .card-num{color:var(--ink-3);}
+
+/* lista punktowana — blok, nie grid: inline <strong> nie może stać się osobnym elementem */
+.blist{display:block;}
+.bitem{
+  display:block;position:relative;padding-left:20px;margin-bottom:9px;
+  font-size:var(--fs-body);line-height:1.58;color:var(--ink-2);
+}
+.bitem:last-child{margin-bottom:0;}
+.bitem::before{
+  content:'';position:absolute;left:0;top:.62em;width:7px;height:8px;background:var(--accent);
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+}
+.blist--tight .bitem{margin-bottom:6px;}
+.bitem--s{font-size:var(--fs-small);line-height:1.52;}
+
+/* wyróżnik */
+.punch{
+  display:flex;align-items:center;justify-content:space-between;gap:clamp(18px,2.4vw,44px);
+  padding:clamp(14px,1.5vw,22px) clamp(16px,1.8vw,28px);
+  background:linear-gradient(100deg,rgba(0,206,209,.13),rgba(0,206,209,.03));
+  border-left:3px solid var(--accent);
+}
+.punch-text{font-size:var(--fs-lead);line-height:1.5;color:var(--ink-0);font-weight:300;}
+.punch-tag{
+  flex:0 0 auto;font-family:var(--ff-mono);font-size:var(--fs-small);line-height:1.75;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--accent);text-align:right;
+}
+
+/* liczby */
+.stats{display:grid;gap:clamp(18px,2.4vw,44px);grid-auto-flow:column;grid-auto-columns:1fr;}
+.stats--wrap{grid-auto-flow:row;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));}
+.stat{display:flex;flex-direction:column;gap:5px;min-width:0;}
+.stat-num{
+  font-family:var(--ff-display);font-size:clamp(34px,3.6vw,64px);font-weight:600;
+  line-height:1;letter-spacing:-.035em;
+  background:linear-gradient(120deg,var(--cb-primary),var(--cb-cyan));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.stat-num sup{font-size:.44em;vertical-align:super;letter-spacing:0;}
+.stat-lab{font-size:var(--fs-small);line-height:1.5;color:var(--ink-2);}
+.stat-sub{font-family:var(--ff-mono);font-size:calc(var(--fs-small)*.9);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);}
+
+/* proces */
+.flow{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:0;align-items:stretch;}
+.flow-node{
+  position:relative;display:flex;flex-direction:column;gap:7px;min-width:0;
+  padding:clamp(13px,1.4vw,20px) clamp(15px,1.6vw,24px);border-top:1px solid var(--line);
+}
+.flow-node::before{
+  content:'';position:absolute;left:0;top:-4px;width:8px;height:9px;background:var(--accent);
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+}
+.flow-node+.flow-node{border-left:1px solid var(--line-2);}
+.flow-n{font-family:var(--ff-mono);font-size:var(--fs-small);letter-spacing:.16em;color:var(--accent);}
+.flow-t{font-family:var(--ff-display);font-size:calc(var(--fs-display-s)*.86);font-weight:500;line-height:1.25;color:var(--ink-0);}
+.flow-d{font-size:var(--fs-small);line-height:1.55;color:var(--ink-2);}
+
+/* tabela */
+.tbl{width:100%;border-collapse:collapse;font-size:var(--fs-small);}
+.tbl th{
+  padding:0 14px 10px 0;text-align:left;vertical-align:bottom;
+  font-family:var(--ff-mono);font-size:calc(var(--fs-small)*.92);font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);
+  border-bottom:1px solid var(--line);
+}
+.tbl td{padding:11px 14px 11px 0;vertical-align:top;border-bottom:1px solid var(--line-2);color:var(--ink-2);line-height:1.55;}
+.tbl tr:last-child td{border-bottom:0;}
+.tbl .t-name{color:var(--ink-0);font-weight:500;width:1%;white-space:nowrap;}
+.tbl .t-price{font-family:var(--ff-mono);color:var(--accent);white-space:nowrap;text-align:right;padding-right:0;}
+.tbl .t-meta{font-family:var(--ff-mono);font-size:calc(var(--fs-small)*.9);color:var(--ink-3);white-space:nowrap;}
+.tbl tr.is-total td{border-top:1px solid var(--accent);border-bottom:0;padding-top:14px;color:var(--ink-0);font-weight:500;}
+
+/* chipy */
+.chips{display:flex;flex-wrap:wrap;gap:7px;}
+.chip{
+  padding:5px 12px;border:1px solid var(--line);color:var(--ink-2);
+  font-family:var(--ff-mono);font-size:calc(var(--fs-small)*.94);letter-spacing:.09em;text-transform:uppercase;
+}
+.chip.is-on{border-color:var(--accent);color:var(--accent);}
+
+/* oś czasu */
+.tl{display:flex;flex-direction:column;gap:0;}
+.tl-item{
+  display:grid;grid-template-columns:minmax(86px,auto) 1fr;gap:clamp(16px,2vw,34px);
+  padding:clamp(12px,1.3vw,20px) 0;border-bottom:1px solid var(--line-2);position:relative;
+}
+.tl-item:last-child{border-bottom:0;}
+.tl-when{font-family:var(--ff-mono);font-size:var(--fs-small);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);padding-top:3px;}
+.tl-what{display:flex;flex-direction:column;gap:5px;min-width:0;}
+.tl-t{font-family:var(--ff-display);font-size:calc(var(--fs-display-s)*.9);font-weight:500;color:var(--ink-0);line-height:1.28;}
+.tl-d{font-size:var(--fs-small);line-height:1.58;color:var(--ink-2);}
+
+/* cytat / opinia */
+.tq{position:relative;padding:clamp(16px,1.8vw,28px);border:1px solid var(--line);background:var(--bg-2);overflow:hidden;}
+.slide--dark .tq{background:rgba(255,255,255,.032);}
+.tq-mark{
+  position:absolute;right:10px;top:-18px;font-family:var(--ff-display);font-size:110px;
+  line-height:1;color:var(--accent);opacity:.14;pointer-events:none;
+}
+.tq-text{position:relative;font-size:var(--fs-body);line-height:1.66;color:var(--ink-1);font-style:italic;}
+.tq-who{margin-top:12px;font-family:var(--ff-mono);font-size:calc(var(--fs-small)*.94);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);}
+.tq-who b{color:var(--accent);font-weight:500;}
+
+/* separator sekcji */
+.sect{display:flex;flex-direction:column;gap:clamp(14px,1.8vw,28px);}
+.sect-num{
+  font-family:var(--ff-display);font-size:clamp(64px,9vw,168px);font-weight:600;line-height:.86;
+  letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1.5px var(--accent);
+}
+.sect-title{font-family:var(--ff-display);font-size:var(--fs-display-l);font-weight:500;line-height:1.1;letter-spacing:-.022em;color:var(--ink-0);}
+
+/* logotypy klientów / narzędzi */
+.logos{display:flex;flex-wrap:wrap;align-items:center;gap:clamp(22px,3vw,54px);}
+.logo-item{height:clamp(22px,2vw,34px);width:auto;opacity:.42;filter:grayscale(1);transition:opacity .25s,filter .25s;}
+.logo-item:hover{opacity:1;filter:none;}
+
+/* box z linkiem / wideo */
+.linkbox{
+  display:flex;align-items:center;gap:14px;padding:13px 17px;
+  border:1px solid var(--line);background:var(--bg-2);cursor:pointer;text-decoration:none;
+  transition:border-color .2s,background .2s;
+}
+.slide--dark .linkbox{background:rgba(255,255,255,.032);}
+.linkbox:hover{border-color:var(--accent);}
+.lb-icon{
+  flex:0 0 auto;width:32px;height:36px;display:grid;place-items:center;background:var(--accent);color:#04141a;
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+}
+.lb-icon svg{width:13px;height:13px;}
+.lb-text{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.lb-t{font-size:var(--fs-body);color:var(--ink-0);font-weight:500;}
+.lb-d{font-family:var(--ff-mono);font-size:calc(var(--fs-small)*.9);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);}
+
+/* okładka */
+.cover{display:flex;flex-direction:column;gap:clamp(20px,2.6vw,40px);justify-content:center;height:100%;}
+.cover-logo{display:flex;align-items:center;gap:14px;}
+.cover-logo svg{width:clamp(40px,3.4vw,58px);height:auto;}
+.cover-logo b{font-family:var(--ff-logo);font-size:clamp(15px,1.3vw,21px);font-weight:600;letter-spacing:.2em;color:var(--ink-0);}
+.cover-meta{
+  display:flex;flex-wrap:wrap;gap:clamp(18px,2.4vw,44px);padding-top:clamp(16px,2vw,30px);
+  border-top:1px solid var(--line);
+  font-family:var(--ff-mono);font-size:var(--fs-small);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+}
+.cover-meta b{display:block;color:var(--ink-0);font-weight:500;letter-spacing:.06em;margin-top:3px;text-transform:none;font-family:var(--ff-body);font-size:var(--fs-body);}
+
+/* spis treści */
+.toc{display:flex;flex-direction:column;}
+.toc-row{
+  display:grid;grid-template-columns:minmax(56px,auto) minmax(0,1fr) minmax(0,1.35fr);
+  gap:clamp(16px,2.4vw,44px);align-items:baseline;
+  padding:clamp(13px,1.5vw,22px) 0;border-bottom:1px solid var(--line-2);
+}
+.toc-row:last-child{border-bottom:0;}
+.toc-n{font-family:var(--ff-display);font-size:clamp(24px,2.4vw,42px);font-weight:600;line-height:1;letter-spacing:-.04em;color:var(--accent);opacity:.85;}
+.toc-t{font-family:var(--ff-display);font-size:var(--fs-display-s);font-weight:500;color:var(--ink-0);line-height:1.24;}
+.toc-d{font-size:var(--fs-small);line-height:1.55;color:var(--ink-2);}
+
+/* kontakt */
+.contact{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(26px,3.6vw,64px);align-items:center;}
+/* podmień <div> na <img class="contact-photo" src="…"> — kadr heksagonalny obetnie zdjęcie */
+.contact-photo{width:clamp(120px,12vw,190px);aspect-ratio:1;object-fit:cover;
+  background:linear-gradient(150deg,rgba(169,245,214,.22),rgba(132,220,241,.14));
+  border:0;clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
+.contact-lines{display:flex;flex-direction:column;gap:7px;font-family:var(--ff-mono);font-size:var(--fs-body);color:var(--ink-1);}
+.contact-lines a{color:var(--accent);text-decoration:none;}
+.contact-lines a:hover{text-decoration:underline;}
+
+/* ── 11. WYKRESY ──────────────────────────────────────────────────────────── */
+/* Każdy wykres żyje w .viz — kontener zapytań. Rozmiary wewnętrzne liczą się
+   od szerokości .viz (cqw), nie od okna, więc ten sam markup działa w kolumnie
+   splitu i na całą szerokość slajdu. */
+.viz{container-type:inline-size;width:100%;max-width:100%;min-width:0;}
+.viz-cap{
+  margin-top:10px;font-family:var(--ff-mono);font-size:calc(var(--fs-small)*.88);
+  letter-spacing:.06em;color:var(--ink-3);line-height:1.55;
+}
+
+/* legenda — zawsze klasą, nigdy inline'owym kolorem, żeby czytała się na obu motywach */
+.legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-family:var(--ff-mono);font-size:calc(var(--fs-small)*.92);color:var(--ink-2);}
+.legend--col{flex-direction:column;gap:9px;}
+.legend i{display:inline-flex;align-items:center;gap:8px;font-style:normal;}
+.legend i::before{content:'';width:11px;height:12px;background:var(--c,var(--dv-1));flex:0 0 auto;
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
+.legend b{color:var(--ink-0);font-weight:500;margin-left:auto;padding-left:14px;font-variant-numeric:tabular-nums;}
+
+/* słupki pionowe */
+.c-bars{
+  --h:clamp(140px,32cqw,250px);
+  display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);
+  gap:clamp(7px,1.5cqw,20px);align-items:end;
+}
+.c-bars .b{display:grid;grid-template-rows:auto var(--h) auto;justify-items:center;gap:7px;min-width:0;}
+.c-bars .bv{font-family:var(--ff-mono);font-size:clamp(11px,2cqw,16px);font-weight:600;color:var(--ink-0);align-self:end;}
+/* max-width: przy czterech słupkach na całą szerokość kolumny bez tego robią się bloki */
+.c-bars .bar{align-self:end;width:100%;max-width:clamp(40px,11cqw,120px);height:var(--v,50%);
+  background:var(--c,var(--dv-1));transition:height .8s var(--ease);}
+.c-bars .bx{font-family:var(--ff-mono);font-size:clamp(9.5px,1.6cqw,13px);letter-spacing:.08em;color:var(--ink-3);
+  text-align:center;line-height:1.35;border-top:1px solid var(--line);padding-top:7px;width:100%;}
+.c-bars .b.is-rest .bar{background:var(--dv-rest);}
+.c-bars .b.is-hi .bar{background:linear-gradient(180deg,var(--cb-primary),var(--cb-cyan-deep));}
+
+/* słupki poziome z rankingiem */
+.c-rank{display:flex;flex-direction:column;gap:clamp(6px,1.1cqw,13px);}
+.c-rank .r{display:grid;grid-template-columns:auto minmax(0,var(--lbl,26%)) minmax(0,1fr) auto;gap:clamp(8px,1.4cqw,16px);align-items:center;}
+.c-rank .rn{font-family:var(--ff-mono);font-size:clamp(10px,1.5cqw,13px);color:var(--ink-3);letter-spacing:.06em;}
+/* etykieta wyrównana do prawej — przylega do słupka, oko nie skacze przez pustkę */
+.c-rank .rl{font-size:clamp(11px,1.6cqw,15px);color:var(--ink-1);line-height:1.3;overflow-wrap:anywhere;text-align:right;}
+.c-rank .rt{height:clamp(16px,2.6cqw,28px);background:var(--dv-track);position:relative;}
+.c-rank .rf{position:absolute;inset:0 auto 0 0;width:var(--v,50%);background:var(--c,var(--dv-1));transition:width .8s var(--ease);}
+.c-rank .rv{font-family:var(--ff-mono);font-size:clamp(11px,1.8cqw,16px);font-weight:600;color:var(--ink-0);
+  font-variant-numeric:tabular-nums;min-width:3.2em;text-align:right;}
+.c-rank .r.is-rest .rf{background:var(--dv-rest);}
+.c-rank .r.is-neg .rf{background:var(--dv-neg);}
+
+/* mierniki */
+.c-meter{display:flex;flex-direction:column;gap:clamp(10px,1.6cqw,18px);}
+.c-meter .m{display:flex;flex-direction:column;gap:6px;}
+.c-meter .mh{display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+  font-size:clamp(11px,1.6cqw,15px);color:var(--ink-1);}
+.c-meter .mh b{font-family:var(--ff-mono);font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums;}
+.c-meter .mt{height:5px;background:var(--dv-track);position:relative;}
+.c-meter .mf{position:absolute;inset:0 auto 0 0;width:var(--v,50%);background:var(--c,var(--dv-1));transition:width .8s var(--ease);}
+
+/* kołowy / pierścieniowy — conic-gradient, wartości czytamy z legendy */
+.c-pie{--p:clamp(130px,52cqw,230px);width:var(--p);height:var(--p);border-radius:50%;
+  background:conic-gradient(var(--dv-1) 0 40%,var(--dv-2) 40% 68%,var(--dv-3) 68% 86%,var(--dv-rest) 86% 100%);}
+.c-donut{position:relative;--p:clamp(130px,52cqw,230px);width:var(--p);height:var(--p);}
+.c-donut::before{content:'';position:absolute;inset:0;border-radius:50%;background:var(--ring,conic-gradient(var(--dv-1) 0 40%,var(--dv-2) 40% 68%,var(--dv-rest) 68% 100%));}
+.c-donut::after{content:'';position:absolute;inset:22%;border-radius:50%;background:var(--bg-0);}
+.c-donut .dc{position:absolute;inset:0;display:grid;place-content:center;text-align:center;z-index:1;gap:2px;}
+.c-donut .dv{font-family:var(--ff-display);font-size:clamp(24px,9cqw,44px);font-weight:600;letter-spacing:-.03em;color:var(--ink-0);line-height:1;}
+.c-donut .dl{font-family:var(--ff-mono);font-size:clamp(9px,2.2cqw,12px);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);}
+
+/* zmiana przed → po */
+.c-delta{display:grid;grid-template-columns:1fr auto 1fr;gap:clamp(12px,2.4cqw,30px);align-items:end;}
+.c-delta .d{display:grid;grid-template-rows:auto clamp(90px,22cqw,170px) auto;justify-items:center;gap:8px;}
+.c-delta .dv{font-family:var(--ff-mono);font-size:clamp(13px,2.6cqw,22px);font-weight:600;color:var(--ink-0);align-self:end;}
+.c-delta .db{align-self:end;width:100%;height:var(--v,50%);background:var(--c,var(--dv-rest));}
+.c-delta .d.is-after .db{background:linear-gradient(180deg,var(--cb-primary),var(--cb-cyan-deep));}
+.c-delta .dl{font-family:var(--ff-mono);font-size:clamp(9.5px,1.7cqw,13px);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);}
+.c-delta .darrow{align-self:center;display:flex;flex-direction:column;align-items:center;gap:4px;padding-bottom:clamp(24px,6cqw,50px);}
+.c-delta .darrow span{font-family:var(--ff-mono);font-size:clamp(12px,2.2cqw,19px);font-weight:600;color:var(--accent);white-space:nowrap;}
+.c-delta .darrow svg{width:clamp(20px,4cqw,34px);height:auto;color:var(--accent);}
+
+/* mapa ciepła */
+.c-heat{display:grid;gap:3px;}
+.c-heat .hc{aspect-ratio:1.6;display:grid;place-items:center;
+  font-family:var(--ff-mono);font-size:clamp(9px,1.5cqw,13px);font-variant-numeric:tabular-nums;}
+.c-heat .hh{background:none!important;color:var(--ink-3);letter-spacing:.09em;text-transform:uppercase;font-size:clamp(8.5px,1.3cqw,11.5px);}
+/* Rampa podana wprost dla obu motywów, nie przez przezroczystość. Ten sam
+   kolor z alfą daje nad czernią i nad bielą dwa różne kolory tła, a liczba na
+   kafelku musi być czytelna w obu — przy alfie zawsze któryś stopień wypada.
+   Motyw przełącza się na slajdzie, nie na dokumencie, więc zmienne rampy
+   siedzą na .slide--dark / .slide--light. Legenda pod mapą bierze kolor
+   stąd (--hm-1, --hm-3, --hm-5) i nie powtarza wartości u siebie. */
+.slide--dark{--hm-0:#0f151b;--hm-1:#123037;--hm-2:#14525a;--hm-3:#0e7f86;--hm-4:#04b0b3;--hm-5:#00CED1;}
+.slide--light{--hm-0:#eef4f6;--hm-1:#d5edf0;--hm-2:#a9e0e5;--hm-3:#5fc9cf;--hm-4:#12b3b8;--hm-5:#00949a;}
+.hm-0{background:var(--hm-0);color:#7a8496;}
+.hm-1{background:var(--hm-1);color:#a7bcc0;}
+.hm-2{background:var(--hm-2);color:#e3f6f8;}
+.hm-3{background:var(--hm-3);color:#eafcfd;}
+.hm-4{background:var(--hm-4);color:#04141a;}
+.hm-5{background:var(--hm-5);color:#04141a;font-weight:600;}
+.slide--light .hm-0{color:#77879a;}
+.slide--light .hm-1{color:#2f4d55;}
+.slide--light .hm-2{color:#123c43;}
+.slide--light .hm-3{color:#06272c;}
+.slide--light .hm-4{color:#04141a;}
+.slide--light .hm-5{color:#ffffff;}
+
+/* piktogramy — grid, żeby jednostki zawijały się zamiast wypychać kontener */
+.c-units{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--u,14px),var(--u,14px)));
+  gap:clamp(3px,.7cqw,6px);align-content:start;}
+.c-units i{display:block;width:var(--u,14px);height:calc(var(--u,14px)*1.12);background:var(--dv-track);
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
+.c-units i.on{background:var(--c,var(--dv-1));}
+
+/* kafle KPI */
+.c-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(clamp(120px,26cqw,190px),1fr));gap:clamp(10px,1.6cqw,20px);}
+.c-kpi .k{display:flex;flex-direction:column;gap:4px;padding:clamp(12px,1.8cqw,20px);border:1px solid var(--line);border-left:3px solid var(--accent);}
+.c-kpi .kv{font-family:var(--ff-display);font-size:clamp(24px,5.4cqw,44px);font-weight:600;line-height:1;letter-spacing:-.035em;color:var(--ink-0);}
+.c-kpi .kl{font-size:clamp(11px,1.6cqw,14px);color:var(--ink-2);line-height:1.4;}
+.c-kpi .kd{font-family:var(--ff-mono);font-size:clamp(10px,1.4cqw,12.5px);letter-spacing:.08em;color:var(--ink-3);}
+.c-kpi .kd.up{color:var(--dv-pos);} .c-kpi .kd.down{color:var(--dv-neg);}
+
+/* linia / obszar — SVG, punkty liczone przy pisaniu slajdu */
+.c-line{width:100%;height:auto;display:block;overflow:visible;}
+.c-line .ax{stroke:var(--line);stroke-width:1;}
+.c-line .gl{stroke:var(--line-2);stroke-width:1;}
+.c-line .ar{fill:url(#cbArea);}
+.c-line .ln{fill:none;stroke:var(--dv-1);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round;}
+.c-line .ln2{fill:none;stroke:var(--dv-rest);stroke-width:2;stroke-dasharray:5 4;}
+.c-line .pt{fill:var(--dv-1);}
+.c-line .lb{fill:var(--ink-3);font-family:var(--ff-mono);font-size:11px;letter-spacing:.06em;}
+
+/* pasek 100% */
+.c-stack{display:flex;height:clamp(26px,4.4cqw,44px);width:100%;overflow:hidden;}
+.c-stack i{display:block;height:100%;width:var(--v,25%);background:var(--c,var(--dv-1));
+  display:grid;place-items:center;font-family:var(--ff-mono);font-size:clamp(9px,1.5cqw,12.5px);
+  font-weight:600;color:#04141a;font-style:normal;}
+
+/* ── 12. KROKI, ANIMACJE, TRYBY ───────────────────────────────────────────── */
+/* Krok = jednostka odsłaniania. W trybie dokumentu wszystko widać od razu. */
+.slide [data-step]{opacity:0;transition:opacity .38s var(--ease),transform .38s var(--ease);transition-delay:var(--d,0s);}
+.slide [data-step]:not(svg *){transform:translateY(10px);}
+.slide.is-revealed [data-step],
+body.anim-off .slide [data-step]{opacity:1;transform:none;}
+body.anim-off .slide [data-step]{transition:none;}
+
+/* tryb prezentacji — kroki czekają na klik */
+body.mode-present .slide [data-step]{opacity:0;}
+body.mode-present .slide [data-step].is-shown{opacity:1;transform:none;}
+body.mode-present.anim-off .slide [data-step].is-shown{transition:none;}
+
+/* szczegóły — przypisy, źródła, dane dodatkowe */
+.detail{display:none;}
+body.details-on .detail{display:block;}
+body.details-on .detail.is-inline{display:inline;}
+tr.detail{display:none;}
+body.details-on tr.detail{display:table-row;}
+
+/* animacja zaawansowana — dodatkowy ruch wejścia dla nagłówków i kart */
+body.anim-adv .slide.is-active .h-display,
+body.anim-adv .slide.is-active .h-title{animation:riseIn .7s var(--ease) both;}
+body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;animation-delay:calc(var(--i,0)*.07s);}
+@keyframes riseIn{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+@media (prefers-reduced-motion:reduce){
+  body.anim-adv .slide.is-active .h-display,
+  body.anim-adv .slide.is-active .h-title,
+  body.anim-adv .slide.is-active .card{animation:none;}
+  .deck{scroll-behavior:auto;}
+}
+
+/* ── 13. LIGHTBOX ─────────────────────────────────────────────────────────── */
+.lightbox{position:fixed;inset:0;z-index:200;display:none;place-items:center;background:rgba(4,6,11,.92);backdrop-filter:blur(6px);}
+.lightbox.is-open{display:grid;}
+.lb-frame{width:min(90vw,1200px);aspect-ratio:16/9;background:#000;border:1px solid var(--d-line);}
+.lb-frame iframe{width:100%;height:100%;border:0;}
+.lb-close{position:absolute;top:22px;right:26px;background:none;border:0;color:var(--d-ink-1);font-size:30px;cursor:pointer;line-height:1;}
+.lb-fallback{display:grid;place-items:center;height:100%;gap:14px;color:var(--d-ink-2);text-align:center;padding:30px;}
+
+/* ── 14. WYDRUK / PDF ─────────────────────────────────────────────────────── */
+@page{size:1600px 900px;margin:0;}
+@media print{
+  body{overflow:visible;background:#fff;}
+  .topbar,.drawer,.drawer-tab,.drawer-scrim,.vprog,.arrows,.grain,.lightbox{display:none!important;}
+  .deck{height:auto;overflow:visible;scroll-snap-type:none;}
+  .slide{page-break-after:always;break-after:page;height:900px;width:1600px;min-height:0;}
+  .slide [data-step]{opacity:1!important;transform:none!important;}
+  .detail{display:block!important;}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+
+/* ── 15. MAŁE EKRANY ──────────────────────────────────────────────────────── */
+@media (max-width:900px){
+  .split,.split--38,.split--62{grid-template-columns:minmax(0,1fr);}
+  .cards--3,.cards--4,.cards--5{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .head-row{grid-template-columns:minmax(0,1fr);}
+  .head-meta{text-align:left;}
+  .flow{grid-auto-flow:row;grid-auto-columns:auto;}
+  .flow-node+.flow-node{border-left:0;}
+  .drawer{--drawer-w:min(86vw,326px);}
+  .toc-row{grid-template-columns:auto minmax(0,1fr);}
+  .toc-d{grid-column:2;}
+}
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+
+<!-- ══ MENU WYSUWANE ═══════════════════════════════════════════════════════ -->
+<button class="drawer-tab" id="drawerTab" aria-label="Otwórz menu" aria-expanded="false" aria-controls="drawer">
+  <span class="drawer-tab-bars"></span>
+  <span class="drawer-tab-label">MENU</span>
+</button>
+<div class="drawer-scrim" id="drawerScrim"></div>
+
+<aside class="drawer" id="drawer" aria-label="Spis slajdów">
+  <div class="drawer-head">
+    <div class="drawer-logo">
+      <svg viewBox="0 0 240 275" aria-hidden="true">
+        <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#A9F5D6" opacity=".7"/>
+        <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" transform="translate(80,45)" fill="#84DCF1" opacity=".7"/>
+        <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" transform="translate(0,90)" fill="#84F1F1" opacity=".7"/>
+      </svg>
+      <b>CLOUDBOTS</b>
+    </div>
+    <!-- [KLIENT] — nazwa odbiorcy albo temat decku -->
+    <div class="drawer-client">Oferta · [KLIENT]</div>
+  </div>
+
+  <nav class="drawer-nav" id="drawerNav"><!-- generowane z data-nav / data-group --></nav>
+
+  <div class="drawer-foot">
+    <div><kbd>←</kbd><kbd>→</kbd> slajd &nbsp; <kbd>M</kbd> menu</div>
+    <div><kbd>P</kbd> tryb &nbsp; <kbd>D</kbd> szczegóły &nbsp; <kbd>F</kbd> dopasowanie</div>
+    <div><kbd>A</kbd> auto &nbsp; <kbd>L</kbd> język &nbsp; <kbd>Esc</kbd> zamknij</div>
+  </div>
+</aside>
+
+<!-- ══ STEROWANIE ══════════════════════════════════════════════════════════ -->
+<div class="topbar" id="topbar">
+  <div class="tb-extra" id="tbExtra">
+    <button class="tb" id="btnFit"   title="Tryb dopasowania (F)">Zmieść</button>
+    <button class="tb" id="btnZoomOut" title="Pomniejsz">−</button>
+    <button class="tb" id="btnZoomIn"  title="Powiększ">+</button>
+    <span class="tb-sep"></span>
+    <button class="tb" id="btnAnim"  title="Poziom animacji">Anim: prosta</button>
+    <button class="tb" id="btnLang"  title="Język (L)">EN</button>
+    <span class="tb-sep"></span>
+    <button class="tb" id="btnPdf"   title="Eksport do PDF">PDF</button>
+    <button class="tb" id="btnPptx"  title="Eksport do PowerPointa">PPTX</button>
+    <span class="tb-sep"></span>
+  </div>
+  <button class="tb" id="btnMode"  title="Dokument / Prezentacja (P)">Dokument</button>
+  <button class="tb" id="btnDet"   title="Pokaż dodatkowe dane (D)">Szczegóły</button>
+  <button class="tb" id="btnAuto"  title="Autoodtwarzanie (A)">
+    <svg class="tb-ring" viewBox="0 0 12 12"><circle class="r-bg" cx="6" cy="6" r="5.4"/><circle class="r-fg" cx="6" cy="6" r="5.4"/></svg>
+    Auto
+  </button>
+  <button class="tb" id="btnMore" title="Więcej ustawień" aria-expanded="false">•••</button>
+</div>
+
+<aside class="vprog" id="vprog" aria-hidden="true"></aside>
+
+<div class="arrows">
+  <button id="btnPrev" aria-label="Poprzedni slajd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg></button>
+  <button id="btnNext" aria-label="Następny slajd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18l6-6-6-6"/></svg></button>
+</div>
+
+<!-- ══ SLAJDY ══════════════════════════════════════════════════════════════ -->
+<div class="deck" id="deck">
+
+<!-- ─── 01 · OKŁADKA ─────────────────────────────────────────────────────── -->
+<section class="slide slide--dark" data-theme="dark" data-nav="Okładka" data-group="Wstęp">
+  <div class="hex-deco">
+    <span style="width:300px;height:346px;top:14%;right:9%;"></span>
+    <span style="width:172px;height:198px;bottom:11%;right:24%;animation-delay:-4s;"></span>
+    <span style="width:112px;height:129px;top:9%;right:29%;animation-delay:-8s;opacity:.06"></span>
+  </div>
+
+  <div class="chrome-top">
+    <span class="chrome-tag"><span class="chrome-tag-dot"></span>cloudbots.eu</span>
+    <span class="chrome-progress"></span>
+  </div>
+
+  <div class="stage">
+    <div class="cover">
+      <div class="cover-logo" data-step="0">
+        <svg viewBox="0 0 240 275" aria-label="CloudBots">
+          <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#A9F5D6" opacity=".7"/>
+          <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" transform="translate(80,45)" fill="#84DCF1" opacity=".7"/>
+          <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" transform="translate(0,90)" fill="#84F1F1" opacity=".7"/>
+        </svg>
+        <b>CLOUDBOTS</b>
+      </div>
+
+      <p class="eyebrow" data-step="1" data-en="Capabilities deck · 2026">Przegląd kompetencji · 2026</p>
+
+      <h1 class="h-display" data-step="1" style="max-width:20ch"
+          data-en="Agents that <em>actually run</em> in production.">
+        Agenci AI, którzy <em>naprawdę działają</em> na produkcji.
+      </h1>
+
+      <p class="h-sub" data-step="2" style="max-width:56ch"
+         data-en="From discovery workshop to a deployed agent — one team, one path, no proof-of-concept graveyard.">
+        Od warsztatu discovery do wdrożonego agenta — jeden zespół, jedna ścieżka, bez cmentarzyska pilotaży.
+      </p>
+
+      <div class="cover-meta" data-step="3">
+        <div>Dla<b>[KLIENT]</b></div>
+        <div>Data<b>[MIESIĄC ROK]</b></div>
+        <div>Autor<b>Krzysztof Karaszewski</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chrome-bottom">
+    <span class="chrome-tag" data-manual="1">CloudBots · cloudbots.eu</span>
+    <span data-en="Confidential">Poufne</span>
+  </div>
+</section>
+
+<!-- ─── 02 · SPIS TREŚCI ─────────────────────────────────────────────────── -->
+<section class="slide slide--light" data-theme="light" data-nav="Spis treści" data-group="Wstęp">
+  <div class="chrome-top">
+    <span class="chrome-tag"><span class="chrome-tag-dot"></span>02</span>
+    <span class="chrome-progress"></span>
+  </div>
+
+  <div class="stage">
+    <div class="stack">
+      <div data-step="0">
+        <p class="eyebrow" data-en="Contents">Spis treści</p>
+        <h2 class="h-title" style="margin-top:14px" data-en="Five threads of this conversation.">Pięć wątków tej rozmowy.</h2>
+      </div>
+
+      <div class="toc" data-step="1">
+        <div class="toc-row">
+          <span class="toc-n">01</span>
+          <span class="toc-t" data-en="AI Discovery">AI Discovery</span>
+          <span class="toc-d" data-en="Three sessions that map what the organisation can realistically run.">Trzy sesje, które mapują, co organizacja realnie uruchomi.</span>
+        </div>
+        <div class="toc-row">
+          <span class="toc-n">02</span>
+          <span class="toc-t" data-en="Agent development">Wytwarzanie agentów</span>
+          <span class="toc-d" data-en="Data-driven development — evaluation before the first line of production code.">Data-Driven Development — ewaluacja przed pierwszą linią kodu produkcyjnego.</span>
+        </div>
+        <div class="toc-row">
+          <span class="toc-n">03</span>
+          <span class="toc-t" data-en="Process analysis">Analiza procesów</span>
+          <span class="toc-d" data-en="Wide AI Implementation Strategy: from recording to a ranked backlog.">Wide AI Implementation Strategy: od nagrania do backlogu z priorytetami.</span>
+        </div>
+        <div class="toc-row">
+          <span class="toc-n">04</span>
+          <span class="toc-t" data-en="Agentic coding in RPA">Agentic Coding w RPA</span>
+          <span class="toc-d" data-en="Two workshops: UiPath and Python, each two days.">Dwa warsztaty: UiPath i Python, po dwa dni każdy.</span>
+        </div>
+        <div class="toc-row">
+          <span class="toc-n">05</span>
+          <span class="toc-t" data-en="Enablement">Enablement</span>
+          <span class="toc-d" data-en="Entry programme plus a catalogue of seven learning paths.">Program wejściowy plus katalog siedmiu ścieżek.</span>
+        </div>
+      </div>
+
+      <p class="note" data-step="2" data-en="Modules are independent. AI Discovery is the recommended entry point — everything else reads better once the AS-IS is on the table.">
+        Moduły są niezależne. AI Discovery to rekomendowany punkt wejścia — reszta czyta się lepiej, gdy stan AS-IS leży na stole.
+      </p>
+    </div>
+  </div>
+
+  <div class="chrome-bottom">
+    <span class="chrome-tag" data-manual="1">CloudBots · cloudbots.eu</span><span></span>
+  </div>
+</section>
+
+<!-- ─── 03 · PROBLEM (split + liczba) ────────────────────────────────────── -->
+<section class="slide slide--dark" data-theme="dark" data-nav="Problem" data-group="Kontekst">
+  <div class="grid-deco"></div>
+  <div class="chrome-top">
+    <span class="chrome-tag"><span class="chrome-tag-dot"></span>03</span>
+    <span class="chrome-progress"></span>
+  </div>
+
+  <div class="stage">
+    <div class="split split--center">
+      <div class="split-col" data-step="0">
+        <p class="eyebrow" data-en="The problem">Problem</p>
+        <h2 class="h-title" data-en="Pilots pass. Production doesn&rsquo;t.">Pilotaże przechodzą. Produkcja nie.</h2>
+        <p class="lead" data-en="An agent demoed on ten cases behaves differently on ten thousand. What breaks is rarely the model — it is the missing evaluation set, the undefined tool boundary and the absent path to release.">
+          Agent pokazany na dziesięciu przypadkach zachowuje się inaczej na dziesięciu tysiącach. Rzadko zawodzi model — zawodzi brak zbioru ewaluacyjnego, niezdefiniowana granica narzędzi i nieistniejąca ścieżka wdrożenia.
+        </p>
+        <p class="note detail" data-en="Detail: in the four deployments we audited in 2025, the median time from &bdquo;demo works&rdquo; to &bdquo;first production run&rdquo; was 7 months.">
+          Szczegół: w czterech wdrożeniach audytowanych w 2025 mediana czasu od „demo działa” do „pierwsze uruchomienie produkcyjne” wyniosła 7 miesięcy.
+        </p>
+      </div>
+
+      <div class="split-col" data-step="1">
+        <div class="viz">
+          <div class="c-rank">
+            <div class="r"><span class="rn">01</span><span class="rl" data-en="No evaluation set">Brak zbioru ewaluacyjnego</span><span class="rt"><i class="rf" style="--v:88%"></i></span><span class="rv">88%</span></div>
+            <div class="r"><span class="rn">02</span><span class="rl" data-en="Undefined tool boundary">Niezdefiniowana granica narzędzi</span><span class="rt"><i class="rf" style="--v:71%"></i></span><span class="rv">71%</span></div>
+            <div class="r"><span class="rn">03</span><span class="rl" data-en="No release path">Brak ścieżki wdrożenia</span><span class="rt"><i class="rf" style="--v:64%"></i></span><span class="rv">64%</span></div>
+            <div class="r"><span class="rn">04</span><span class="rl" data-en="Data not accessible">Dane niedostępne</span><span class="rt"><i class="rf" style="--v:52%"></i></span><span class="rv">52%</span></div>
+            <div class="r is-rest"><span class="rn">05</span><span class="rl" data-en="Other">Pozostałe</span><span class="rt"><i class="rf" style="--v:23%"></i></span><span class="rv">23%</span></div>
+          </div>
+          <p class="viz-cap" data-en="Blockers named in 24 discovery workshops, 2024–2026. Multiple answers allowed.">
+            Blokery wskazane w 24 warsztatach discovery, 2024–2026. Odpowiedzi wielokrotne.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chrome-bottom">
+    <span class="chrome-tag" data-manual="1">CloudBots · cloudbots.eu</span><span></span>
+  </div>
+</section>
+
+<!-- ─── 04 · LICZBY ──────────────────────────────────────────────────────── -->
+<section class="slide slide--light" data-theme="light" data-nav="Liczby" data-group="Kontekst">
+  <div class="chrome-top">
+    <span class="chrome-tag"><span class="chrome-tag-dot"></span>04</span>
+    <span class="chrome-progress"></span>
+  </div>
+
+  <div class="stage">
+    <div class="stack stack--loose">
+      <div class="head-row" data-step="0">
+        <div>
+          <p class="eyebrow" data-en="By the numbers">W liczbach</p>
+          <h2 class="h-title" style="margin-top:14px" data-en="What the last two years look like.">Jak wyglądają ostatnie dwa lata.</h2>
+        </div>
+        <div class="head-meta" data-en="Data: internal<br>Period: 2024–2026">Dane: wewnętrzne<br>Okres: 2024–2026</div>
+      </div>
+
+      <div class="stats" data-step="1">
+        <div class="stat">
+          <span class="stat-num" data-count-to="24">24</span>
+          <span class="stat-lab" data-en="discovery workshops delivered">zrealizowanych warsztatów discovery</span>
+          <span class="stat-sub" data-en="PL / EN">PL / EN</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" data-count-to="9">9</span>
+          <span class="stat-lab" data-en="agents running in production">agentów działających produkcyjnie</span>
+          <span class="stat-sub" data-en="finance, retail, logistics">finanse, retail, logistyka</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" data-count-to="10" data-count-suffix="×">10×</span>
+          <span class="stat-lab" data-en="shorter development time with agentic coding">krótszy czas wytwarzania z agentic coding</span>
+          <span class="stat-sub" data-en="80 h instead of 500 h">80 h zamiast 500 h</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" data-count-to="98" data-count-suffix="%">98%</span>
+          <span class="stat-lab" data-en="of workshop participants recommend the format">uczestników poleca ten format warsztatu</span>
+          <span class="stat-sub" data-en="n = 187">n = 187</span>
+        </div>
+      </div>
+
+      <div class="split split--62" data-step="2">
+        <div class="split-col">
+          <div class="viz">
+            <div class="c-bars">
+              <div class="b"><span class="bv">3</span><i class="bar" style="--v:19%"></i><span class="bx">2023</span></div>
+              <div class="b"><span class="bv">7</span><i class="bar" style="--v:44%"></i><span class="bx">2024</span></div>
+              <div class="b"><span class="bv">11</span><i class="bar" style="--v:69%"></i><span class="bx">2025</span></div>
+              <div class="b is-hi"><span class="bv">16</span><i class="bar" style="--v:100%"></i><span class="bx">2026*</span></div>
+            </div>
+            <p class="viz-cap" data-en="Projects delivered per year. *2026 — forecast from signed contracts.">
+              Projekty zrealizowane rocznie. *2026 — prognoza z podpisanych umów.
+            </p>
+          </div>
+        </div>
+        <div class="split-col">
+          <div class="viz">
+            <div class="c-meter">
+              <div class="m"><span class="mh"><span data-en="Financial services">Usługi finansowe</span><b>42%</b></span><span class="mt"><i class="mf" style="--v:42%"></i></span></div>
+              <div class="m"><span class="mh"><span data-en="Retail &amp; e-commerce">Retail i e-commerce</span><b>26%</b></span><span class="mt"><i class="mf" style="--v:26%;--c:var(--dv-2)"></i></span></div>
+              <div class="m"><span class="mh"><span data-en="Logistics">Logistyka</span><b>19%</b></span><span class="mt"><i class="mf" style="--v:19%;--c:var(--dv-3)"></i></span></div>
+              <div class="m"><span class="mh"><span data-en="Other">Pozostałe</span><b>13%</b></span><span class="mt"><i class="mf" style="--v:13%;--c:var(--dv-rest)"></i></span></div>
+            </div>
+            <p class="viz-cap" data-en="Revenue split by client sector, 2025.">Udział sektorów w przychodzie, 2025.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chrome-bottom">
+    <span class="chrome-tag" data-manual="1">CloudBots · cloudbots.eu</span><span></span>
+  </div>
+</section>
+
+<!-- ─── 05 · KARTY (wzór modułu) ─────────────────────────────────────────── -->
+<section class="slide slide--light" data-theme="light" data-nav="Moduł 01 · Discovery" data-group="Moduły">
+  <div class="chrome-top">
+    <span class="chrome-tag"><span class="chrome-tag-dot"></span>05</span>
+    <span class="chrome-progress"></span>
+  </div>
+
+  <div class="stage">
+    <div class="stack">
+      <div class="head-row" data-step="0">
+        <div>
+          <p class="eyebrow" data-en="Module 01 · AI Discovery">Moduł 01 · AI Discovery</p>
+          <h2 class="h-title" style="margin-top:14px" data-en="What the <em>AI Discovery workshop</em> consists of.">
+            Z czego składa się <em>warsztat AI Discovery</em>.
+          </h2>
+          <p class="h-sub" style="margin-top:12px" data-en="Three sessions of three hours with three different groups, run as a structured interview.">
+            Trzy sesje po trzy godziny z trzema różnymi grupami, prowadzone jako ustrukturyzowany wywiad.
+          </p>
+        </div>
+        <div class="head-meta" data-en="3 sessions × 3 h<br>3–4 weeks in total<br>remote or on site<br><strong>Polish or English</strong>">
+          3 sesje × 3 h<br>3–4 tygodnie łącznie<br>zdalnie lub stacjonarnie<br><strong>Po polsku lub angielsku</strong>
+        </div>
+      </div>
+
+      <div class="cards cards--3" data-step="1">
+        <div class="card" style="--i:0">
+          <span class="card-num" data-en="Session 1 · 3 h">Sesja 1 · 3 h</span>
+          <h3 class="card-title card-title--s" data-en="RPA platform and current state">Platforma RPA i stan obecny</h3>
+          <div class="blist blist--tight">
+            <div class="bitem bitem--s" data-en="Automation architecture, environments and the real duration of the project lifecycle">Architektura automatyzacji, środowiska i realne czasy cyklu życia projektu</div>
+            <div class="bitem bitem--s" data-en="AI already in production: what runs, how it was built, what it costs">AI już produkcyjne: co działa, jak zbudowane, ile kosztuje</div>
+            <div class="bitem bitem--s" data-en="Whether RPA robots can serve as tools for AI agents, and under which model">Czy roboty RPA mogą być narzędziami dla agentów AI i w jakim modelu</div>
+          </div>
+          <div class="card-foot" data-en="RPA / automation, IT, data, process owners">RPA / automatyzacja, IT, dane, właściciele procesów</div>
+        </div>
+
+        <div class="card" style="--i:1">
+          <span class="card-num" data-en="Session 2 · 3 h">Sesja 2 · 3 h</span>
+          <h3 class="card-title card-title--s" data-en="Architectural patterns and governance">Wzorce architektoniczne i governance</h3>
+          <div class="blist blist--tight">
+            <div class="bitem bitem--s" data-en="Infrastructure reviewed against five patterns: Prompt Chain, RAG, Assistant, AI + RPA, Agent">Infrastruktura pod pięć wzorców: Prompt Chain, RAG, Asystent, AI + RPA, Agent</div>
+            <div class="bitem bitem--s" data-en="Approval path for an AI project and how long it really takes">Ścieżka zatwierdzania projektu AI i jej realny czas trwania</div>
+            <div class="bitem bitem--s" data-en="EU AI Act, GDPR, group policies — what constrains which pattern">EU AI Act, RODO, polityki grupowe — co ogranicza który wzorzec</div>
+          </div>
+          <div class="card-foot" data-en="CoE, security, IT, transformation team">CoE, bezpieczeństwo, IT, zespół transformacji</div>
+        </div>
+
+        <div class="card" style="--i:2">
+          <span class="card-num" data-en="Session 3 · 3 h">Sesja 3 · 3 h</span>
+          <h3 class="card-title card-title--s" data-en="IT and cloud team">Zespół IT i chmury</h3>
+          <div class="blist blist--tight">
+            <div class="bitem bitem--s" data-en="Cloud stack, regions, data residency; model access — quotas, private endpoints">Stos chmurowy, regiony, rezydencja danych; dostęp do modeli — kwoty, prywatne endpointy</div>
+            <div class="bitem bitem--s" data-en="Identity, permissions and secrets: the scope an agent may act in">Tożsamość, uprawnienia i sekrety: zakres, w którym agent może działać</div>
+            <div class="bitem bitem--s" data-en="Environments, CI/CD and the cost model: token billing, budgets, chargeback">Środowiska, CI/CD i model kosztowy: rozliczanie tokenów, budżety, chargeback</div>
+          </div>
+          <div class="card-foot" data-en="IT, cloud, network, infrastructure security">IT, chmura, sieć, bezpieczeństwo infrastruktury</div>
+        </div>
+      </div>
+
+      <div class="punch" data-step="2">
+        <span class="punch-text" data-en="The <em>final report</em> contains: the AS-IS state, a gap analysis with priorities, a use case catalogue with feasibility ratings and a 12-month roadmap.">
+          <em>Raport końcowy</em> zawiera: stan AS-IS, gap analysis z priorytetami, katalog use case’ów z oceną wykonalności i roadmapę 12-miesięczną.
+        </span>
+        <span class="punch-tag" data-en="Questionnaire before the sessions<br>Report in 10 working days">Kwestionariusz przed sesjami<br>Raport w 10 dni roboczych</span>
+      </div>
+
+      <p class="note" data-step="2" data-en="Reference delivery: a consumer finance bank in Poland — an AS-IS report identifying <strong>a dozen-odd gaps organised into a priority list</strong>, documentation of the architectural patterns and decks for management. NDA signed before the first session as standard.">
+        Realizacja referencyjna: bank z sektora consumer finance w Polsce — raport AS-IS wskazujący <strong>kilkanaście luk uporządkowanych w listę priorytetów</strong>, dokumentacja wzorców architektonicznych i prezentacje dla managementu. NDA podpisywane standardowo przed pierwszą sesją.
+      </p>
+    </div>
+  </div>
+
+  <div class="chrome-bottom">
+    <span class="chrome-tag" data-manual="1">CloudBots · cloudbots.eu</span><span></span>
+  </div>
+</section>
+
+<!-- ─── 06 · PROCES ──────────────────────────────────────────────────────── -->
+<section class="slide slide--dark" data-theme="dark" data-nav="Jak pracujemy" data-group="Moduły">
+  <div class="hex-deco"><span style="width:230px;height:265px;bottom:-10%;left:-4%;opacity:.07"></span></div>
+  <div class="chrome-top">
+    <span class="chrome-tag"><span class="chrome-tag-dot"></span>06</span>
+    <span class="chrome-progress"></span>
+  </div>
+
+  <div class="stage">
+    <div class="stack stack--loose">
+      <div data-step="0">
+        <p class="eyebrow" data-en="Method">Metoda</p>
+        <h2 class="h-title" style="margin-top:14px;max-width:24ch" data-en="Five steps, and the loop closes after every one.">
+          Pięć kroków, a pętla domyka się po każdym.
+        </h2>
+      </div>
+
+      <div class="flow" data-step="1">
+        <div class="flow-node">
+          <span class="flow-n">01</span>
+          <span class="flow-t" data-en="Frame">Ramowanie</span>
+          <span class="flow-d" data-en="What decision does the agent make and who bears its cost when it is wrong.">Jaką decyzję podejmuje agent i kto ponosi jej koszt, gdy jest błędna.</span>
+        </div>
+        <div class="flow-node">
+          <span class="flow-n">02</span>
+          <span class="flow-t" data-en="Evaluate">Ewaluacja</span>
+          <span class="flow-d" data-en="A labelled set built before any prompt. No set, no build.">Zbiór oznaczony przed pierwszym promptem. Nie ma zbioru — nie ma budowy.</span>
+        </div>
+        <div class="flow-node">
+          <span class="flow-n">03</span>
+          <span class="flow-t" data-en="Build">Budowa</span>
+          <span class="flow-d" data-en="Tools first, prompt second. The boundary is code, not instruction.">Najpierw narzędzia, potem prompt. Granica to kod, nie instrukcja.</span>
+        </div>
+        <div class="flow-node">
+          <span class="flow-n">04</span>
+          <span class="flow-t" data-en="Ship">Wdrożenie</span>
+          <span class="flow-d" data-en="Shadow run against the human path until the delta stops surprising.">Bieg równoległy do ścieżki ludzkiej, aż różnica przestanie zaskakiwać.</span>
+        </div>
+        <div class="flow-node">
+          <span class="flow-n">05</span>
+          <span class="flow-t" data-en="Observe">Obserwacja</span>
+          <span class="flow-d" data-en="Every production run rejoins the evaluation set. The set grows, the agent stops drifting.">Każdy przebieg produkcyjny wraca do zbioru. Zbiór rośnie, agent przestaje dryfować.</span>
+        </div>
+      </div>
+
+      <div class="punch" data-step="2">
+        <span class="punch-text" data-en="The set is the product. Prompts change weekly; <em>the evaluation set is what stays</em> with the client.">
+          Zbiór jest produktem. Prompty zmieniają się co tydzień; <em>zbiór ewaluacyjny to jest to, co zostaje</em> po stronie klienta.
+        </span>
+        <span class="punch-tag" data-en="Typically 8–12 weeks">Typowo 8–12 tygodni</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="chrome-bottom">
+    <span class="chrome-tag" data-manual="1">CloudBots · cloudbots.eu</span><span></span>
+  </div>
+</section>
+
+<!-- ─── 07 · SEPARATOR SEKCJI ────────────────────────────────────────────── -->
+<section class="slide slide--dark" data-theme="dark" data-nav="Sekcja: Warunki" data-group="Warunki">
+  <div class="hex-deco">
+    <span style="width:340px;height:392px;top:12%;right:-6%;opacity:.08"></span>
+    <span style="width:180px;height:208px;bottom:14%;right:16%;opacity:.06;animation-delay:-6s"></span>
+  </div>
+  <div class="chrome-top">
+    <span class="chrome-tag"><span class="chrome-tag-dot"></span>07</span>
+    <span class="chrome-progress"></span>
+  </div>
+
+  <div class="stage">
+    <div class="sect">
+      <span class="sect-num" data-step="0">03</span>
+      <h2 class="sect-title" data-step="1" style="max-width:18ch" data-en="Terms, scope and what it costs.">Warunki, zakres i ile to kosztuje.</h2>
+      <p class="h-sub" data-step="2" style="max-width:48ch" data-en="Rates are a starting point for the conversation, not a price list.">
+        Stawki są punktem wyjścia do rozmowy, nie cennikiem.
+      </p>
+    </div>
+  </div>
+
+  <div class="chrome-bottom">
+    <span class="chrome-tag" data-manual="1">CloudBots · cloudbots.eu</span><span></span>
+  </div>
+</section>
+
+<!-- ─── 08 · TABELA ──────────────────────────────────────────────────────── -->
+<section class="slide slide--light" data-theme="light" data-nav="Wycena" data-group="Warunki">
+  <div class="chrome-top">
+    <span class="chrome-tag"><span class="chrome-tag-dot"></span>08</span>
+    <span class="chrome-progress"></span>
+  </div>
+
+  <div class="stage">
+    <div class="stack">
+      <div class="head-row" data-step="0">
+        <div>
+          <p class="eyebrow" data-en="Pricing">Wycena</p>
+          <h2 class="h-title" style="margin-top:14px" data-en="Six ways to work together.">Sześć form współpracy.</h2>
+        </div>
+        <div class="head-meta" data-en="All amounts net<br>PLN">Kwoty netto<br>PLN</div>
+      </div>
+
+      <table class="tbl" data-step="1">
+        <thead>
+          <tr>
+            <th data-en="Format">Forma</th>
+            <th data-en="What you get">Co dostajesz</th>
+            <th class="t-meta" data-en="Duration">Czas</th>
+            <th class="t-price" data-en="From">Od</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="t-name" data-en="Diagnostic workshop">Warsztat diagnostyczny</td><td data-en="AS-IS report, gap analysis, 12-month roadmap">Raport AS-IS, gap analysis, roadmapa 12-miesięczna</td><td class="t-meta">3–4 tyg.</td><td class="t-price">12 000</td></tr>
+          <tr><td class="t-name" data-en="Implementation workshop">Warsztat wdrożeniowy</td><td data-en="Two days on site plus a first pool of piloted processes">Dwa dni na miejscu plus pierwsza pula procesów pilotażowych</td><td class="t-meta">4–6 tyg.</td><td class="t-price">25 000</td></tr>
+          <tr><td class="t-name" data-en="Technical workshop">Warsztat techniczny</td><td data-en="Agentic coding: UiPath or Python track, group up to 10">Agentic coding: ścieżka UiPath albo Python, grupa do 10</td><td class="t-meta">2 dni</td><td class="t-price">15 000</td></tr>
+          <tr><td class="t-name" data-en="Training day">Dzień szkoleniowy</td><td data-en="From the catalogue of seven paths, Polish or English">Z katalogu siedmiu ścieżek, po polsku lub angielsku</td><td class="t-meta">1 dzień</td><td class="t-price">9 500</td></tr>
+          <tr><td class="t-name" data-en="Pilot project">Projekt pilotażowy</td><td data-en="One agent from framing to shadow run in production">Jeden agent od ramowania do biegu równoległego na produkcji</td><td class="t-meta">8–12 tyg.</td><td class="t-price">48 000</td></tr>
+          <tr><td class="t-name" data-en="Hourly advisory">Doradztwo godzinowe</td><td data-en="Architecture review, code review, escalation support">Przegląd architektury, code review, wsparcie eskalacyjne</td><td class="t-meta">wg potrzeb</td><td class="t-price">300 / h</td></tr>
+          <tr class="detail"><td class="t-name" data-en="Retainer">Retainer</td><td data-en="Reserved capacity, priority response, quarterly review">Zarezerwowana dostępność, priorytetowa reakcja, przegląd kwartalny</td><td class="t-meta">kwartał</td><td class="t-price">24 000</td></tr>
+        </tbody>
+      </table>
+
+      <div class="punch" data-step="2">
+        <span class="punch-text" data-en="Amounts are a <em>starting point</em>. Scope, group size and delivery mode move them in both directions.">
+          Kwoty są <em>punktem wyjścia</em>. Zakres, wielkość grupy i tryb realizacji przesuwają je w obie strony.
+        </span>
+        <span class="punch-tag" data-en="Press D for extra rows">Naciśnij D po dodatkowe wiersze</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="chrome-bottom">
+    <span class="chrome-tag" data-manual="1">CloudBots · cloudbots.eu</span><span></span>
+  </div>
+</section>
+
+<!-- ─── 09 · OŚ CZASU ────────────────────────────────────────────────────── -->
+<section class="slide slide--light" data-theme="light" data-nav="Harmonogram" data-group="Warunki">
+  <div class="chrome-top">
+    <span class="chrome-tag"><span class="chrome-tag-dot"></span>09</span>
+    <span class="chrome-progress"></span>
+  </div>
+
+  <div class="stage">
+    <div class="split split--38">
+      <div class="split-col" data-step="0">
+        <p class="eyebrow" data-en="Timeline">Harmonogram</p>
+        <h2 class="h-title" data-en="Twelve weeks, four checkpoints.">Dwanaście tygodni, cztery punkty kontrolne.</h2>
+        <p class="lead" data-en="Each checkpoint is a go / no-go. Stopping after any of them costs nothing beyond the work already done.">
+          Każdy punkt kontrolny to decyzja idziemy / nie idziemy. Zatrzymanie po którymkolwiek nie kosztuje nic ponad już wykonaną pracę.
+        </p>
+        <div class="chips">
+          <span class="chip is-on">Discovery</span>
+          <span class="chip">Ewaluacja</span>
+          <span class="chip">Budowa</span>
+          <span class="chip">Shadow run</span>
+        </div>
+      </div>
+
+      <div class="split-col" data-step="1">
+        <div class="tl">
+          <div class="tl-item">
+            <span class="tl-when" data-en="Weeks 1–3">Tydz. 1–3</span>
+            <span class="tl-what">
+              <span class="tl-t" data-en="Discovery and framing">Discovery i ramowanie</span>
+              <span class="tl-d" data-en="Three sessions, questionnaire, AS-IS report. Checkpoint: is there a case worth building?">Trzy sesje, kwestionariusz, raport AS-IS. Punkt kontrolny: czy jest case wart zbudowania?</span>
+            </span>
+          </div>
+          <div class="tl-item">
+            <span class="tl-when" data-en="Weeks 4–5">Tydz. 4–5</span>
+            <span class="tl-what">
+              <span class="tl-t" data-en="Evaluation set">Zbiór ewaluacyjny</span>
+              <span class="tl-d" data-en="200–500 labelled cases with the client&rsquo;s subject-matter experts. Checkpoint: is the baseline measurable?">200–500 oznaczonych przypadków z ekspertami klienta. Punkt kontrolny: czy baseline jest mierzalny?</span>
+            </span>
+          </div>
+          <div class="tl-item">
+            <span class="tl-when" data-en="Weeks 6–10">Tydz. 6–10</span>
+            <span class="tl-what">
+              <span class="tl-t" data-en="Build">Budowa</span>
+              <span class="tl-d" data-en="Tools, boundaries, prompt, iteration against the set. Checkpoint: does the agent beat the baseline?">Narzędzia, granice, prompt, iteracja na zbiorze. Punkt kontrolny: czy agent bije baseline?</span>
+            </span>
+          </div>
+          <div class="tl-item">
+            <span class="tl-when" data-en="Weeks 11–12">Tydz. 11–12</span>
+            <span class="tl-what">
+              <span class="tl-t" data-en="Shadow run">Bieg równoległy</span>
+              <span class="tl-d" data-en="Production traffic, human decision still binding. Checkpoint: switch the binding decision.">Ruch produkcyjny, decyzja człowieka nadal wiążąca. Punkt kontrolny: przełączenie decyzji wiążącej.</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chrome-bottom">
+    <span class="chrome-tag" data-manual="1">CloudBots · cloudbots.eu</span><span></span>
+  </div>
+</section>
+
+<!-- ─── 10 · OPINIE ──────────────────────────────────────────────────────── -->
+<section class="slide slide--light" data-theme="light" data-nav="Opinie" data-group="Dowody">
+  <div class="chrome-top">
+    <span class="chrome-tag"><span class="chrome-tag-dot"></span>10</span>
+    <span class="chrome-progress"></span>
+  </div>
+
+  <div class="stage">
+    <div class="stack stack--loose">
+      <div data-step="0">
+        <p class="eyebrow" data-en="What participants say">Co mówią uczestnicy</p>
+        <h2 class="h-title" style="margin-top:14px" data-en="Three sentences we did not write.">Trzy zdania, których nie napisaliśmy.</h2>
+      </div>
+
+      <div class="cards cards--3" data-step="1">
+        <div class="tq">
+          <span class="tq-mark">”</span>
+          <p class="tq-text" data-en="We came in expecting a slide deck about AI. We left with a list of eleven things our own infrastructure blocks — and the order to fix them in.">
+            Przyszliśmy po prezentację o AI. Wyszliśmy z listą jedenastu rzeczy, które blokuje nasza własna infrastruktura — i z kolejnością ich naprawiania.
+          </p>
+          <p class="tq-who"><b>Head of Automation</b><br><span data-en="banking, 4 000+ employees">bankowość, 4 000+ pracowników</span></p>
+        </div>
+        <div class="tq">
+          <span class="tq-mark">”</span>
+          <p class="tq-text" data-en="The evaluation set was the part nobody had asked us for before. It is also the only artefact still in daily use a year later.">
+            Zbiór ewaluacyjny to była ta część, o którą wcześniej nikt nas nie poprosił. To też jedyny artefakt, którego używamy codziennie rok później.
+          </p>
+          <p class="tq-who"><b>RPA Team Lead</b><br><span data-en="retail, 900 employees">retail, 900 pracowników</span></p>
+        </div>
+        <div class="tq">
+          <span class="tq-mark">”</span>
+          <p class="tq-text" data-en="Two days of agentic coding did more for the team than the previous six months of internal enablement. Mostly because we shipped something on day two.">
+            Dwa dni agentic coding zrobiły dla zespołu więcej niż poprzednie pół roku wewnętrznego enablementu. Głównie dlatego, że drugiego dnia coś wdrożyliśmy.
+          </p>
+          <p class="tq-who"><b>Delivery Manager</b><br><span data-en="logistics, 2 300 employees">logistyka, 2 300 pracowników</span></p>
+        </div>
+      </div>
+
+      <div class="logos" data-step="2" aria-label="Narzędzia i platformy">
+        <span class="chip">UiPath</span><span class="chip">Power Automate</span><span class="chip">Azure OpenAI</span>
+        <span class="chip">Anthropic</span><span class="chip">LangGraph</span><span class="chip">Copilot Studio</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="chrome-bottom">
+    <span class="chrome-tag" data-manual="1">CloudBots · cloudbots.eu</span><span></span>
+  </div>
+</section>
+
+<!-- ─── 11 · KONTAKT ─────────────────────────────────────────────────────── -->
+<section class="slide slide--dark" data-theme="dark" data-nav="Kontakt" data-group="Dowody">
+  <div class="hex-deco">
+    <span style="width:300px;height:346px;top:-6%;left:-5%;opacity:.07"></span>
+    <span style="width:150px;height:173px;bottom:12%;right:8%;opacity:.06;animation-delay:-5s"></span>
+  </div>
+  <div class="chrome-top">
+    <span class="chrome-tag"><span class="chrome-tag-dot"></span>11</span>
+    <span class="chrome-progress"></span>
+  </div>
+
+  <div class="stage">
+    <div class="stack stack--loose">
+      <div data-step="0">
+        <p class="eyebrow" data-en="Next step">Następny krok</p>
+        <h2 class="h-title" style="margin-top:14px;max-width:22ch" data-en="One call to find out whether there is anything to build.">
+          Jedna rozmowa, żeby ustalić, czy jest co budować.
+        </h2>
+      </div>
+
+      <div class="contact" data-step="1">
+        <div class="contact-photo" aria-hidden="true"></div>
+        <div class="contact-lines">
+          <div><strong>Krzysztof Karaszewski</strong></div>
+          <div data-en="Founder · CloudBots">Założyciel · CloudBots</div>
+          <div><a href="mailto:krzysztof.karaszewski@cloudbots.eu">krzysztof.karaszewski@cloudbots.eu</a></div>
+          <div><a href="https://cloudbots.eu">cloudbots.eu</a></div>
+          <div><a href="https://www.linkedin.com/in/krzysztofkaraszewski/">linkedin.com/in/krzysztofkaraszewski</a></div>
+        </div>
+      </div>
+
+      <p class="note" data-step="2" data-en="NDA signed before the first session as standard. All artefacts stay with the client.">
+        NDA podpisywane standardowo przed pierwszą sesją. Wszystkie artefakty zostają po stronie klienta.
+      </p>
+    </div>
+  </div>
+
+  <div class="chrome-bottom">
+    <span class="chrome-tag" data-manual="1">CloudBots · cloudbots.eu</span>
+    <span>2026</span>
+  </div>
+</section>
+
+</div><!-- /.deck -->
+
+<!-- ══ LIGHTBOX ════════════════════════════════════════════════════════════ -->
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" id="lbClose" aria-label="Zamknij">×</button>
+  <div class="lb-frame" id="lbFrame"></div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   SILNIK
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function(){
+'use strict';
+
+const deck    = document.getElementById('deck');
+const slides  = Array.from(deck.querySelectorAll('.slide'));
+const body    = document.body;
+const N       = slides.length;
+let current   = 0;
+
+/* ── numeracja slajdów i postęp w chrome ────────────────────────────────── */
+slides.forEach((s,i)=>{
+  const tag = s.querySelector('.chrome-top .chrome-tag');
+  if(tag && !tag.hasAttribute('data-manual')){
+    const dot = tag.querySelector('.chrome-tag-dot');
+    tag.textContent = String(i+1).padStart(2,'0');
+    if(dot) tag.prepend(dot);
+  }
+  const pr = s.querySelector('.chrome-progress');
+  if(pr) pr.style.setProperty('--p', (N<2?100:(i/(N-1))*100)+'%');
+  /* indeks karty dla kaskady animacji zaawansowanej */
+  s.querySelectorAll('.cards > *').forEach((c,j)=>{ if(!c.style.getPropertyValue('--i')) c.style.setProperty('--i', j); });
+});
+
+/* ── menu wysuwane ──────────────────────────────────────────────────────── */
+const drawer = document.getElementById('drawer');
+const dTab   = document.getElementById('drawerTab');
+const dScrim = document.getElementById('drawerScrim');
+const dNav   = document.getElementById('drawerNav');
+
+(function buildNav(){
+  let lastGroup = null, html = '';
+  slides.forEach((s,i)=>{
+    const g = s.dataset.group;
+    if(g && g !== lastGroup){ html += `<div class="dgroup">${g}</div>`; lastGroup = g; }
+    const label = s.dataset.nav || `Slajd ${i+1}`;
+    html += `<button class="ditem" data-go="${i}"><span class="dn">${String(i+1).padStart(2,'0')}</span><span class="dt">${label}</span></button>`;
+  });
+  dNav.innerHTML = html;
+  dNav.addEventListener('click', e=>{
+    const b = e.target.closest('[data-go]');
+    if(!b) return;
+    goTo(+b.dataset.go);
+    closeDrawer();
+  });
+})();
+
+function openDrawer(){ body.classList.add('drawer-open'); dTab.setAttribute('aria-expanded','true'); }
+function closeDrawer(){ body.classList.remove('drawer-open'); dTab.setAttribute('aria-expanded','false'); }
+function toggleDrawer(){ body.classList.contains('drawer-open') ? closeDrawer() : openDrawer(); }
+dTab.addEventListener('click', toggleDrawer);
+dScrim.addEventListener('click', closeDrawer);
+
+/* ── pasek postępu ──────────────────────────────────────────────────────── */
+const vprog = document.getElementById('vprog');
+vprog.innerHTML = slides.map((_,i)=>`<i data-go="${i}"></i>`).join('');
+vprog.addEventListener('click', e=>{ const t=e.target.closest('[data-go]'); if(t) goTo(+t.dataset.go); });
+
+/* ── nawigacja ──────────────────────────────────────────────────────────── */
+function goTo(i){
+  i = Math.max(0, Math.min(N-1, i));
+  slides[i].scrollIntoView({behavior:'smooth', block:'start'});
+}
+document.getElementById('btnPrev').addEventListener('click', ()=>step(-1));
+document.getElementById('btnNext').addEventListener('click', ()=>step(1));
+
+/* w trybie prezentacji strzałka najpierw odsłania kolejny krok */
+function step(dir){
+  if(dir > 0 && body.classList.contains('mode-present') && revealNext(slides[current])) return;
+  goTo(current + dir);
+}
+
+/* ── obserwator aktywnego slajdu ────────────────────────────────────────── */
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(en=>{
+    if(en.intersectionRatio > .5){
+      const i = slides.indexOf(en.target);
+      if(i === current && en.target.classList.contains('is-active')) return;
+      current = i;
+      setActive(i);
+    }
+  });
+},{root:deck, threshold:[.5]});
+slides.forEach(s=>io.observe(s));
+
+function setActive(i){
+  slides.forEach((s,j)=>s.classList.toggle('is-active', j===i));
+  body.classList.toggle('is-light', slides[i].dataset.theme === 'light');
+  Array.from(vprog.children).forEach((seg,j)=>{
+    seg.classList.toggle('is-current', j===i);
+    seg.classList.toggle('is-done', j<i);
+  });
+  Array.from(dNav.querySelectorAll('.ditem')).forEach((b,j)=>b.classList.toggle('is-current', j===i));
+  fitSlide(slides[i]);
+  revealSlide(slides[i]);
+  fireCountups(slides[i]);
+  if(autoOn) restartAuto();
+}
+
+/* ── kroki ──────────────────────────────────────────────────────────────── */
+/* Tryb dokumentu: wszystko widać, kroki dają tylko kaskadę wejścia.
+   Tryb prezentacji: kroki czekają na strzałkę. */
+let stepTimer = null;
+function revealSlide(s){
+  clearTimeout(stepTimer);
+  const steps = Array.from(s.querySelectorAll('[data-step]'));
+  if(body.classList.contains('mode-present')){
+    s.classList.remove('is-revealed');
+    steps.forEach(el=>el.classList.remove('is-shown'));
+    revealNext(s);           /* pierwszy krok pokazujemy od razu */
+    return;
+  }
+  steps.forEach(el=>{
+    const n = parseInt(el.dataset.step,10) || 0;
+    el.style.setProperty('--d', body.classList.contains('anim-off') ? '0s' : (n*0.13)+'s');
+  });
+  requestAnimationFrame(()=>s.classList.add('is-revealed'));
+}
+function revealNext(s){
+  const hidden = Array.from(s.querySelectorAll('[data-step]:not(.is-shown)'));
+  if(!hidden.length) return false;
+  const lvl = hidden[0].dataset.step;
+  hidden.filter(el=>el.dataset.step === lvl).forEach(el=>{ el.style.setProperty('--d','0s'); el.classList.add('is-shown'); });
+  return true;
+}
+
+/* ── odliczanie liczb ───────────────────────────────────────────────────── */
+function fireCountups(s){
+  if(body.classList.contains('anim-off')) return;
+  s.querySelectorAll('[data-count-to]').forEach(el=>{
+    if(el.dataset.counted) return;
+    el.dataset.counted = '1';
+    const to = parseFloat(el.dataset.countTo);
+    const suf = el.dataset.countSuffix || '';
+    const pre = el.dataset.countPrefix || '';
+    const dec = (el.dataset.countTo.split('.')[1]||'').length;
+    const t0 = performance.now(), dur = 950;
+    (function tick(now){
+      const p = Math.min(1,(now-t0)/dur), e = 1-Math.pow(1-p,3);
+      el.textContent = pre + (to*e).toFixed(dec).replace('.',',') + suf;
+      if(p<1) requestAnimationFrame(tick);
+    })(t0);
+  });
+}
+
+/* ── autoskalowanie ─────────────────────────────────────────────────────── */
+/* transform:scale zamiast zoom — html2canvas i druk radzą sobie z transformem,
+   z zoomem nie. Skalujemy bezpośrednie dziecko .stage, nie sam slajd. */
+const FIT_MODES = [
+  {id:'fit',  label:'Zmieść',  labelEn:'Fit'},
+  {id:'fill', label:'Wypełnij',labelEn:'Fill'},
+  {id:'off',  label:'1:1',     labelEn:'1:1'}
+];
+const FIT_MAX = 1.30;            /* powyżej tego rzadki slajd robi się karykaturalny */
+const FIT_MIN = 0.45;
+let fitIdx   = 0;
+let userZoom = parseFloat(localStorage.getItem('cbZoom')) || 1;
+
+/* Skalujemy dziecko .stage, a nie slajd. Skalowanie zmienia też szerokość, więc
+   za każdym razem kompensujemy ją odwrotnością współczynnika: przy width=100/k%
+   i transform-origin w środku przeskalowana treść ląduje dokładnie na krawędziach
+   sceny. Bez tego przy k<1 treść odsuwa się od marginesu, a przy k>1 wychodzi
+   poza kadr. Pętla przelicza, bo zmiana szerokości zmienia zawijanie tekstu. */
+function fitSlide(s){
+  const stage = s.querySelector('.stage');
+  const child = stage && stage.firstElementChild;
+  if(!child) return;
+  const mode = FIT_MODES[fitIdx].id;
+
+  child.style.width = '100%';
+  child.style.setProperty('--fit', 1);
+
+  let k = userZoom;
+  if(mode !== 'off'){
+    for(let pass = 0; pass < 3; pass++){
+      const natural = child.offsetHeight || 1;
+      let kk = (stage.clientHeight / natural) * 0.985;
+      if(mode === 'fit') kk = Math.min(1, kk);
+      kk = Math.max(FIT_MIN, Math.min(FIT_MAX, kk)) * userZoom;
+      if(Math.abs(kk - k) < 0.005){ k = kk; break; }
+      k = kk;
+      child.style.width = (100 / k) + '%';
+    }
+  }
+  child.style.width = (100 / k) + '%';
+  child.style.setProperty('--fit', k.toFixed(4));
+}
+function fitAll(){ slides.forEach(fitSlide); }
+addEventListener('resize', ()=>{ clearTimeout(fitAll._t); fitAll._t = setTimeout(fitAll, 140); });
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>setTimeout(fitAll,60));
+
+const btnFit = document.getElementById('btnFit');
+btnFit.addEventListener('click', ()=>{
+  fitIdx = (fitIdx+1) % FIT_MODES.length;
+  btnFit.textContent = lang==='en' ? FIT_MODES[fitIdx].labelEn : FIT_MODES[fitIdx].label;
+  fitAll();
+});
+document.getElementById('btnZoomIn').addEventListener('click',  ()=>setZoom(userZoom+0.06));
+document.getElementById('btnZoomOut').addEventListener('click', ()=>setZoom(userZoom-0.06));
+function setZoom(z){
+  userZoom = Math.max(0.6, Math.min(1.6, +z.toFixed(2)));
+  localStorage.setItem('cbZoom', userZoom);
+  fitAll();
+}
+
+/* ── rozwijane sterowanie ───────────────────────────────────────────────── */
+const btnMore = document.getElementById('btnMore');
+btnMore.addEventListener('click', ()=>{
+  body.classList.toggle('tb-open');
+  const on = body.classList.contains('tb-open');
+  btnMore.classList.toggle('is-on', on);
+  btnMore.setAttribute('aria-expanded', on);
+});
+
+/* ── tryb dokument / prezentacja ────────────────────────────────────────── */
+const btnMode = document.getElementById('btnMode');
+btnMode.addEventListener('click', ()=>{
+  body.classList.toggle('mode-present');
+  const on = body.classList.contains('mode-present');
+  btnMode.classList.toggle('is-on', on);
+  btnMode.textContent = on ? (lang==='en'?'Present':'Prezentacja') : (lang==='en'?'Document':'Dokument');
+  revealSlide(slides[current]);
+});
+
+/* ── szczegóły ──────────────────────────────────────────────────────────── */
+const btnDet = document.getElementById('btnDet');
+btnDet.addEventListener('click', ()=>{
+  body.classList.toggle('details-on');
+  btnDet.classList.toggle('is-on', body.classList.contains('details-on'));
+  fitAll();
+});
+
+/* ── poziom animacji ────────────────────────────────────────────────────── */
+const ANIMS = [
+  {cls:'',          label:'Anim: prosta',  labelEn:'Anim: simple'},
+  {cls:'anim-adv',  label:'Anim: pełna',   labelEn:'Anim: full'},
+  {cls:'anim-off',  label:'Anim: brak',    labelEn:'Anim: off'}
+];
+let animIdx = 0;
+const btnAnim = document.getElementById('btnAnim');
+btnAnim.addEventListener('click', ()=>{
+  body.classList.remove('anim-adv','anim-off');
+  animIdx = (animIdx+1) % ANIMS.length;
+  if(ANIMS[animIdx].cls) body.classList.add(ANIMS[animIdx].cls);
+  btnAnim.textContent = lang==='en' ? ANIMS[animIdx].labelEn : ANIMS[animIdx].label;
+  revealSlide(slides[current]);
+});
+
+/* ── autoodtwarzanie ────────────────────────────────────────────────────── */
+const AUTO_MS = 7000;
+let autoOn = false, autoTimer = null, ringTimer = null;
+const btnAuto = document.getElementById('btnAuto');
+const ring    = btnAuto.querySelector('.r-fg');
+btnAuto.addEventListener('click', ()=>{ autoOn = !autoOn; btnAuto.classList.toggle('is-on', autoOn); autoOn ? restartAuto() : stopAuto(); });
+function restartAuto(){
+  stopAuto(false);
+  ring.style.transition = 'none';  ring.style.setProperty('--o', 34);
+  ringTimer = setTimeout(()=>{ ring.style.transition = `stroke-dashoffset ${AUTO_MS}ms linear`; ring.style.setProperty('--o', 0); }, 30);
+  autoTimer = setTimeout(()=>{ current >= N-1 ? goTo(0) : goTo(current+1); }, AUTO_MS);
+}
+function stopAuto(reset = true){
+  clearTimeout(autoTimer); clearTimeout(ringTimer);
+  if(reset){ ring.style.transition = 'none'; ring.style.setProperty('--o', 34); }
+}
+
+/* ── język ──────────────────────────────────────────────────────────────── */
+let lang = 'pl';
+const btnLang = document.getElementById('btnLang');
+btnLang.addEventListener('click', ()=>setLang(lang === 'pl' ? 'en' : 'pl'));
+function setLang(l){
+  document.querySelectorAll('[data-en]').forEach(el=>{
+    if(!el.dataset.pl) el.dataset.pl = el.innerHTML;      /* dopisz polski przy pierwszym przełączeniu */
+    el.innerHTML = (l === 'en') ? el.dataset.en : el.dataset.pl;
+  });
+  lang = l;
+  document.documentElement.lang = l;
+  btnLang.textContent = (l === 'en') ? 'PL' : 'EN';
+  btnFit.textContent  = (l === 'en') ? FIT_MODES[fitIdx].labelEn : FIT_MODES[fitIdx].label;
+  btnAnim.textContent = (l === 'en') ? ANIMS[animIdx].labelEn : ANIMS[animIdx].label;
+  btnDet.textContent  = (l === 'en') ? 'Details' : 'Szczegóły';
+  const pres = body.classList.contains('mode-present');
+  btnMode.textContent = (l === 'en') ? (pres?'Present':'Document') : (pres?'Prezentacja':'Dokument');
+  fitAll();
+}
+
+/* ── lightbox ───────────────────────────────────────────────────────────── */
+const lb = document.getElementById('lightbox'), lbFrame = document.getElementById('lbFrame');
+const NO_YT_EMBED = location.protocol === 'file:';    /* YouTube blokuje osadzenie z dysku (błąd 153) */
+document.addEventListener('click', e=>{
+  const t = e.target.closest('[data-video]');
+  if(!t) return;
+  e.preventDefault();
+  const url = t.dataset.video;
+  if(NO_YT_EMBED && /youtu/.test(url)){ window.open(url, '_blank', 'noopener'); return; }
+  lbFrame.innerHTML = `<iframe src="${url}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+  lb.classList.add('is-open');
+});
+function closeLb(){ lb.classList.remove('is-open'); lbFrame.innerHTML = ''; }
+document.getElementById('lbClose').addEventListener('click', closeLb);
+lb.addEventListener('click', e=>{ if(e.target === lb) closeLb(); });
+
+/* ── eksport ────────────────────────────────────────────────────────────── */
+document.getElementById('btnPdf').addEventListener('click', ()=>{
+  body.classList.add('is-clean');
+  slides.forEach(s=>{ const c = s.querySelector('.stage')?.firstElementChild; if(c){ c.style.setProperty('--fit', 1); c.style.width = '100%'; } });
+  setTimeout(()=>{ window.print(); body.classList.remove('is-clean'); fitAll(); }, 120);
+});
+
+document.getElementById('btnPptx').addEventListener('click', async ()=>{
+  const btn = document.getElementById('btnPptx');
+  const old = btn.textContent; btn.textContent = '…';
+  try{
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+    await loadScript('https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js');
+    body.classList.add('is-clean');
+    const pptx = new PptxGenJS();
+    pptx.defineLayout({name:'CB16x9', width:13.333, height:7.5});
+    pptx.layout = 'CB16x9';
+    for(const s of slides){
+      const canvas = await html2canvas(s, {scale:2, backgroundColor:null, logging:false, useCORS:true,
+                                           windowWidth:s.offsetWidth, windowHeight:s.offsetHeight});
+      pptx.addSlide().addImage({data:canvas.toDataURL('image/png'), x:0, y:0, w:13.333, h:7.5});
+    }
+    await pptx.writeFile({fileName:'CloudBots-prezentacja.pptx'});
+  }catch(err){
+    alert('Eksport PPTX nie powiódł się: ' + err.message + '\nUżyj scripts/export-deck.py — daje lepszą jakość.');
+  }finally{
+    body.classList.remove('is-clean'); btn.textContent = old;
+  }
+});
+function loadScript(src){
+  return new Promise((ok, no)=>{
+    if(document.querySelector(`script[src="${src}"]`)) return ok();
+    const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = ()=>no(new Error('brak dostępu do ' + src));
+    document.head.appendChild(s);
+  });
+}
+
+/* ── kółko myszy: jeden gest = jeden slajd ──────────────────────────────── */
+let wheelAcc = 0, wheelLock = false;
+deck.addEventListener('wheel', e=>{
+  if(body.classList.contains('drawer-open')) return;
+  e.preventDefault();
+  if(wheelLock) return;
+  wheelAcc += e.deltaY;
+  if(Math.abs(wheelAcc) > 40){
+    step(wheelAcc > 0 ? 1 : -1);
+    wheelAcc = 0; wheelLock = true;
+    setTimeout(()=>{ wheelLock = false; }, 240);
+  }
+},{passive:false});
+
+/* ── klawiatura ─────────────────────────────────────────────────────────── */
+addEventListener('keydown', e=>{
+  if(e.target.matches('input,textarea')) return;
+  const k = e.key;
+  if(k === 'Escape'){ closeDrawer(); closeLb(); return; }
+  if(k === 'ArrowRight' || k === 'ArrowDown' || k === 'PageDown' || k === ' '){ e.preventDefault(); step(1); return; }
+  if(k === 'ArrowLeft'  || k === 'ArrowUp'   || k === 'PageUp'){ e.preventDefault(); step(-1); return; }
+  if(k === 'Home'){ e.preventDefault(); goTo(0); return; }
+  if(k === 'End'){ e.preventDefault(); goTo(N-1); return; }
+  const key = k.toLowerCase();
+  if(key === 'm'){ toggleDrawer(); return; }
+  if(key === 'p'){ btnMode.click(); return; }
+  if(key === 'd'){ btnDet.click(); return; }
+  if(key === 'f'){ btnFit.click(); return; }
+  if(key === 'a'){ btnAuto.click(); return; }
+  if(key === 'l'){ btnLang.click(); return; }
+  if(/^[1-9]$/.test(k)){ goTo(+k - 1); return; }
+});
+
+/* ── start ──────────────────────────────────────────────────────────────── */
+setActive(0);
+fitAll();
+setTimeout(fitAll, 400);      /* po dojechaniu fontów */
+})();
+</script>
+</body>
+</html>

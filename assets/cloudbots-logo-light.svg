@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 300">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@600');
+    </style>
+  </defs>
+
+  <!-- Hexagon 1 (Mint) -->
+  <polygon
+    points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2"
+    transform="translate(0, 0)"
+    fill="#A9F5D6"
+    opacity="0.7"
+  />
+
+  <!-- Hexagon 2 (Cyan) -->
+  <polygon
+    points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2"
+    transform="translate(80, 45)"
+    fill="#84DCF1"
+    opacity="0.7"
+  />
+
+  <!-- Hexagon 3 (Turquoise) -->
+  <polygon
+    points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2"
+    transform="translate(0, 90)"
+    fill="#84F1F1"
+    opacity="0.5"
+  />
+
+  <!-- Logo Text - Dark for light mode -->
+  <text x="35" y="155" font-family="'Exo 2', sans-serif" font-size="62" font-weight="600" letter-spacing="2" fill="#1e293b">CLOUDBOTS</text>
+</svg>

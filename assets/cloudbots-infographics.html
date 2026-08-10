@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CloudBots · infografiki</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Exo+2:wght@600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   CLOUDBOTS · INFOGRAFIKI
+   Siedem samodzielnych płócien w stałych rozmiarach pikselowych. Każde ma
+   data-render — scripts/render.py zapisuje je jako PNG w 2×.
+   Rozmiar płótna jest stały celowo: infografika ma być artefaktem o znanym
+   kadrze, nie responsywną stroną. Skalowanie podglądu robi transform, więc
+   eksport zawsze wychodzi w nominalnym rozmiarze.
+   Instrukcja edycji: references/infographics.md
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  --cb-primary:#00CED1; --cb-primary-700:#00b8b8; --cb-mint:#A9F5D6;
+  --cb-cyan:#84DCF1; --cb-turq:#84F1F1; --cb-cyan-deep:#0891b2;
+  --ff-display:'Space Grotesk',system-ui,sans-serif;
+  --ff-body:'Inter',system-ui,sans-serif;
+  --ff-mono:'JetBrains Mono',Consolas,monospace;
+  --ff-logo:'Exo 2',var(--ff-display);
+  --ease:cubic-bezier(.16,1,.3,1);
+  --hex:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+}
+*,*::before,*::after{box-sizing:border-box;}
+body{margin:0;background:#1b1d24;color:#c2c5d2;font-family:var(--ff-body);-webkit-font-smoothing:antialiased;}
+
+/* ── kadr podglądu ─────────────────────────────────────────────────────── */
+.page{padding:44px 34px 100px;max-width:1500px;margin:0 auto;}
+.page > h1{font-family:var(--ff-display);font-size:32px;font-weight:500;letter-spacing:-.025em;color:#f4f1e8;margin:0 0 6px;}
+.page > p.sub{margin:0 0 40px;color:#8a8f9e;max-width:70ch;line-height:1.6;}
+.slot{margin-bottom:56px;}
+.slot-head{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:14px;
+  padding-bottom:11px;border-bottom:1px solid rgba(255,255,255,.09);}
+.slot-head h2{font-family:var(--ff-display);font-size:18px;font-weight:500;color:#f4f1e8;margin:0;}
+.slot-head code{font-family:var(--ff-mono);font-size:12px;color:var(--cb-primary);letter-spacing:.05em;}
+.slot-head .dim{font-family:var(--ff-mono);font-size:11.5px;color:#6b7080;letter-spacing:.1em;margin-left:auto;}
+.holder{overflow:hidden;}
+.holder > .canvas{transform-origin:top left;}
+
+/* ── płótno ───────────────────────────────────────────────────────────── */
+.canvas{position:relative;overflow:hidden;display:flex;flex-direction:column;
+  --bg-0:#08090f; --bg-1:#0e1019; --bg-2:#161927;
+  /* --ink-3 jest o stopień jaśniejszy niż w decku: grafika bywa oglądana
+     na telefonie i drukowana, a #4a4f63 na czerni schodzi poniżej 3:1 */
+  --ink-0:#f4f1e8; --ink-1:#c2c5d2; --ink-2:#7b819a; --ink-3:#606779;
+  --line:rgba(255,255,255,.11); --line-2:rgba(255,255,255,.055);
+  --accent:var(--cb-primary);
+  background:var(--bg-0);color:var(--ink-1);}
+.canvas.light{
+  --bg-0:#F8FAFC; --bg-1:#f1f5f9; --bg-2:#ffffff;
+  --ink-0:#0f1729; --ink-1:#243043; --ink-2:#475569; --ink-3:#7b8a9d;
+  --line:rgba(15,23,41,.12); --line-2:rgba(15,23,41,.06);
+  --accent:var(--cb-cyan-deep);}
+
+.c-169{width:1600px;height:900px;padding:74px 84px 62px;}
+.c-sq  {width:1080px;height:1080px;padding:78px 78px 62px;}
+.c-45  {width:1080px;height:1350px;padding:78px 76px 62px;}
+.c-a4  {width:1240px;height:1754px;padding:86px 88px 70px;}
+
+/* ziarno — ta sama tekstura co w decku, inaczej grafiki wyglądają na obcy zestaw */
+.canvas::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:3;opacity:.04;
+  mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");}
+.canvas.light::after{opacity:.025;mix-blend-mode:multiply;}
+.canvas > *{position:relative;z-index:1;}
+
+/* ── nagłówek i stopka płótna ─────────────────────────────────────────── */
+.eyebrow{font-family:var(--ff-mono);font-size:14px;font-weight:500;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--accent);margin:0 0 16px;display:flex;align-items:center;gap:12px;}
+.eyebrow::before{content:'';width:11px;height:12px;background:var(--accent);flex:0 0 auto;clip-path:var(--hex);}
+.ig-title{font-family:var(--ff-display);font-weight:500;letter-spacing:-.03em;line-height:1.06;
+  color:var(--ink-0);margin:0;font-size:64px;}
+.c-sq .ig-title,.c-45 .ig-title{font-size:56px;}
+.ig-sub{margin:18px 0 0;font-size:22px;line-height:1.5;color:var(--ink-2);max-width:44ch;font-weight:300;}
+.c-sq .ig-sub,.c-45 .ig-sub{font-size:20px;}
+.ig-body{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;padding:44px 0;}
+
+.ig-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;
+  padding-top:22px;border-top:1px solid var(--line);}
+.ig-src{font-family:var(--ff-mono);font-size:13px;line-height:1.5;letter-spacing:.04em;color:var(--ink-3);max-width:58ch;}
+.mark{display:flex;align-items:center;gap:13px;flex:0 0 auto;}
+.mark svg{height:34px;width:auto;display:block;}
+.mark .wm{font-family:var(--ff-logo);font-size:21px;font-weight:600;letter-spacing:.09em;color:var(--ink-0);}
+.mark .dm{font-family:var(--ff-mono);font-size:11.5px;letter-spacing:.14em;color:var(--ink-3);
+  padding-left:13px;border-left:1px solid var(--line);}
+
+/* dekoracja tła — jeden heksagon, nigdy więcej */
+.hex-deco{position:absolute;z-index:0;background:var(--accent);opacity:.05;clip-path:var(--hex);pointer-events:none;}
+.grid-deco{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(var(--line-2) 1px,transparent 1px),linear-gradient(90deg,var(--line-2) 1px,transparent 1px);
+  background-size:74px 74px;
+  -webkit-mask-image:radial-gradient(ellipse 70% 60% at 78% 22%,#000,transparent 72%);
+          mask-image:radial-gradient(ellipse 70% 60% at 78% 22%,#000,transparent 72%);}
+
+/* ── 1. ŁAŃCUCH PROCESU ───────────────────────────────────────────────── */
+.chain{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:0;align-items:stretch;}
+.chain .node{position:relative;padding:34px 30px 30px 34px;border-top:2px solid var(--line);}
+.chain .node + .node{border-left:1px solid var(--line-2);}
+.chain .node.is-hi{border-top-color:var(--accent);}
+.chain .cn{position:absolute;top:-13px;left:34px;width:26px;height:29px;background:var(--bg-0);
+  display:grid;place-items:center;font-family:var(--ff-mono);font-size:13px;font-weight:600;color:var(--ink-3);}
+.chain .node.is-hi .cn{color:var(--accent);}
+.canvas.light .chain .cn{background:var(--bg-0);}
+.chain .ct{font-family:var(--ff-display);font-size:27px;font-weight:500;letter-spacing:-.02em;color:var(--ink-0);
+  margin:0 0 12px;line-height:1.2;}
+.chain .cd{font-size:17px;line-height:1.55;color:var(--ink-2);margin:0;}
+.chain .cm{margin-top:18px;font-family:var(--ff-mono);font-size:13px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);}
+.chain .node.is-hi .cm{color:var(--accent);}
+
+/* ── 2. STOS WARSTW ───────────────────────────────────────────────────── */
+.stack{display:flex;flex-direction:column;gap:14px;}
+.stack .layer{display:grid;grid-template-columns:74px 1fr auto;gap:26px;align-items:center;
+  padding:26px 30px;background:var(--bg-1);border-left:4px solid var(--c,var(--accent));}
+.stack .ln{font-family:var(--ff-mono);font-size:14px;letter-spacing:.14em;color:var(--ink-3);}
+.stack .lt{font-family:var(--ff-display);font-size:26px;font-weight:500;color:var(--ink-0);letter-spacing:-.02em;line-height:1.25;}
+.stack .ld{font-size:16.5px;color:var(--ink-2);margin-top:5px;line-height:1.5;}
+.stack .lb{font-family:var(--ff-mono);font-size:14px;letter-spacing:.09em;color:var(--c,var(--accent));
+  white-space:nowrap;padding-left:22px;}
+.stack .layer.is-base{background:none;border-left-style:dashed;}
+
+/* ── 3. MACIERZ 2×2 ───────────────────────────────────────────────────── */
+.mtx{display:grid;grid-template-columns:52px 1fr 1fr;grid-template-rows:1fr 1fr 52px;gap:14px;height:100%;}
+.mtx .q{position:relative;padding:32px 30px;background:var(--bg-1);display:flex;flex-direction:column;justify-content:space-between;}
+.mtx .q.is-hi{background:linear-gradient(160deg,rgba(0,206,209,.16),rgba(0,206,209,.03));
+  outline:1px solid rgba(0,206,209,.36);outline-offset:-1px;}
+.canvas.light .mtx .q.is-hi{background:linear-gradient(160deg,rgba(8,145,178,.13),rgba(8,145,178,.02));
+  outline-color:rgba(8,145,178,.34);}
+.mtx .qt{font-family:var(--ff-display);font-size:30px;font-weight:500;letter-spacing:-.025em;color:var(--ink-0);margin:0;line-height:1.15;}
+.mtx .qd{font-size:17px;line-height:1.55;color:var(--ink-2);margin:12px 0 0;}
+.mtx .qtag{font-family:var(--ff-mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);}
+.mtx .q.is-hi .qtag{color:var(--accent);}
+.mtx .ax{display:grid;place-items:center;font-family:var(--ff-mono);font-size:14px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--ink-3);}
+.mtx .ax-y{grid-row:1/3;grid-column:1;writing-mode:vertical-rl;transform:rotate(180deg);}
+.mtx .ax-x{grid-row:3;grid-column:2/4;}
+
+/* ── 4. OŚ CZASU ──────────────────────────────────────────────────────── */
+.road{position:relative;padding-top:60px;}
+.road::before{content:'';position:absolute;left:0;right:0;top:60px;height:2px;background:var(--line);}
+.road .track{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;}
+.road .stop{position:relative;padding:44px 30px 0 0;}
+.road .dot{position:absolute;top:-9px;left:0;width:18px;height:20px;background:var(--ink-3);clip-path:var(--hex);}
+.road .stop.is-hi .dot{background:var(--accent);}
+.road .when{font-family:var(--ff-mono);font-size:14px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-3);position:absolute;top:-46px;left:0;}
+.road .stop.is-hi .when{color:var(--accent);}
+.road .what{font-family:var(--ff-display);font-size:25px;font-weight:500;color:var(--ink-0);
+  letter-spacing:-.02em;line-height:1.2;margin:0 0 10px;}
+.road .desc{font-size:16.5px;line-height:1.55;color:var(--ink-2);margin:0;}
+
+/* ── 5. LEJEK ─────────────────────────────────────────────────────────── */
+/* Szerokość pasa to wprost wartość w procentach największego etapu. Etykieta
+   idzie nad pasem, nie w środku — inaczej ostatni, najwęższy pas nie ma gdzie
+   jej zmieścić i człowiek zaczyna rozciągać szerokości „żeby ładnie wyszło”,
+   a wtedy grafika kłamie. */
+.funnel{display:flex;flex-direction:column;gap:10px;align-items:center;}
+.funnel .fstep{width:100%;display:flex;flex-direction:column;align-items:center;gap:9px;}
+.funnel .fl{font-family:var(--ff-display);font-size:24px;font-weight:500;letter-spacing:-.02em;color:var(--ink-0);}
+.funnel .fr{width:var(--w,100%);min-width:80px;height:66px;background:var(--c,var(--cb-primary));
+  display:grid;place-items:center;color:#04141a;}
+.funnel .fv{font-family:var(--ff-mono);font-size:25px;font-weight:600;font-variant-numeric:tabular-nums;}
+.funnel .fdrop{font-family:var(--ff-mono);font-size:14px;letter-spacing:.09em;color:var(--ink-3);padding:2px 0;}
+
+/* ── 6. EKOSYSTEM HEKSAGONALNY ────────────────────────────────────────── */
+/* Prawdziwy plaster miodu. Heksagon --hex jest „pointy-top”, więc sąsiedzi leżą
+   na lewo, na prawo oraz po skosie — nigdy dokładnie nad i pod. Skok siatki:
+   w poziomie W, w pionie 0,75·H, z przesunięciem W/2. Przy W=210 i H=242
+   komórka 204×235 zostawia 6 px fugi. Nie ruszaj tych liczb pojedynczo —
+   albo przeliczasz cały zestaw, albo plaster przestaje przylegać. */
+.eco{position:relative;width:630px;height:605px;margin:0 auto;}
+.eco .cell{position:absolute;width:204px;height:235px;background:var(--bg-1);clip-path:var(--hex);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:0 24px;text-align:center;}
+.eco .cell.core{background:linear-gradient(160deg,var(--cb-primary),var(--cb-cyan-deep));color:#04141a;}
+.eco .et{font-family:var(--ff-display);font-size:21px;font-weight:500;line-height:1.2;color:var(--ink-0);letter-spacing:-.015em;}
+.eco .cell.core .et{font-size:25px;color:#04141a;}
+.eco .ed{font-family:var(--ff-mono);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);}
+.eco .cell.core .ed{color:rgba(4,20,26,.7);}
+
+/* ── 7. PORÓWNANIE ────────────────────────────────────────────────────── */
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:44px;align-items:stretch;}
+.vs .col{display:flex;flex-direction:column;gap:20px;padding:34px 36px;background:var(--bg-1);}
+.vs .col.is-hi{background:linear-gradient(165deg,rgba(0,206,209,.15),rgba(0,206,209,.02));
+  outline:1px solid rgba(0,206,209,.34);outline-offset:-1px;}
+.canvas.light .vs .col.is-hi{background:linear-gradient(165deg,rgba(8,145,178,.12),rgba(8,145,178,.02));
+  outline-color:rgba(8,145,178,.32);}
+.vs .vh{font-family:var(--ff-mono);font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);
+  padding-bottom:16px;border-bottom:1px solid var(--line);}
+.vs .col.is-hi .vh{color:var(--accent);}
+.vs .vbig{font-family:var(--ff-display);font-size:52px;font-weight:600;letter-spacing:-.035em;
+  color:var(--ink-0);line-height:1;}
+.vs .vrow{display:flex;gap:15px;font-size:18px;line-height:1.5;color:var(--ink-1);}
+.vs .vrow::before{content:'';width:11px;height:12px;background:var(--ink-3);flex:0 0 auto;margin-top:9px;clip-path:var(--hex);}
+.vs .col.is-hi .vrow::before{background:var(--accent);}
+.vs .div{display:grid;place-items:center;font-family:var(--ff-mono);font-size:15px;letter-spacing:.2em;
+  color:var(--ink-3);writing-mode:vertical-rl;}
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Infografiki CloudBots</h1>
+  <p class="sub">Siedem płócien w stałych kadrach. Podgląd jest przeskalowany, eksport wychodzi w nominalnym rozmiarze przez <code>scripts/render.py</code>. Wymiana treści: <code>references/infographics.md</code>.</p>
+
+  <!-- ══ 1 ══════════════════════════════════════════════════════════════ -->
+  <section class="slot">
+    <div class="slot-head"><h2>Łańcuch procesu</h2><code>.chain</code><span class="dim">1600 × 900</span></div>
+    <div class="holder">
+      <div class="canvas c-169" data-render="ig-lancuch">
+        <div class="grid-deco"></div>
+        <div class="hex-deco" style="width:360px;height:415px;top:150px;right:110px"></div>
+        <header>
+          <p class="eyebrow">Jak pracujemy</p>
+          <h2 class="ig-title">Od pomysłu do agenta<br>na produkcji w 12 tygodni</h2>
+        </header>
+        <div class="ig-body">
+          <div class="chain">
+            <div class="node"><span class="cn">01</span>
+              <h3 class="ct">Discovery</h3>
+              <p class="cd">Mapujemy procesy i wybieramy te, które faktycznie da się zautomatyzować.</p>
+              <p class="cm">2 tygodnie</p></div>
+            <div class="node"><span class="cn">02</span>
+              <h3 class="ct">Prototyp</h3>
+              <p class="cd">Jeden proces, działający agent, zbiór ewaluacyjny na twardych danych.</p>
+              <p class="cm">3 tygodnie</p></div>
+            <div class="node is-hi"><span class="cn">03</span>
+              <h3 class="ct">Wdrożenie</h3>
+              <p class="cd">Integracja z systemami, kontrola dostępu, obserwowalność, rollback.</p>
+              <p class="cm">5 tygodni</p></div>
+            <div class="node"><span class="cn">04</span>
+              <h3 class="ct">Przekazanie</h3>
+              <p class="cd">Szkolenie zespołu, runbook, plan rozwoju na kolejne kwartały.</p>
+              <p class="cm">2 tygodnie</p></div>
+          </div>
+        </div>
+        <footer class="ig-foot">
+          <p class="ig-src">Średni czas dla wdrożeń realizowanych w 2025 roku.</p>
+          <div class="mark">
+            <svg viewBox="0 0 240 275" fill="none" aria-hidden="true">
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#A9F5D6" opacity=".7"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84DCF1" opacity=".7" transform="translate(80,45)"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84F1F1" opacity=".5" transform="translate(0,90)"/>
+            </svg>
+            <span class="wm">CLOUDBOTS</span>
+            <span class="dm">cloudbots.eu</span>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 2 ══════════════════════════════════════════════════════════════ -->
+  <section class="slot">
+    <div class="slot-head"><h2>Stos warstw</h2><code>.stack</code><span class="dim">1080 × 1350 · 4:5</span></div>
+    <div class="holder">
+      <div class="canvas c-45 light" data-render="ig-warstwy">
+        <header>
+          <p class="eyebrow">Architektura</p>
+          <h2 class="ig-title">Cztery warstwy<br>wdrożenia agenta</h2>
+          <p class="ig-sub">Pomijasz którąkolwiek — agent działa na demie i przewraca się na produkcji.</p>
+        </header>
+        <div class="ig-body">
+          <div class="stack">
+            <div class="layer" style="--c:var(--cb-primary)">
+              <span class="ln">L4</span>
+              <span><span class="lt">Nadzór</span><span class="ld">Ewaluacja, logi decyzji, próg eskalacji do człowieka.</span></span>
+              <span class="lb">ciągły</span></div>
+            <div class="layer" style="--c:var(--cb-cyan-deep)">
+              <span class="ln">L3</span>
+              <span><span class="lt">Orkiestracja</span><span class="ld">Podział zadań, pamięć, retry, limity kosztu.</span></span>
+              <span class="lb">runtime</span></div>
+            <div class="layer" style="--c:#5B7FE0">
+              <span class="ln">L2</span>
+              <span><span class="lt">Narzędzia</span><span class="ld">API systemów, RPA, wyszukiwanie po dokumentach.</span></span>
+              <span class="lb">integracje</span></div>
+            <div class="layer is-base" style="--c:var(--ink-3)">
+              <span class="ln">L1</span>
+              <span><span class="lt">Dane i dostęp</span><span class="ld">Źródła prawdy, uprawnienia, retencja, audyt.</span></span>
+              <span class="lb">fundament</span></div>
+          </div>
+        </div>
+        <footer class="ig-foot">
+          <p class="ig-src">Model referencyjny CloudBots dla wdrożeń agentowych.</p>
+          <div class="mark">
+            <svg viewBox="0 0 240 275" fill="none" aria-hidden="true">
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#A9F5D6" opacity=".7"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84DCF1" opacity=".7" transform="translate(80,45)"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84F1F1" opacity=".5" transform="translate(0,90)"/>
+            </svg>
+            <span class="wm">CLOUDBOTS</span>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 3 ══════════════════════════════════════════════════════════════ -->
+  <section class="slot">
+    <div class="slot-head"><h2>Macierz 2×2</h2><code>.mtx</code><span class="dim">1080 × 1080 · kwadrat</span></div>
+    <div class="holder">
+      <div class="canvas c-sq" data-render="ig-macierz">
+        <header>
+          <p class="eyebrow">Gdzie zacząć</p>
+          <h2 class="ig-title">Który proces oddać<br>agentowi jako pierwszy</h2>
+        </header>
+        <div class="ig-body">
+          <div class="mtx">
+            <div class="ax ax-y">Wpływ na koszt →</div>
+            <div class="q">
+              <div><h3 class="qt">Odłóż</h3><p class="qd">Duża wartość, ale dane rozproszone i brak właściciela procesu.</p></div>
+              <span class="qtag">Najpierw uporządkuj dane</span></div>
+            <div class="q is-hi">
+              <div><h3 class="qt">Zacznij tutaj</h3><p class="qd">Powtarzalny, opisany, mierzalny. Zwrot widać w pierwszym kwartale.</p></div>
+              <span class="qtag">Pilot 6–8 tygodni</span></div>
+            <div class="q">
+              <div><h3 class="qt">Zostaw ludziom</h3><p class="qd">Rzadki, wyjątkowy, wymaga negocjacji. Automatyzacja się nie zwróci.</p></div>
+              <span class="qtag">Bez zmian</span></div>
+            <div class="q">
+              <div><h3 class="qt">Szybkie skrypty</h3><p class="qd">Łatwe, ale niska stawka. Agent to przerost formy nad treścią.</p></div>
+              <span class="qtag">RPA albo makro</span></div>
+            <div class="ax ax-x">Gotowość danych →</div>
+          </div>
+        </div>
+        <footer class="ig-foot">
+          <p class="ig-src">Na podstawie 24 warsztatów discovery, 2024–2025.</p>
+          <div class="mark">
+            <svg viewBox="0 0 240 275" fill="none" aria-hidden="true">
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#A9F5D6" opacity=".7"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84DCF1" opacity=".7" transform="translate(80,45)"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84F1F1" opacity=".5" transform="translate(0,90)"/>
+            </svg>
+            <span class="wm">CLOUDBOTS</span>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 4 ══════════════════════════════════════════════════════════════ -->
+  <section class="slot">
+    <div class="slot-head"><h2>Oś czasu</h2><code>.road</code><span class="dim">1600 × 900</span></div>
+    <div class="holder">
+      <div class="canvas c-169 light" data-render="ig-oscasu">
+        <header>
+          <p class="eyebrow">Roadmapa 2026</p>
+          <h2 class="ig-title">Cztery kwartały,<br>cztery decyzje</h2>
+        </header>
+        <div class="ig-body">
+          <div class="road">
+            <div class="track">
+              <div class="stop"><span class="when">Q1</span><span class="dot"></span>
+                <h3 class="what">Inwentaryzacja</h3>
+                <p class="desc">Katalog procesów, właściciele, dane. Bez tego reszta roku to zgadywanie.</p></div>
+              <div class="stop"><span class="when">Q2</span><span class="dot"></span>
+                <h3 class="what">Pierwszy agent</h3>
+                <p class="desc">Jeden proces na produkcji, ze zbiorem ewaluacyjnym i progiem eskalacji.</p></div>
+              <div class="stop is-hi"><span class="when">Q3</span><span class="dot"></span>
+                <h3 class="what">Platforma</h3>
+                <p class="desc">Wspólna orkiestracja, obserwowalność, kontrola kosztu dla całej organizacji.</p></div>
+              <div class="stop"><span class="when">Q4</span><span class="dot"></span>
+                <h3 class="what">Skalowanie</h3>
+                <p class="desc">Kolejne procesy wchodzą tygodniami, nie kwartałami. Zespół działa sam.</p></div>
+            </div>
+          </div>
+        </div>
+        <footer class="ig-foot">
+          <p class="ig-src">Ścieżka rekomendowana organizacjom bez wcześniejszych wdrożeń AI.</p>
+          <div class="mark">
+            <svg viewBox="0 0 240 275" fill="none" aria-hidden="true">
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#A9F5D6" opacity=".7"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84DCF1" opacity=".7" transform="translate(80,45)"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84F1F1" opacity=".5" transform="translate(0,90)"/>
+            </svg>
+            <span class="wm">CLOUDBOTS</span>
+            <span class="dm">cloudbots.eu</span>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 5 ══════════════════════════════════════════════════════════════ -->
+  <section class="slot">
+    <div class="slot-head"><h2>Lejek</h2><code>.funnel</code><span class="dim">1080 × 1350 · 4:5</span></div>
+    <div class="holder">
+      <div class="canvas c-45" data-render="ig-lejek">
+        <div class="hex-deco" style="width:216px;height:249px;top:262px;right:96px"></div>
+        <header>
+          <p class="eyebrow">Discovery w liczbach</p>
+          <h2 class="ig-title">Ze stu procesów<br>zostaje dziewięć</h2>
+          <p class="ig-sub">Większość odpada nie na technologii, tylko na braku właściciela i danych.</p>
+        </header>
+        <div class="ig-body">
+          <div class="funnel">
+            <div class="fstep"><span class="fl">Zgłoszone</span>
+              <span class="fr" style="--w:100%;--c:var(--cb-mint)"><b class="fv">100</b></span></div>
+            <span class="fdrop">−38 · brak właściciela procesu</span>
+            <div class="fstep"><span class="fl">Opisane</span>
+              <span class="fr" style="--w:62%;--c:var(--cb-turq)"><b class="fv">62</b></span></div>
+            <span class="fdrop">−34 · dane niedostępne lub niepełne</span>
+            <div class="fstep"><span class="fl">Wykonalne</span>
+              <span class="fr" style="--w:28%;--c:var(--cb-cyan)"><b class="fv">28</b></span></div>
+            <span class="fdrop">−19 · zwrot poniżej progu</span>
+            <div class="fstep"><span class="fl">Wdrożone</span>
+              <span class="fr" style="--w:9%;--c:var(--cb-primary)"><b class="fv">9</b></span></div>
+          </div>
+        </div>
+        <footer class="ig-foot">
+          <p class="ig-src">Dane zagregowane z 24 warsztatów discovery, 2024–2025.</p>
+          <div class="mark">
+            <svg viewBox="0 0 240 275" fill="none" aria-hidden="true">
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#A9F5D6" opacity=".7"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84DCF1" opacity=".7" transform="translate(80,45)"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84F1F1" opacity=".5" transform="translate(0,90)"/>
+            </svg>
+            <span class="wm">CLOUDBOTS</span>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 6 ══════════════════════════════════════════════════════════════ -->
+  <section class="slot">
+    <div class="slot-head"><h2>Ekosystem heksagonalny</h2><code>.eco</code><span class="dim">1080 × 1080 · kwadrat</span></div>
+    <div class="holder">
+      <div class="canvas c-sq" data-render="ig-ekosystem">
+        <header>
+          <p class="eyebrow">Zakres usług</p>
+          <h2 class="ig-title">Jeden zespół,<br>sześć kompetencji</h2>
+        </header>
+        <div class="ig-body">
+          <div class="eco">
+            <div class="cell" style="left:108px;top:3px"><span class="et">Discovery</span><span class="ed">warsztaty</span></div>
+            <div class="cell" style="left:318px;top:3px"><span class="et">Integracje</span><span class="ed">API i RPA</span></div>
+            <div class="cell" style="left:3px;top:185px"><span class="et">Doradztwo</span><span class="ed">strategia</span></div>
+            <div class="cell core" style="left:213px;top:185px"><span class="et">Agenci AI</span><span class="ed">rdzeń</span></div>
+            <div class="cell" style="left:423px;top:185px"><span class="et">MLOps</span><span class="ed">ewaluacja</span></div>
+            <div class="cell" style="left:108px;top:366px"><span class="et">Chmura</span><span class="ed">infrastruktura</span></div>
+            <div class="cell" style="left:318px;top:366px"><span class="et">Szkolenia</span><span class="ed">zespoły</span></div>
+          </div>
+        </div>
+        <footer class="ig-foot">
+          <p class="ig-src">Wszystkie kompetencje w jednym zespole — bez podwykonawców.</p>
+          <div class="mark">
+            <svg viewBox="0 0 240 275" fill="none" aria-hidden="true">
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#A9F5D6" opacity=".7"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84DCF1" opacity=".7" transform="translate(80,45)"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84F1F1" opacity=".5" transform="translate(0,90)"/>
+            </svg>
+            <span class="wm">CLOUDBOTS</span>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 7 ══════════════════════════════════════════════════════════════ -->
+  <section class="slot">
+    <div class="slot-head"><h2>Porównanie</h2><code>.vs</code><span class="dim">1600 × 900</span></div>
+    <div class="holder">
+      <div class="canvas c-169" data-render="ig-porownanie">
+        <header>
+          <p class="eyebrow">Przed i po</p>
+          <h2 class="ig-title">Obsługa reklamacji<br>przed i po wdrożeniu</h2>
+        </header>
+        <div class="ig-body">
+          <div class="vs">
+            <div class="col">
+              <span class="vh">Stan wyjściowy</span>
+              <span class="vbig">18 h</span>
+              <span class="vrow">Mediana czasu pierwszej odpowiedzi</span>
+              <span class="vrow">Cztery osoby przepisujące dane między systemami</span>
+              <span class="vrow">Brak jednolitej kwalifikacji zgłoszenia</span>
+              <span class="vrow">Eskalacja zależna od tego, kto akurat czyta skrzynkę</span>
+            </div>
+            <div class="div">PO WDROŻENIU</div>
+            <div class="col is-hi">
+              <span class="vh">Po 12 tygodniach</span>
+              <span class="vbig">40 min</span>
+              <span class="vrow">Mediana czasu pierwszej odpowiedzi</span>
+              <span class="vrow">Agent kwalifikuje i uzupełnia dane w tle</span>
+              <span class="vrow">Jedna reguła kwalifikacji, zapisana i testowana</span>
+              <span class="vrow">Eskalacja z progiem pewności, z pełnym logiem decyzji</span>
+            </div>
+          </div>
+        </div>
+        <footer class="ig-foot">
+          <p class="ig-src">Wdrożenie w firmie retailowej, 2025. Dane za pierwszy kwartał po starcie.</p>
+          <div class="mark">
+            <svg viewBox="0 0 240 275" fill="none" aria-hidden="true">
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#A9F5D6" opacity=".7"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84DCF1" opacity=".7" transform="translate(80,45)"/>
+              <polygon points="80,0 160,46.2 160,138.6 80,184.8 0,138.6 0,46.2" fill="#84F1F1" opacity=".5" transform="translate(0,90)"/>
+            </svg>
+            <span class="wm">CLOUDBOTS</span>
+            <span class="dm">cloudbots.eu</span>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* Podgląd skalujemy do szerokości kolumny. render.py ustawia body.raw i zdejmuje
+   skalowanie, żeby zrzut wyszedł w nominalnym rozmiarze płótna. */
+function fitPreviews(){
+  if(document.body.classList.contains('raw')) return;
+  document.querySelectorAll('.holder').forEach(h=>{
+    const c = h.firstElementChild;
+    const k = Math.min(1, h.clientWidth / c.offsetWidth);
+    c.style.transform = `scale(${k})`;
+    h.style.height = (c.offsetHeight * k) + 'px';
+  });
+}
+addEventListener('load', fitPreviews);
+addEventListener('resize', fitPreviews);
+</script>
+</body>
+</html>
