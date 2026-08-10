@@ -75,7 +75,9 @@
   --ink-0:var(--l-ink-0); --ink-1:var(--l-ink-1); --ink-2:var(--l-ink-2); --ink-3:var(--l-ink-3);
   --line:var(--l-line); --line-2:var(--l-line-2);
   --accent:var(--cb-cyan-deep); --accent-soft:var(--cb-primary);
-  --dv-2:#0E7490; --dv-rest:#94A3B8; --dv-track:rgba(15,23,41,.10);
+  /* jasna mięta ma na białym kontrast 1,3:1 — pasek znika, więc na jasnym motywie
+     schodzi o kilka stopni w dół, zostając w tej samej rodzinie koloru */
+  --dv-2:#0E7490; --dv-3:#3FBFA0; --dv-rest:#94A3B8; --dv-track:rgba(15,23,41,.10);
 }
 
 /* ── 2. BAZA ──────────────────────────────────────────────────────────────── */
@@ -366,6 +368,14 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .split--38{grid-template-columns:minmax(0,.62fr) minmax(0,1fr);}
 .split--62{grid-template-columns:minmax(0,1fr) minmax(0,.62fr);}
 .split--center{align-items:center;}
+/* rząd wykresów: podpisy obu kolumn siadają na jednej linii, a krótszy wykres
+   rozciąga się do wysokości dłuższego. Bez tego prawa kolumna kończy się
+   w powietrzu i dwa wykresy przestają czytać się jako jeden układ. */
+.split--viz{align-items:stretch;}
+.split--viz .split-col{flex:1;}
+.split--viz .viz{display:flex;flex-direction:column;flex:1;}
+.split--viz .viz-cap{margin-top:auto;padding-top:14px;}
+.split--viz .c-meter{flex:1;justify-content:space-between;}
 .split-col{display:flex;flex-direction:column;gap:clamp(13px,1.4vw,22px);min-width:0;}
 
 .cards{display:grid;gap:clamp(13px,1.4vw,22px);align-items:stretch;}
@@ -613,8 +623,10 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 }
 .c-bars .b{display:grid;grid-template-rows:auto var(--h) auto;justify-items:center;gap:7px;min-width:0;}
 .c-bars .bv{font-family:var(--ff-mono);font-size:clamp(11px,2cqw,16px);font-weight:600;color:var(--ink-0);align-self:end;}
-/* max-width: przy czterech słupkach na całą szerokość kolumny bez tego robią się bloki */
-.c-bars .bar{align-self:end;width:100%;max-width:clamp(34px,7.5cqw,84px);height:var(--v,50%);
+/* Szerokość słupka mierzymy komórką siatki, nie kontenerem: przy cqw zwężenie
+   kolumny zwężało słupek razem z nią, więc przerwa zostawała ta sama i dominowała
+   nad danymi. 56% komórki trzyma słupek szerszy od przerwy przy każdej liczbie słupków. */
+.c-bars .bar{align-self:end;width:100%;max-width:min(84px,56%);height:var(--v,50%);
   background:var(--c,var(--dv-1));transition:height .8s var(--ease);}
 .c-bars .bx{font-family:var(--ff-mono);font-size:clamp(9.5px,1.6cqw,13px);letter-spacing:.08em;color:var(--ink-3);
   text-align:center;line-height:1.35;border-top:1px solid var(--line);padding-top:7px;width:100%;}
@@ -640,7 +652,8 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .c-meter .mh{display:flex;justify-content:space-between;align-items:baseline;gap:14px;
   font-size:clamp(11px,1.6cqw,15px);color:var(--ink-1);}
 .c-meter .mh b{font-family:var(--ff-mono);font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums;}
-.c-meter .mt{height:5px;background:var(--dv-track);position:relative;}
+/* 5px obok słupka wysokiego na 180px czytało się jak linijka, nie jak dane */
+.c-meter .mt{height:clamp(7px,1.2cqw,11px);background:var(--dv-track);position:relative;}
 .c-meter .mf{position:absolute;inset:0 auto 0 0;width:var(--v,50%);background:var(--c,var(--dv-1));transition:width .8s var(--ease);}
 
 /* kołowy / pierścieniowy — conic-gradient, wartości czytamy z legendy */
@@ -1040,13 +1053,13 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
         </div>
       </div>
 
-      <div class="split split--62" data-step="2">
+      <div class="split split--viz" data-step="2">
         <div class="split-col">
           <div class="viz">
             <div class="c-bars">
-              <div class="b"><span class="bv">3</span><i class="bar" style="--v:19%"></i><span class="bx">2023</span></div>
-              <div class="b"><span class="bv">7</span><i class="bar" style="--v:44%"></i><span class="bx">2024</span></div>
-              <div class="b"><span class="bv">11</span><i class="bar" style="--v:69%"></i><span class="bx">2025</span></div>
+              <div class="b"><span class="bv">3</span><i class="bar" style="--v:18.75%"></i><span class="bx">2023</span></div>
+              <div class="b"><span class="bv">7</span><i class="bar" style="--v:43.75%"></i><span class="bx">2024</span></div>
+              <div class="b"><span class="bv">11</span><i class="bar" style="--v:68.75%"></i><span class="bx">2025</span></div>
               <div class="b is-hi"><span class="bv">16</span><i class="bar" style="--v:100%"></i><span class="bx">2026*</span></div>
             </div>
             <p class="viz-cap" data-en="Projects delivered per year. *2026 — forecast from signed contracts.">
@@ -1058,8 +1071,8 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
           <div class="viz">
             <div class="c-meter">
               <div class="m"><span class="mh"><span data-en="Financial services">Usługi finansowe</span><b>42%</b></span><span class="mt"><i class="mf" style="--v:42%"></i></span></div>
-              <div class="m"><span class="mh"><span data-en="Retail &amp; e-commerce">Retail i e-commerce</span><b>26%</b></span><span class="mt"><i class="mf" style="--v:26%;--c:var(--dv-2)"></i></span></div>
-              <div class="m"><span class="mh"><span data-en="Logistics">Logistyka</span><b>19%</b></span><span class="mt"><i class="mf" style="--v:19%;--c:var(--dv-3)"></i></span></div>
+              <div class="m"><span class="mh"><span data-en="Retail &amp; e-commerce">Retail i e-commerce</span><b>26%</b></span><span class="mt"><i class="mf" style="--v:26%"></i></span></div>
+              <div class="m"><span class="mh"><span data-en="Logistics">Logistyka</span><b>19%</b></span><span class="mt"><i class="mf" style="--v:19%"></i></span></div>
               <div class="m"><span class="mh"><span data-en="Other">Pozostałe</span><b>13%</b></span><span class="mt"><i class="mf" style="--v:13%;--c:var(--dv-rest)"></i></span></div>
             </div>
             <p class="viz-cap" data-en="Revenue split by client sector, 2025.">Udział sektorów w przychodzie, 2025.</p>

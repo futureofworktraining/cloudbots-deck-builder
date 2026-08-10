@@ -98,6 +98,7 @@ Nagłówek z metadanymi po prawej:
 <div class="split split--38">…</div>    <!-- wąska lewa (0,62 : 1) -->
 <div class="split split--62">…</div>    <!-- wąska prawa (1 : 0,62) -->
 <div class="split split--center">…</div><!-- wyrównanie do środka w pionie -->
+<div class="split split--viz">…</div>   <!-- dwa wykresy: wspólna linia podpisów -->
 
 <div class="cards cards--3">…</div>     <!-- --2 … --5 -->
 ```
@@ -105,6 +106,10 @@ Nagłówek z metadanymi po prawej:
 Dobór: `.split--38` gdy lewa kolumna to tylko nagłówek, a prawa niesie treść.
 `.split--62` gdy prawa jest wtrętem (wykres, cytat). Równy `.split` tylko wtedy,
 gdy obie strony faktycznie ważą tyle samo.
+
+`.split--viz` jest dla pary wykresów: krótszy rozciąga się do wysokości dłuższego,
+a `.viz-cap` obu kolumn siada na jednej linii. Bez tego kolumny kończą się na różnej
+wysokości i slajd rozpada się na wykres i ozdobnik — szczegóły w `charts.md`, zasada 7.
 
 Powyżej czterech kart na slajdzie tekst schodzi poniżej progu czytelności —
 `cards--5` jest dla haseł jednowyrazowych.

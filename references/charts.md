@@ -38,6 +38,28 @@ przełączeniu motywu — patrz `design-system.md` §7.
 próby albo okresu. „24 warsztaty, 2024–2026, odpowiedzi wielokrotne” to różnica między
 danymi a wrażeniem.
 
+**6. Kolor serii tylko wtedy, gdy koduje kategorię.** Pozycje uszeregowane malejąco już
+niosą swoją informację długością i kolejnością — pomalowanie ich na cztery kolory niczego
+nie dodaje, a rozbija wykres na cztery niezwiązane paski. Zostaw jeden `--dv-1` i sięgnij
+po drugi kolor wyłącznie tam, gdzie pozycja naprawdę jest innego rodzaju: `--dv-rest`
+dla „Pozostałe” (worek, nie kategoria), `--dv-neg` dla wartości ujemnej, gradient
+`.is-hi` dla prognozy obok faktów.
+
+**7. Dwa wykresy obok siebie to jeden układ.** Owiń je w `.split.split--viz` — krótszy
+rozciągnie się do wysokości dłuższego, a `.viz-cap` obu kolumn siądzie na wspólnej linii.
+Bez tego prawa kolumna kończy się w powietrzu i slajd czyta się jako wykres plus ozdobnik.
+
+```html
+<div class="split split--viz">
+  <div class="split-col"><div class="viz"><div class="c-bars">…</div><p class="viz-cap">…</p></div></div>
+  <div class="split-col"><div class="viz"><div class="c-meter">…</div><p class="viz-cap">…</p></div></div>
+</div>
+```
+
+Dobierz też proporcję do gęstości: cztery słupki potrzebują mniej miejsca niż cztery paski
+z etykietami tekstowymi. Przy takiej parze zostań przy równym podziale — `.split--62`
+rozciąga słupki tak, że przerwy między nimi zaczynają dominować nad danymi.
+
 ---
 
 ## Dobór typu
@@ -98,11 +120,21 @@ Etykieta jest wyrównana do prawej, żeby przylegała do słupka i oko nie skaka
   <div class="m"><span class="mh"><span>Usługi finansowe</span><b>42%</b></span>
       <span class="mt"><i class="mf" style="--v:42%"></i></span></div>
   <div class="m"><span class="mh"><span>Retail</span><b>26%</b></span>
-      <span class="mt"><i class="mf" style="--v:26%;--c:var(--dv-2)"></i></span></div>
+      <span class="mt"><i class="mf" style="--v:26%"></i></span></div>
+  <div class="m"><span class="mh"><span>Pozostałe</span><b>13%</b></span>
+      <span class="mt"><i class="mf" style="--v:13%;--c:var(--dv-rest)"></i></span></div>
 </div>
 ```
 
-Lżejszy wizualnie od rankingu — nadaje się jako drugi wykres na slajdzie.
+Lżejszy wizualnie od rankingu — nadaje się jako drugi wykres na slajdzie. Jeden kolor
+na wszystkie pozycje, `--dv-rest` tylko dla worka „Pozostałe” (zasada 6).
+
+Wartość stoi po prawej stronie w linii etykiety, nie przy końcu paska: przy 13% wpadłaby
+w tor, a wyrównana kolumna liczb daje się porównać wzrokiem. Pustka po prawej przy niskich
+udziałach to koszt tego, że tor sięga 100% — skala bez odniesienia przestaje być skalą.
+
+W `.split--viz` mierniki rozkładają się na wysokość sąsiada. Działa to dla trzech do sześciu
+pozycji; przy dwóch odstępy robią się większe niż same paski — wtedy zostaw zwykły `.split`.
 
 ## 4. `.c-donut` — pierścień
 
