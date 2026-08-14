@@ -441,11 +441,31 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .h-title+.h-sub,.h-display+.h-sub,.sect-title+.h-sub{margin-top:clamp(8px,.85vw,13px);}
 .split-col{--stack-gap:clamp(13px,1.4vw,22px);display:flex;flex-direction:column;gap:var(--stack-gap);min-width:0;}
 
-.cards{display:grid;gap:clamp(13px,1.4vw,22px);align-items:stretch;}
+.cards{--cards-gap:clamp(13px,1.4vw,22px);display:grid;gap:var(--cards-gap);align-items:stretch;}
 .cards--2{grid-template-columns:repeat(2,minmax(0,1fr));}
 .cards--3{grid-template-columns:repeat(3,minmax(0,1fr));}
 .cards--4{grid-template-columns:repeat(4,minmax(0,1fr));}
 .cards--5{grid-template-columns:repeat(5,minmax(0,1fr));}
+/* Model dojrzalosci to sekwencja, nie piec niezaleznych kafli. Kierunek niesie
+   narastajaca gorna krawedz — ten sam jezyk, co pasek postepu w belce — plus
+   lacznik miedzy kartami. Bez tego jedynym sygnalem progresji bylo obramowanie
+   ostatniej karty. */
+.cards--steps .card,.cards--steps .card.is-quiet{position:relative;
+  border-top-color:color-mix(in srgb,var(--accent) var(--step,20%),var(--line));}
+.cards--steps .card:nth-child(1){--step:14%;}
+.cards--steps .card:nth-child(2){--step:35%;}
+.cards--steps .card:nth-child(3){--step:56%;}
+.cards--steps .card:nth-child(4){--step:78%;}
+.cards--steps .card:nth-child(5){--step:100%;}
+.cards--steps .card+.card::before{
+  content:'';position:absolute;top:-2px;left:calc(var(--cards-gap,18px)*-1);
+  width:var(--cards-gap,18px);height:3px;
+  background:color-mix(in srgb,var(--accent) var(--step,20%),transparent);
+}
+@media (prefers-reduced-motion:no-preference){
+  .cards--steps .card{transition:border-top-color .5s var(--ease);}
+}
+
 
 /* ── 10. KOMPONENTY ───────────────────────────────────────────────────────── */
 /* karta */
@@ -549,7 +569,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .flow-node+.flow-node{border-left:1px solid var(--line-2);}
 .flow-n{font-family:var(--ff-mono);font-size:var(--fs-small);letter-spacing:.16em;color:var(--accent);}
 .flow-t{font-family:var(--ff-display);font-size:calc(var(--fs-display-s)*.86);font-weight:500;line-height:1.25;color:var(--ink-0);
-  min-height:2lh;display:flex;align-items:flex-end;}
+  min-height:2lh;display:flex;align-items:flex-start;}
 .flow-d{font-size:var(--fs-body);line-height:1.55;color:var(--ink-2);}
 
 /* tabela */
@@ -725,7 +745,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
    wiersz negocjuje szerokość kolumn osobno i tory startują w różnych miejscach,
    przez co długości słupków przestają być porównywalne. */
 .c-rank{display:grid;grid-template-columns:auto minmax(0,var(--lbl,34%)) minmax(0,1fr) auto;
-  column-gap:clamp(8px,1.4cqw,16px);row-gap:clamp(6px,1.1cqw,13px);align-items:center;}
+  column-gap:clamp(14px,2.2cqw,26px);row-gap:clamp(6px,1.1cqw,13px);align-items:center;}
 .c-rank .r{display:contents;}
 .c-rank .rn{font-family:var(--ff-mono);font-size:clamp(12px,2.2cqw,var(--fs-small));color:var(--ink-3);letter-spacing:.06em;}
 /* etykieta wyrównana do prawej — przylega do słupka, oko nie skacze przez pustkę */
