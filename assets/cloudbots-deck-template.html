@@ -396,6 +396,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .head-meta{
   font-family:var(--ff-mono);font-size:var(--fs-small);line-height:1.95;
   letter-spacing:.05em;color:var(--ink-3);text-align:right;white-space:nowrap;padding-top:6px;
+  border-left:1px solid var(--line);padding-left:18px;
 }
 .head-meta strong{color:var(--accent);font-weight:500;}
 
@@ -584,9 +585,12 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 }
 .tbl td{padding:14px 14px 14px 0;vertical-align:baseline;border-bottom:1px solid var(--line-2);color:var(--ink-2);line-height:1.55;}
 .tbl tr:last-child td{border-bottom:0;}
+/* ostatni WIDOCZNY wiersz tez bez kreski: ostatnim <tr> bywa ukryty .detail,
+   wiec bez tego pod tabela wisi kreska w trybie bez szczegolow */
+body:not(.details-on) .tbl tbody tr:has(+ tr.detail:last-child) td{border-bottom:0;}
 .tbl .t-name{color:var(--ink-0);font-weight:500;width:24%;padding-right:clamp(20px,2.2vw,38px);}
-.tbl .t-price{font-family:var(--ff-mono);color:var(--accent);white-space:nowrap;text-align:right;padding-right:0;}
-.tbl .t-meta{font-family:var(--ff-mono);font-size:var(--fs-small);color:var(--ink-3);white-space:nowrap;vertical-align:baseline;}
+.tbl .t-price{font-family:var(--ff-mono);color:var(--accent);white-space:nowrap;text-align:right;padding-right:0;width:12%;}
+.tbl .t-meta{font-family:var(--ff-mono);font-size:var(--fs-small);color:var(--ink-3);white-space:nowrap;vertical-align:baseline;width:13%;}
 .tbl tr.is-total td{border-top:1px solid var(--accent);border-bottom:0;padding-top:14px;color:var(--ink-0);font-weight:500;}
 
 /* chipy */
@@ -603,7 +607,8 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .chip.is-on{color:var(--accent);}
 
 /* oś czasu */
-.tl{display:grid;grid-template-columns:minmax(86px,auto) 1fr;column-gap:clamp(16px,2vw,34px);}
+/* start listy na linii tytulu sasiedniej kolumny */
+.tl{margin-top:clamp(14px,2.1vw,33px);display:grid;grid-template-columns:minmax(86px,auto) 1fr;column-gap:clamp(16px,2vw,34px);}
 .tl-item{
   display:grid;grid-column:span 2;grid-template-columns:subgrid;
   padding:clamp(12px,1.3vw,20px) 0;border-bottom:1px solid var(--line-2);position:relative;
@@ -1811,6 +1816,9 @@ function paraKoncowa(root){
       off += len;
     }
     if(!target) return;
+    /* W waskiej kolumnie karty zwiazana para prawie zawsze dokłada wiersz.
+       Karta ma jednak zapas wysokosci, a wdowa kosztuje wiecej niz wiersz. */
+    const luzny = el.classList.contains('card-text') || el.classList.contains('flow-d');
     const przed = ragProfil(el);
     const orig = target.nodeValue;
     target.nodeValue = orig.slice(0, i) + ' ' + orig.slice(i + m[0].length);
@@ -1824,7 +1832,8 @@ function paraKoncowa(root){
     const boks = el.clientWidth || (el.parentElement ? el.parentElement.clientWidth : 0);
     const przepelnia = boks > 0 &&
       (el.scrollWidth > boks + 1 || (po && po.szer > boks + 1));
-    if(przed && po && (przepelnia || po.n > przed.n || po.min < Math.min(przed.min, 0.62)))
+    const dokladaWiersz = luzny ? po.n > przed.n + 1 : po.n > przed.n;
+    if(przed && po && (przepelnia || dokladaWiersz || po.min < Math.min(przed.min, luzny ? 0.30 : 0.62)))
       target.nodeValue = orig;
     else PARA_UNDO.push([target, orig]);
   });
