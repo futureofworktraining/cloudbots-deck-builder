@@ -27,13 +27,13 @@
      2,5:1 wobec tła — podpisy źródeł i stopka znikały na projektorze. Cała para
      ink-2/ink-3 przesunięta w górę, żeby ink-3 trzymał 4,5:1 i zostawił ink-2
      wyraźnie nad sobą. */
-  --d-ink-0:#f4f1e8; --d-ink-1:#c2c5d2; --d-ink-2:#949ab2; --d-ink-3:#7e849e;
-  --d-line:rgba(255,255,255,.10); --d-line-2:rgba(255,255,255,.05);
+  --d-ink-0:#f4f1e8; --d-ink-1:#c2c5d2; --d-ink-2:#a2a8bf; --d-ink-3:#8d93ad;
+  --d-line:rgba(255,255,255,.15); --d-line-2:rgba(255,255,255,.085);
 
   /* motyw jasny */
   --l-bg-0:#F8FAFC; --l-bg-1:#f1f5f9; --l-bg-2:#ffffff;
-  --l-ink-0:#0f1729; --l-ink-1:#243043; --l-ink-2:#475569; --l-ink-3:#5f6f82;
-  --l-line:rgba(15,23,41,.11); --l-line-2:rgba(15,23,41,.055);
+  --l-ink-0:#0f1729; --l-ink-1:#243043; --l-ink-2:#3f4c60; --l-ink-3:#54637a;
+  --l-line:rgba(15,23,41,.17); --l-line-2:rgba(15,23,41,.10);
 
   /* aliasy przełączane przez .slide--dark / .slide--light */
   --bg-0:var(--d-bg-0); --bg-1:var(--d-bg-1); --bg-2:var(--d-bg-2);
@@ -553,13 +553,13 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 
 /* tabela */
 .tbl{width:100%;border-collapse:collapse;font-size:var(--fs-body);}
-.tbl th{
+.tbl th,.tbl th.t-meta{
   padding:0 14px 10px 0;text-align:left;vertical-align:bottom;
   font-family:var(--ff-mono);font-size:calc(var(--fs-small)*.92);font-weight:500;
   letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);
   border-bottom:1px solid var(--line);
 }
-.tbl td{padding:11px 14px 11px 0;vertical-align:top;border-bottom:1px solid var(--line-2);color:var(--ink-2);line-height:1.55;}
+.tbl td{padding:11px 14px 11px 0;vertical-align:baseline;border-bottom:1px solid var(--line-2);color:var(--ink-2);line-height:1.55;}
 .tbl tr:last-child td{border-bottom:0;}
 .tbl .t-name{color:var(--ink-0);font-weight:500;width:24%;padding-right:clamp(20px,2.2vw,38px);}
 .tbl .t-price{font-family:var(--ff-mono);color:var(--accent);white-space:nowrap;text-align:right;padding-right:0;}
@@ -680,9 +680,11 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
    11 px obok leadu 20 px. Mnożnik cqw dobija do tokenu przy ~650 px szerokości,
    czyli przy każdej kolumnie splitu; węższy wykres nadal zmniejsza pismo. */
 .viz{container-type:inline-size;width:100%;max-width:100%;min-width:0;}
+/* Podpis niesie mianownik wykresu — czytany z dystansu, wiec nie schodzi
+   ponizej reszty drobnej typografii ani na najslabszy odcien. */
 .viz-cap{
-  margin-top:10px;font-family:var(--ff-mono);font-size:var(--fs-small);
-  letter-spacing:.02em;color:var(--ink-2);line-height:1.55;
+  margin-top:10px;font-family:var(--ff-mono);font-size:calc(var(--fs-small)*1.05);
+  letter-spacing:.02em;color:var(--ink-1);line-height:1.55;
 }
 
 /* legenda — zawsze klasą, nigdy inline'owym kolorem, żeby czytała się na obu motywach */
@@ -726,7 +728,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .c-rank .rn{font-family:var(--ff-mono);font-size:clamp(12px,2.2cqw,var(--fs-small));color:var(--ink-3);letter-spacing:.06em;}
 /* etykieta wyrównana do prawej — przylega do słupka, oko nie skacze przez pustkę */
 .c-rank .rl{font-size:clamp(12px,2.6cqw,var(--fs-body));color:var(--ink-1);line-height:1.3;overflow-wrap:anywhere;
-  text-align:right;text-wrap:balance;}
+  text-align:right;text-wrap:balance;min-height:2lh;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;}
 .c-rank .rt{height:clamp(16px,2.6cqw,28px);background:var(--dv-track);position:relative;
   box-shadow:inset 0 0 0 1px var(--dv-track-line);}
 .c-rank .rf{position:absolute;inset:0 auto 0 0;width:var(--v,50%);background:var(--c,var(--dv-1));transition:width .8s var(--ease);}
@@ -1597,7 +1599,17 @@ slides.forEach((s,i)=>{
 /* ── sierotki ───────────────────────────────────────────────────────────── */
 /* Jednoliterowy spójnik na końcu wiersza to w polskim składzie błąd. Wiązanie
    robimy w JS, a nie w źródle, żeby treść slajdu pozostała czytelnym tekstem. */
-function sierotki(root){
+/* Cala obrobka typograficzna w jednym miejscu, bo wersja EN podmienia innerHTML
+   i musi dostac dokladnie to samo traktowanie co polska. */
+function typografia(root){
+  spojniki(root);
+  pauzy(root);
+  paraKoncowa(root);
+  akcenty(root);
+}
+
+/* Jedno- i dwuliterowe spojniki nie zostaja na koncu wiersza. */
+function spojniki(root){
   const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode: n => /^(SCRIPT|STYLE|CODE|PRE)$/.test(n.parentNode.nodeName)
       ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
@@ -1608,40 +1620,9 @@ function sierotki(root){
     if(v !== n.nodeValue) n.nodeValue = v;
   }
 }
-sierotki(deck);
-
-/* Ostatnia para wyrazow w naglowku zostaje razem — inaczej pojedyncze slowo
-   ladowalo samo w ostatnim wierszu i rozbijalo blok tytulowy. */
-deck.querySelectorAll('.h-title,.sect-title,.h-sub,.lead,.card-lead,.card-text,.card-foot span,.tl-d,.flow-d,.toc-d,.viz-cap,.stat-sub').forEach(el=>{
-  /* Szukamy ostatniej spacji w CAŁYM tekście elementu, także wewnątrz <em>.
-     Wersja działająca tylko na ostatnim węźle nie łapała tytułów zakończonych
-     akcentem, np. „… to <em>luka wdrożeniowa</em>.” */
-  const nodes = [];
-  const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
-  for(let n; (n = w.nextNode()); ) nodes.push(n);
-  const full = nodes.map(n=>n.nodeValue).join('');
-  const m = full.replace(/\s+$/,'').match(/[ 	]+(?=\S+$)/);
-  if(!m) return;
-  let idx = full.replace(/\s+$/,'').lastIndexOf(m[0]), off = 0;
-  for(const n of nodes){
-    const len = n.nodeValue.length;
-    if(idx >= off && idx < off + len){
-      const i = idx - off;
-      n.nodeValue = n.nodeValue.slice(0, i) + ' ' + n.nodeValue.slice(i + m[0].length);
-      break;
-    }
-    off += len;
-  }
-});
-
-/* Krótki akcent kolorystyczny rozcięty między wiersze rozbija myśl nagłówka. */
-deck.querySelectorAll('.h-title em, .sect-title em').forEach(em=>{
-  if(em.textContent.trim().split(/\s+/).length <= 3) em.style.whiteSpace = 'nowrap';
-});
 
 /* Pauza nie otwiera wiersza. */
-sierotkiPauza(deck);
-function sierotkiPauza(root){
+function pauzy(root){
   const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode: n => /^(SCRIPT|STYLE)$/.test(n.parentNode.nodeName)
       ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
@@ -1651,6 +1632,71 @@ function sierotkiPauza(root){
     if(v !== n.nodeValue) n.nodeValue = v;
   }
 }
+
+const PARA_SEL = '.h-title,.sect-title,.h-sub,.lead,.card-lead,.card-text,.card-foot span,' +
+                 '.tl-d,.flow-d,.toc-d,.viz-cap,.stat-sub,.stat-lab';
+
+/* Liczy wiersze i najkrotszy z nich wzgledem najszerszego — sluzy do oceny,
+   czy wiazanie poprawilo, czy popsulo rag. */
+function ragProfil(el){
+  const r = document.createRange(); r.selectNodeContents(el);
+  /* Grupujemy po wierszu, nie po prostokacie: tekst po </em> daje wlasny
+     prostokat w tej samej linii i bez tego wygladalby jak osobny wiersz. */
+  const linie = new Map();
+  for(const b of r.getClientRects()){
+    if(b.height <= 4 || b.width <= 0.5) continue;
+    const k = Math.round(b.top);
+    const w = linie.get(k);
+    if(w) { w.l = Math.min(w.l, b.left); w.r = Math.max(w.r, b.right); }
+    else linie.set(k, {l: b.left, r: b.right});
+  }
+  const W = [...linie.values()].map(v => v.r - v.l);
+  if(!W.length) return null;
+  const max = Math.max(...W);
+  return {n: W.length, min: Math.min(...W) / max};
+}
+
+/* Ostatnia para wyrazow zostaje razem — inaczej pojedyncze slowo laduje samo
+   w ostatnim wierszu. W waskiej kolumnie zwiazana para bywa jednak dluzsza niz
+   resztka wiersza i rozwala rag mocniej, niz naprawia; wtedy wycofujemy zmiane. */
+function paraKoncowa(root){
+  root.querySelectorAll(PARA_SEL).forEach(el => {
+    const nodes = [];
+    const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    for(let n; (n = w.nextNode()); ) nodes.push(n);
+    const full = nodes.map(n => n.nodeValue).join('');
+    const trimmed = full.replace(/\s+$/, '');
+    const m = trimmed.match(/[ \t]+(?=\S+$)/);
+    if(!m) return;
+    const idx = trimmed.lastIndexOf(m[0]);
+    let target = null, i = 0, off = 0;
+    for(const n of nodes){
+      const len = n.nodeValue.length;
+      if(idx >= off && idx < off + len){ target = n; i = idx - off; break; }
+      off += len;
+    }
+    if(!target) return;
+    const przed = ragProfil(el);
+    const orig = target.nodeValue;
+    target.nodeValue = orig.slice(0, i) + ' ' + orig.slice(i + m[0].length);
+    const po = ragProfil(el);
+    if(przed && po && (po.n > przed.n || po.min < Math.min(przed.min, 0.62))) target.nodeValue = orig;
+  });
+}
+
+/* Krotki akcent kolorystyczny rozciety miedzy wiersze rozbija mysl naglowka,
+   ale nierozlaczny akcent szerszy od kolumny wychodzi poza siatke — dlatego
+   nowrap zostaje tylko wtedy, gdy naglowek nadal miesci sie w swoim boksie. */
+function akcenty(root){
+  root.querySelectorAll('.h-title em, .sect-title em').forEach(em => {
+    if(em.textContent.trim().split(/\s+/).length > 3) return;
+    const h = em.closest('.h-title, .sect-title');
+    em.style.whiteSpace = 'nowrap';
+    if(h && h.scrollWidth > h.clientWidth + 1) em.style.whiteSpace = '';
+  });
+}
+
+typografia(deck);
 
 /* ── menu wysuwane ──────────────────────────────────────────────────────── */
 const drawer = document.getElementById('drawer');
@@ -1920,6 +1966,7 @@ function setLang(l){
   btnFit.textContent  = (l === 'en') ? FIT_MODES[fitIdx].labelEn : FIT_MODES[fitIdx].label;
   btnAnim.textContent = (l === 'en') ? ANIMS[animIdx].labelEn : ANIMS[animIdx].label;
   btnDet.textContent  = (l === 'en') ? 'Details' : 'Szczegóły';
+  typografia(deck);
   const pres = body.classList.contains('mode-present');
   btnMode.textContent = (l === 'en') ? (pres?'Present':'Document') : (pres?'Prezentacja':'Dokument');
   fitAll();
