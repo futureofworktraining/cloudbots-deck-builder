@@ -121,8 +121,10 @@ body.is-light .grain{opacity:.025;mix-blend-mode:multiply;}
 }
 .deck::-webkit-scrollbar{display:none;}
 
-/* Pomiar typografii dla strony druku: slajd na sztywno 1600 px. */
-body.mierzy-druk .slide{width:1600px;}
+/* Pomiar typografii dla strony druku: slajd na sztywno 1600x900 px. Wysokosc
+   jest tu rownie wazna jak szerokosc — fitSlide czyta stage.clientHeight,
+   wiec bez niej skala do druku liczyla sie z wysokosci OKNA. */
+body.mierzy-druk .slide{width:1600px;height:900px;}
 .slide{
   position:relative;width:100vw;height:100vh;min-height:660px;
   scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;
@@ -570,6 +572,9 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
   clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
 }
 .flow-node+.flow-node{border-left:1px solid var(--line-2);}
+/* pierwsza kolumna nie ma kreski, wiec nie ma czego odsuwac: bez tego jej
+   tresc stala 24px w prawo od marginesu, na ktorym stoi caly slajd */
+.flow-node:first-child{padding-left:0;}
 .flow-n{font-family:var(--ff-mono);font-size:var(--fs-small);letter-spacing:.16em;color:var(--accent);}
 .flow-t{font-family:var(--ff-display);font-size:calc(var(--fs-display-s)*.86);font-weight:500;line-height:1.25;color:var(--ink-0);
   min-height:2lh;display:flex;align-items:flex-start;}
@@ -584,7 +589,6 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
   border-bottom:1px solid var(--line);
 }
 .tbl td{padding:14px 14px 14px 0;vertical-align:baseline;border-bottom:1px solid var(--line-2);color:var(--ink-2);line-height:1.55;}
-.tbl tr:last-child td{border-bottom:0;}
 /* ostatni WIDOCZNY wiersz tez bez kreski: ostatnim <tr> bywa ukryty .detail,
    wiec bez tego pod tabela wisi kreska w trybie bez szczegolow */
 body:not(.details-on) .tbl tbody tr:has(+ tr.detail:last-child) td{border-bottom:0;}
@@ -608,7 +612,7 @@ body:not(.details-on) .tbl tbody tr:has(+ tr.detail:last-child) td{border-bottom
 
 /* oś czasu */
 /* start listy na linii tytulu sasiedniej kolumny */
-.tl{margin-top:clamp(14px,2.1vw,33px);display:grid;grid-template-columns:minmax(86px,auto) 1fr;column-gap:clamp(16px,2vw,34px);}
+.tl{margin-top:clamp(14px,1.5vw,24px);display:grid;grid-template-columns:minmax(86px,auto) 1fr;column-gap:clamp(16px,2vw,34px);}
 .tl-item{
   display:grid;grid-column:span 2;grid-template-columns:subgrid;
   padding:clamp(12px,1.3vw,20px) 0;border-bottom:1px solid var(--line-2);position:relative;
@@ -669,7 +673,10 @@ body:not(.details-on) .tbl tbody tr:has(+ tr.detail:last-child) td{border-bottom
 .cover-logo svg{width:clamp(40px,3.4vw,58px);height:auto;}
 .cover-logo b{font-family:var(--ff-logo);font-size:clamp(15px,1.3vw,21px);font-weight:600;letter-spacing:.2em;color:var(--ink-0);}
 .cover-meta{
-  display:flex;flex-wrap:wrap;gap:clamp(18px,2.4vw,44px);padding-top:clamp(16px,2vw,30px);
+  /* siatka, nie flex: przy flexie pozycje zbijaly sie w lewa polowe i konczyly
+     na 55% szerokosci kreski, ktora nad nimi biegnie przez caly slajd */
+  display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);
+  gap:clamp(18px,2.4vw,44px);padding-top:clamp(16px,2vw,30px);
   border-top:1px solid var(--line);
   font-family:var(--ff-mono);font-size:var(--fs-small);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
 }
@@ -734,15 +741,18 @@ body:not(.details-on) .tbl tbody tr:has(+ tr.detail:last-child) td{border-bottom
    Odstęp między słupkami i tak robi max-width bara, nie gap. */
 .c-bars{
   --h:clamp(110px,20cqw,180px);
+  padding-top:calc(var(--fs-body)*1.5);
   display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);
   gap:0;align-items:end;
 }
-.c-bars .b{display:grid;grid-template-rows:auto var(--h) auto;justify-items:center;gap:7px;min-width:0;}
-.c-bars .bv{font-family:var(--ff-mono);font-size:clamp(12px,2.6cqw,var(--fs-body));font-weight:600;color:var(--ink-0);align-self:end;}
+.c-bars .b{display:grid;grid-template-rows:var(--h) auto;justify-items:center;gap:7px;min-width:0;}
+.c-bars .bv{grid-area:1/1;align-self:end;z-index:1;
+  margin-bottom:calc(var(--h)*var(--v,.5) + 7px);
+  font-family:var(--ff-mono);font-size:clamp(12px,2.6cqw,var(--fs-body));font-weight:600;color:var(--ink-0);}
 /* Szerokość słupka mierzymy komórką siatki, nie kontenerem: przy cqw zwężenie
    kolumny zwężało słupek razem z nią, więc przerwa zostawała ta sama i dominowała
    nad danymi. 56% komórki trzyma słupek szerszy od przerwy przy każdej liczbie słupków. */
-.c-bars .bar{align-self:end;width:100%;max-width:min(84px,56%);height:var(--v,50%);
+.c-bars .bar{grid-area:1/1;align-self:end;width:100%;max-width:min(84px,56%);height:calc(var(--h)*var(--v,.5));
   background:var(--c,var(--dv-1));transition:height .8s var(--ease);}
 .c-bars .bx{font-family:var(--ff-mono);font-size:clamp(12px,2.2cqw,var(--fs-small));letter-spacing:.04em;color:var(--ink-2);
   text-align:center;line-height:1.35;border-top:1px solid var(--line);padding-top:7px;width:100%;}
@@ -906,7 +916,7 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
      ten sam deck daje inny PDF przy 1024 i przy 1920 (tytul 36 vs 60 px). */
   /* Tokeny druku sa czescia generowanego bloku nizej — recznie wpisane
      wartosci rozjezdzaly sie z tym, co deck pokazuje przy 1600px. */
-  .stage>*{--fit:1!important;width:100%!important;height:auto!important;transform:none!important;}
+  .stage>*{max-width:none!important;}
 
   /* Strona ma zawsze 1600x900, ale vw/vh licza sie z OKNA. Ponizsze reguly
      to te same deklaracje przeliczone dla 1600x900 — bez nich ten sam deck
@@ -1010,7 +1020,7 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
   .split,.split--38,.split--62{grid-template-columns:minmax(0,1fr);}
   .cards--3,.cards--4,.cards--5{grid-template-columns:repeat(2,minmax(0,1fr));}
   .head-row{grid-template-columns:minmax(0,1fr);}
-  .head-meta{text-align:left;}
+  .head-meta{border-left:0;padding-left:0;text-align:left;}
   .flow{grid-auto-flow:row;grid-auto-columns:auto;}
   .flow-node+.flow-node{border-left:0;}
   .drawer{--drawer-w:min(86vw,326px);}
@@ -1276,10 +1286,10 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
         <div class="split-col">
           <div class="viz">
             <div class="c-bars">
-              <div class="b"><span class="bv">3</span><i class="bar" style="--v:18.75%"></i><span class="bx">2023</span></div>
-              <div class="b"><span class="bv">7</span><i class="bar" style="--v:43.75%"></i><span class="bx">2024</span></div>
-              <div class="b"><span class="bv">11</span><i class="bar" style="--v:68.75%"></i><span class="bx">2025</span></div>
-              <div class="b is-hi"><span class="bv">16</span><i class="bar" style="--v:100%"></i><span class="bx">2026*</span></div>
+              <div class="b" style="--v:0.1875"><span class="bv">3</span><i class="bar"></i><span class="bx">2023</span></div>
+              <div class="b" style="--v:0.4375"><span class="bv">7</span><i class="bar"></i><span class="bx">2024</span></div>
+              <div class="b" style="--v:0.6875"><span class="bv">11</span><i class="bar"></i><span class="bx">2025</span></div>
+              <div class="b is-hi" style="--v:1.0"><span class="bv">16</span><i class="bar"></i><span class="bx">2026*</span></div>
             </div>
             <p class="viz-cap" data-en="Projects delivered per year. *2026 — forecast from signed contracts.">
               Projekty zrealizowane rocznie. *2026 — prognoza z podpisanych umów.
@@ -1793,7 +1803,11 @@ function ragProfil(el){
   const W = [...linie.values()].map(v => v.r - v.l);
   if(!W.length) return null;
   const max = Math.max(...W);
-  return {n: W.length, min: Math.min(...W) / max, szer: max};
+  /* srodek to wszystkie wiersze poza ostatnim: krotki wiersz w srodku akapitu
+     to dziura, krotki wiersz na koncu to normalne zakonczenie */
+  const srodek = W.length > 1 ? Math.min(...W.slice(0, -1)) / max : 1;
+  return {n: W.length, min: Math.min(...W) / max, ost: W[W.length - 1] / max,
+          srodek: srodek, szer: max};
 }
 
 /* Ostatnia para wyrazow zostaje razem — inaczej pojedyncze slowo laduje samo
@@ -1838,9 +1852,12 @@ function paraKoncowa(root){
     const boks = el.clientWidth || (el.parentElement ? el.parentElement.clientWidth : 0);
     const przepelnia = boks > 0 &&
       (el.scrollWidth > boks + 1 || (po && po.szer > boks + 1));
-    const dokladaWiersz = luzny ? po.n > przed.n + 1 : po.n > przed.n;
-    if(przed && po && (przepelnia || dokladaWiersz || po.min < Math.min(przed.min, luzny ? 0.30 : 0.62)))
-      target.nodeValue = orig;
+    /* po bywa null (element bez prostokatow) — czytamy je dopiero za strazikiem */
+    const gorzej = przed && po && (
+      po.n > przed.n ||                                   /* dodatkowy wiersz */
+      po.srodek < Math.min(przed.srodek, 0.62) ||         /* dziura w srodku */
+      po.ost < Math.min(przed.ost, luzny ? 0.30 : 0.62)); /* zbyt krotki ogon */
+    if(!przed || !po || przepelnia || gorzej) target.nodeValue = orig;
     else PARA_UNDO.push([target, orig]);
   });
 }
@@ -1870,7 +1887,9 @@ function typografiaDruku(on){
   paraKoncowa(deck);
   akcenty(deck);
   ratunek(deck);
-  if(!on) fitAll();
+  /* fitAll takze przy on: skala musi sie policzyc z wymiaru STRONY, inaczej
+     przy waskim oknie ostatnie slowa slajdu wypadaja poza kadr PDF */
+  fitAll();
 }
 addEventListener('beforeprint', ()=>typografiaDruku(true));
 addEventListener('afterprint',  ()=>typografiaDruku(false));
