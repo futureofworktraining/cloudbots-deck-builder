@@ -27,12 +27,12 @@
      2,5:1 wobec tła — podpisy źródeł i stopka znikały na projektorze. Cała para
      ink-2/ink-3 przesunięta w górę, żeby ink-3 trzymał 4,5:1 i zostawił ink-2
      wyraźnie nad sobą. */
-  --d-ink-0:#f4f1e8; --d-ink-1:#c2c5d2; --d-ink-2:#a2a8bf; --d-ink-3:#8d93ad;
+  --d-ink-0:#f4f1e8; --d-ink-1:#c2c5d2; --d-ink-2:#aeb4c9; --d-ink-3:#9aa0b8;
   --d-line:rgba(255,255,255,.30); --d-line-2:rgba(255,255,255,.19);
 
   /* motyw jasny */
   --l-bg-0:#F8FAFC; --l-bg-1:#f1f5f9; --l-bg-2:#ffffff;
-  --l-ink-0:#0f1729; --l-ink-1:#243043; --l-ink-2:#3f4c60; --l-ink-3:#54637a;
+  --l-ink-0:#0f1729; --l-ink-1:#243043; --l-ink-2:#38455a; --l-ink-3:#4b5a70;
   --l-line:rgba(15,23,41,.34); --l-line-2:rgba(15,23,41,.22);
 
   /* aliasy przełączane przez .slide--dark / .slide--light */
@@ -52,9 +52,9 @@
   --fs-display-m:clamp(29px,2.54vw,44px);
   --fs-display-s:clamp(23px,1.82vw,31.5px);
   --fs-lead:clamp(18px,1.39vw,24px);
-  --fs-body:clamp(16.3px,1.19vw,20.5px);
-  --fs-small:clamp(14.5px,1.03vw,17.5px);
-  --fs-mono:clamp(14.5px,1.09vw,18.75px);
+  --fs-body:clamp(17px,1.25vw,21.5px);
+  --fs-small:clamp(15.5px,1.11vw,19px);
+  --fs-mono:clamp(15.5px,1.16vw,20px);
 
   /* rytm */
   --pad-y:clamp(22px,3vh,40px); --pad-x:clamp(34px,4.2vw,76px);
@@ -121,6 +121,8 @@ body.is-light .grain{opacity:.025;mix-blend-mode:multiply;}
 }
 .deck::-webkit-scrollbar{display:none;}
 
+/* Pomiar typografii dla strony druku: slajd na sztywno 1600 px. */
+body.mierzy-druk .slide{width:1600px;}
 .slide{
   position:relative;width:100vw;height:100vh;min-height:660px;
   scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;
@@ -186,7 +188,7 @@ body.is-light .grain{opacity:.025;mix-blend-mode:multiply;}
 /* ── 4. HEKSAGONY — sygnatura marki ───────────────────────────────────────── */
 .hex{clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
 .hex-deco{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0;
-  -webkit-mask-image:linear-gradient(#000 0 78%,transparent 96%);mask-image:linear-gradient(#000 0 78%,transparent 96%);}
+  -webkit-mask-image:linear-gradient(#000 0 58%,transparent 84%);mask-image:linear-gradient(#000 0 58%,transparent 84%);}
 .hex-deco>span{
   position:absolute;display:block;
   clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
@@ -510,7 +512,6 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 /* rynna tylko pod pierwszym akapitem — niższe wiersze biorą pełną szerokość karty */
 .card--ghost .card-lead{padding-right:calc(var(--ghost)*1.35 + 24px);}
 .card-lead{font-size:var(--fs-body);line-height:1.6;color:var(--ink-1);}
-.card-lead,.card-text,.flow-d,.tl-d,.toc-d,.stat-lab{overflow-wrap:break-word;}
 
 /* lista punktowana — blok, nie grid: inline <strong> nie może stać się osobnym elementem */
 .blist{display:block;}
@@ -584,7 +585,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .tbl tr:last-child td{border-bottom:0;}
 .tbl .t-name{color:var(--ink-0);font-weight:500;width:24%;padding-right:clamp(20px,2.2vw,38px);}
 .tbl .t-price{font-family:var(--ff-mono);color:var(--accent);white-space:nowrap;text-align:right;padding-right:0;}
-.tbl .t-meta{font-family:var(--ff-mono);font-size:calc(var(--fs-small)*.9);color:var(--ink-3);white-space:nowrap;}
+.tbl .t-meta{font-family:var(--ff-mono);font-size:var(--fs-small);color:var(--ink-3);white-space:nowrap;vertical-align:baseline;}
 .tbl tr.is-total td{border-top:1px solid var(--accent);border-bottom:0;padding-top:14px;color:var(--ink-0);font-weight:500;}
 
 /* chipy */
@@ -610,7 +611,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .tl-when{font-family:var(--ff-mono);font-size:var(--fs-small);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);padding-top:3px;}
 .tl-what{display:flex;flex-direction:column;gap:5px;min-width:0;}
 .tl-t{font-family:var(--ff-display);font-size:calc(var(--fs-display-s)*.9);font-weight:500;color:var(--ink-0);line-height:1.28;}
-.tl-d{font-size:var(--fs-small);line-height:1.58;color:var(--ink-2);}
+.tl-d{font-size:calc(var(--fs-body)*.95);line-height:1.62;color:var(--ink-2);}
 
 /* cytat / opinia */
 .tq{position:relative;padding:clamp(16px,1.8vw,28px);border:1px solid var(--line);background:var(--bg-2);overflow:hidden;}
@@ -670,7 +671,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .toc{display:flex;flex-direction:column;}
 .toc-row{
   display:grid;grid-template-columns:minmax(56px,auto) minmax(0,1fr) minmax(0,1.35fr);
-  gap:clamp(16px,2.4vw,44px);align-items:center;
+  gap:clamp(16px,2.4vw,44px);align-items:baseline;
   padding:clamp(13px,1.5vw,22px) 0;border-bottom:1px solid var(--line-2);
 }
 .toc-row:last-child{border-bottom:0;}
@@ -1713,6 +1714,23 @@ function typografia(root){
   pauzy(root);
   paraKoncowa(root);
   akcenty(root);
+  ratunek(root);
+}
+
+/* Ostatnie slowo nalezy do ukladu, nie do typografii: jesli po wszystkich
+   wiazaniach element nadal nie miesci sie w swojej kolumnie, rozwiazujemy
+   w nim twarde spacje. Wiazanie spojnikow nie ma wlasnego straznika, a to
+   ono potrafi skleic „z lokalnym championem." w jeden nierozlaczny ciag. */
+function ratunek(root){
+  root.querySelectorAll(PARA_SEL).forEach(el => {
+    if(el.scrollWidth <= el.clientWidth + 1) return;
+    const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    for(let n; (n = w.nextNode()); ){
+      if(n.nodeValue.indexOf(' ') < 0) continue;
+      n.nodeValue = n.nodeValue.replace(/ /g, ' ');
+      if(el.scrollWidth <= el.clientWidth + 1) break;
+    }
+  });
 }
 
 /* Jedno- i dwuliterowe spojniki nie zostaja na koncu wiersza. */
@@ -1762,7 +1780,7 @@ function ragProfil(el){
   const W = [...linie.values()].map(v => v.r - v.l);
   if(!W.length) return null;
   const max = Math.max(...W);
-  return {n: W.length, min: Math.min(...W) / max};
+  return {n: W.length, min: Math.min(...W) / max, szer: max};
 }
 
 /* Ostatnia para wyrazow zostaje razem — inaczej pojedyncze slowo laduje samo
@@ -1795,8 +1813,14 @@ function paraKoncowa(root){
     target.nodeValue = orig.slice(0, i) + ' ' + orig.slice(i + m[0].length);
     const po = ragProfil(el);
     /* Nierozlaczna para szersza od kolumny wychodzi poza karte i nachodzi na
-       sasiednia — to gorsze niz wdowa, wiec przepelnienie cofa wiazanie zawsze. */
-    const przepelnia = el.scrollWidth > el.clientWidth + 1;
+       sasiednia — to gorsze niz wdowa, wiec przepelnienie cofa wiazanie zawsze.
+       Mierzymy najszerszy WIERSZ, nie scrollWidth: przy tekscie wystajacym poza
+       boks scrollWidth potrafi rownac sie clientWidth i nic nie zglaszac. */
+    /* Element inline ma clientWidth 0, wiec porownanie z nim odrzucaloby kazde
+       wiazanie — miara jest wtedy szerokosc rodzica. */
+    const boks = el.clientWidth || (el.parentElement ? el.parentElement.clientWidth : 0);
+    const przepelnia = boks > 0 &&
+      (el.scrollWidth > boks + 1 || (po && po.szer > boks + 1));
     if(przed && po && (przepelnia || po.n > przed.n || po.min < Math.min(przed.min, 0.62)))
       target.nodeValue = orig;
     else PARA_UNDO.push([target, orig]);
@@ -1817,6 +1841,26 @@ function akcenty(root){
 
 typografia(deck);
 
+/* Druk ma stala szerokosc strony, a typografia liczy sie z okna: bez tego ten
+   sam deck lamie sie inaczej w PDF-ie eksportowanym przy 1024 i przy 1920
+   (zmierzone przesuniecie slowa do 222 px). Przed drukiem przeliczamy wiazania
+   dla szerokosci strony, po druku wracamy do szerokosci okna. */
+function typografiaDruku(on){
+  /* .slide ma width:100vw, wiec sama szerokosc .deck nie ogranicza kolumn —
+     na czas przeliczenia narzucamy slajdom szerokosc strony. */
+  document.body.classList.toggle('mierzy-druk', on);
+  paraKoncowa(deck);
+  akcenty(deck);
+  ratunek(deck);
+  if(!on) fitAll();
+}
+addEventListener('beforeprint', ()=>typografiaDruku(true));
+addEventListener('afterprint',  ()=>typografiaDruku(false));
+if(window.matchMedia){
+  const mq = matchMedia('print');
+  if(mq.addEventListener) mq.addEventListener('change', e=>typografiaDruku(e.matches));
+}
+
 /* ── menu wysuwane ──────────────────────────────────────────────────────── */
 const drawer = document.getElementById('drawer');
 const dTab   = document.getElementById('drawerTab');
@@ -1827,9 +1871,11 @@ const dNav   = document.getElementById('drawerNav');
   let lastGroup = null, html = '';
   slides.forEach((s,i)=>{
     const g = s.dataset.group;
-    if(g && g !== lastGroup){ html += `<div class="dgroup">${g}</div>`; lastGroup = g; }
+    const ge = s.dataset.groupEn || g;
+    if(g && g !== lastGroup){ html += `<div class="dgroup" data-en="${ge}">${g}</div>`; lastGroup = g; }
     const label = s.dataset.nav || `Slajd ${i+1}`;
-    html += `<button class="ditem" data-go="${i}"><span class="dn">${String(i+1).padStart(2,'0')}</span><span class="dt">${label}</span></button>`;
+    const labelEn = s.dataset.navEn || label;
+    html += `<button class="ditem" data-go="${i}"><span class="dn">${String(i+1).padStart(2,'0')}</span><span class="dt" data-en="${labelEn}">${label}</span></button>`;
   });
   dNav.innerHTML = html;
   dNav.addEventListener('click', e=>{
@@ -1997,8 +2043,13 @@ function fitSlide(s){
 }
 function fitAll(){ slides.forEach(fitSlide); }
 addEventListener('resize', ()=>{ clearTimeout(fitAll._t);
-  fitAll._t = setTimeout(()=>{ paraKoncowa(deck); akcenty(deck); fitAll(); }, 140); });
-if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>setTimeout(fitAll,60));
+  fitAll._t = setTimeout(()=>{ paraKoncowa(deck); akcenty(deck); ratunek(deck); fitAll(); }, 140); });
+/* Wszystkie decyzje typograficzne opieraja sie na pomiarze szerokosci, wiec
+   musza zapasc na docelowym kroju. Uruchomione przed zaladowaniem fontow
+   mierzyly krój zastepczy i straznicy przepuszczali przepelnienia. */
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>setTimeout(()=>{
+  paraKoncowa(deck); akcenty(deck); ratunek(deck); fitAll();
+}, 60));
 
 const btnFit = document.getElementById('btnFit');
 btnFit.addEventListener('click', ()=>{
