@@ -548,7 +548,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 }
 
 /* liczby */
-.stats{display:grid;gap:clamp(18px,3.4vw,54px);grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);
+.stats{display:grid;gap:clamp(26px,3.4vw,64px);grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);
   grid-template-rows:auto 1fr auto;}
 .stats--wrap{grid-auto-flow:row;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));}
 .stat{display:grid;grid-row:span 3;grid-template-rows:subgrid;gap:5px;min-width:0;}
@@ -597,11 +597,24 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .tbl td{padding:14px 14px 14px 0;vertical-align:baseline;border-bottom:1px solid var(--line-2);color:var(--ink-2);line-height:1.55;}
 /* ostatni WIDOCZNY wiersz tez bez kreski: ostatnim <tr> bywa ukryty .detail,
    wiec bez tego pod tabela wisi kreska w trybie bez szczegolow */
-body:not(.details-on) .tbl tbody tr:has(+ tr.detail:last-child) td{border-bottom:0;}
 .tbl .t-name{color:var(--ink-0);font-weight:500;width:24%;padding-right:clamp(20px,2.2vw,38px);}
 .tbl .t-price{font-family:var(--ff-mono);color:var(--accent);white-space:nowrap;text-align:right;padding-right:0;width:12%;}
 .tbl .t-meta{font-family:var(--ff-mono);font-size:var(--fs-small);color:var(--ink-3);white-space:nowrap;vertical-align:baseline;width:13%;}
 .tbl tr.is-total td{border-top:1px solid var(--accent);border-bottom:0;padding-top:14px;color:var(--ink-0);font-weight:500;}
+
+/* wariant .tbl--signal: tabela porownawcza z wierszem-puenta.
+   Grupowanie i wyroznienie mowia jezykiem samej tabeli — mocniejsza kreska
+   i ciezsza typografia zamiast tla czy kolorowej belki, ktore czytaly sie
+   jako artefakt albo nieoznaczone zaznaczenie. */
+.tbl--signal tbody tr.is-split td{border-bottom:1px solid var(--line);}
+.tbl--signal tbody tr.is-key .t-price{font-size:calc(var(--fs-small)*1.15);font-weight:600;}
+.tbl--signal tbody tr.is-hero{background:transparent;}
+.tbl--signal tbody tr.is-hero td{color:var(--ink-0);}
+.tbl--signal tbody tr.is-hero td:first-child{font-weight:600;}
+/* wyzsza specyficznosc reguly wyzej zjadala akcent liczbie i wiersz-puenta
+   czytal sie jako mniej wazny od pozostalych */
+.tbl--signal tbody tr.is-hero .t-price{color:var(--accent);font-size:calc(var(--fs-small)*1.15);font-weight:700;}
+.tbl--signal tbody tr.detail{opacity:.72;}
 
 /* chipy */
 /* Lista wymiarów, nie pasek nawigacji. Ramka z paddingiem czytała się jak
@@ -758,7 +771,8 @@ body:not(.details-on) .tbl tbody tr:has(+ tr.detail:last-child) td{border-bottom
    Odstęp między słupkami i tak robi max-width bara, nie gap. */
 .c-bars{
   --h:clamp(110px,20cqw,180px);
-  padding-top:calc(var(--fs-body)*1.5);
+  /* +7px = odstep etykiety od wierzcholka; bez tego slupek 100% wypycha ja poza pudelko */
+  padding-top:calc(var(--fs-body)*1.5 + 7px);
   display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);
   gap:0;align-items:end;
 }
@@ -987,7 +1001,7 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
   /* wyróżnik */
 .punch{gap:38.4px;padding:22px 28px;}
   /* liczby */
-.stats{gap:38.4px;}
+.stats{gap:54.4px;}
   .stat-num{font-size:57.6px;}
   .flow-node{gap:12px;padding:20px 24px;}
   .tbl .t-name{padding-right:35.2px;}
@@ -1043,6 +1057,7 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
   .sect>.sect-num{grid-column:1;grid-row:auto;}
   .flow-node+.flow-node{border-left:0;}
   .drawer{--drawer-w:min(86vw,326px);}
+  .stats{grid-auto-flow:row;grid-template-columns:repeat(2,minmax(0,1fr));}
   .toc-row{grid-template-columns:auto minmax(0,1fr);}
   .toc-d{grid-column:2;}
 }
