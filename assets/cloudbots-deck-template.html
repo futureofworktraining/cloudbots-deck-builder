@@ -409,7 +409,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
    osobny modul danych, a nie adnotacja narracyjna do pieciu slupkow.
    50% + polowa rynny = lewa krawedz prawej kolumny .split */
 .split+.maturity-track{
-  margin-top:calc(22px - var(--stack-gap,0px));
+  margin-top:calc(20px - var(--stack-gap,0px));
   margin-left:calc(50% + clamp(26px,3.4vw,64px)/2);}
 /* przypis zrodlowy pod pasem domykajacym opisuje dane NAD nim, a nie stanowi
    kolejnego modulu — trzyma sie go tak samo jak .viz-cap trzyma sie wykresu.
@@ -422,7 +422,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 /* pas etykiet bez wlasnej krawedzi czytal sie jak zabladzone metadane.
    Kreska zawsze NAD pasem — jeden kierunek domkniecia w calym systemie,
    ten sam co szyna osi danych. */
-.cards+.chips,.split+.chips{padding-top:clamp(13px,1.3vw,20px);border-top:1px solid var(--line-2);}
+.cards+.chips,.split+.chips,.stats--band+*{padding-top:clamp(13px,1.3vw,20px);border-top:1px solid var(--line-2);}
 
 .head-row{
   display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(20px,3vw,56px);
@@ -509,10 +509,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 /* rampa samego koloru na kresce 3 px dawala ok. 4,5 jednostki luminancji na
    odcinek — ponizej progu, przy ktorym widz uporzadkuje piec etapow. Piec
    krokow zaczyna sie wyzej i konczy pelnym akcentem. */
-.cards--steps .card:nth-child(1){--step:24%;}
-.cards--steps .card:nth-child(2){--step:44%;}
-.cards--steps .card:nth-child(3){--step:62%;}
-.cards--steps .card:nth-child(4){--step:80%;}
+
 /* stan docelowy dostaje znacznik systemu, a nie osobne tlo: samo wypelnienie
    robilo z ostatniej karty inny mebel, zamiast konca tej samej drogi */
 .cards--steps .card.is-accent::after{
@@ -525,10 +522,13 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 /* drugi kanal roznicy dla stanu docelowego: sam kolor tytulu nie wystarczal */
 .cards--steps .card.is-accent .card-title{color:var(--accent);font-weight:600;}
 .cards--steps .card.is-accent .card-num{color:var(--accent);}
-.cards--steps .card:nth-child(1){--step:14%;}
-.cards--steps .card:nth-child(2){--step:35%;}
-.cards--steps .card:nth-child(3){--step:56%;}
-.cards--steps .card:nth-child(4){--step:78%;}
+/* pelny zakres rampy: przy 14..100% roznica luminancji na odcinek wynosila
+   ok. 8 z 255 (3%) przez rynne 22 px i pieciu etapow nie dalo sie na tej
+   podstawie uporzadkowac. Od kreski bazowej do pelnego akcentu to ok. 33. */
+.cards--steps .card:nth-child(1){--step:0%;}
+.cards--steps .card:nth-child(2){--step:25%;}
+.cards--steps .card:nth-child(3){--step:50%;}
+.cards--steps .card:nth-child(4){--step:75%;}
 .cards--steps .card:nth-child(5){--step:100%;}
 .cards--steps .card+.card::before{
   content:'';position:absolute;top:-5px;left:calc(var(--cards-gap,18px)*-1);
@@ -629,11 +629,12 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 /* .stats--band: cztery liczby jako pas podsumowania, a nie czwarty rownorzedny
    modul danych. Na slajdzie z para wykresow szesc obiektow o zblizonym ciezarze
    konkurowalo o pierwszy odczyt i nie bylo wiadomo, co jest teza slajdu. */
-.stats--band{gap:clamp(20px,2.4vw,44px);}
-/* kreska POD pasem: liczby stoja nad wykresami, ktore je rozwijaja, wiec
-   domkniecie nalezy do gory modulu wykresow, nie do dolu pasa liczb */
-.stats--band+*{padding-top:clamp(15px,1.5vw,24px);border-top:1px solid var(--line-2);
-  margin-top:calc(clamp(15px,1.6vw,26px) - var(--stack-gap,0px));}
+/* rynna ta sama co w .split: przy wezszej trzecia liczba stala 8,0 px
+   obok kolumny wykresu, z ktora kreska ma ja wiazac */
+.stats--band{gap:clamp(26px,3.4vw,64px);}
+/* kreska nalezy do modulu ponizej i ma te sama figure co pas etykiet:
+   41,6 px nad kreska, 20 px pod nia. Wlasny margines dawal odwrotne
+   proporcje (34 nad, 78 pod) i rozsuwal oba moduly do 50,6 px. */
 .stats--band .stat-num{font-size:clamp(26px,2.3vw,38px);}
 .stat-lab{font-size:var(--fs-small);line-height:1.5;color:var(--ink-2);}
 .stat-sub{font-family:var(--ff-mono);font-size:calc(var(--fs-small)*.9);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);}
@@ -656,6 +657,11 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
    praktycznie znikaly i piec wezlow czytalo sie jak luzne kolumny pod
    dekoracyjna linia, a przy 100% jak piec osobnych pudelek */
 .flow-node+.flow-node{border-left:1px solid color-mix(in srgb,var(--line-2) 78%,transparent);}
+/* szyna konczy sie znacznikiem, tak jak drabina dojrzalosci: bez niego
+   ostatnie 293 px linii czytalo sie jak brakujacy szosty przystanek */
+.flow-node:last-child::after{
+  content:'';position:absolute;right:0;top:-4px;width:8px;height:9px;background:var(--accent);
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
 /* pierwsza kolumna nie ma kreski w rynnie, wiec jej tresc siada na marginesie */
 .flow-node:first-child{padding-left:0;}
 /* Szyna biegnie do prawego marginesu, bo jest gorna krawedzia piecioczlonowego
@@ -686,7 +692,11 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
    Grupowanie i wyroznienie mowia jezykiem samej tabeli — mocniejsza kreska
    i ciezsza typografia zamiast tla czy kolorowej belki, ktore czytaly sie
    jako artefakt albo nieoznaczone zaznaczenie. */
-.tbl--signal tbody tr.is-split td{border-bottom:1px solid var(--line);}
+/* kreska grupujaca w srodku tabeli miala luminancje kreski NAGLOWKA
+   (135,9 wobec 163,0 na separatorach wierszy), wiec nieopisany podzial
+   czytal sie jak drugi naglowek albo artefakt */
+.tbl--signal tbody tr.is-split td{border-bottom:1px solid var(--line-2);padding-bottom:17px;}
+.tbl--signal tbody tr.is-split + tr td{padding-top:17px;}
 /* jeden stopien w kolumnie liczbowej: trzy rozne wielkosci rozjezdzaly
    wyrownanie do prawej, a hierarchie i tak niesie waga */
 .tbl--signal tbody tr.is-key .t-price{font-weight:600;}
@@ -728,6 +738,10 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
    rownolegle hairline'y w odleglosci 43 px robily drabinke i pustke
    miedzy modulami. Domkniecie nalezy do pasa, ktory stoi nizej. */
 .split:has(+.chips) .tl-item:last-child{border-bottom:0;}
+/* kreska domykajaca ma szerokosc tego, co domyka: przy pelnej szerokosci
+   byla o 594,5 px szersza od osi i zaczynala sie pod pusta kolumna.
+   38,27% + reszta rynny = lewa krawedz prawej kolumny .split--38 */
+.split--38:has(.tl)+.chips{margin-left:calc(38.27% + clamp(26px,3.4vw,64px)*0.6173);}
 .split-col>.tl:first-child{margin-top:0;}
 /* wspolna linia gorna liczy sie po tuszu, nie po pudelku: pierwszy wiersz osi
    nie wnosi gornego paddingu, wiec jego tekst startuje rowno z nadlinia obok */
@@ -804,7 +818,11 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .lb-d{font-family:var(--ff-mono);font-size:calc(var(--fs-small)*.9);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);}
 
 /* okładka */
-.cover{display:flex;flex-direction:column;gap:clamp(20px,2.6vw,40px);justify-content:center;min-height:100%;}
+/* gap przez zmienna, nie wprost: regula .cover>.eyebrow+* odejmuje
+   --stack-gap i bez tej deklaracji odejmowala zero, przez co nadlinia
+   stala 60 px od tezy i blizej logotypu (40) niz wlasnego tytulu */
+.cover{--stack-gap:clamp(20px,2.6vw,40px);
+  display:flex;flex-direction:column;gap:var(--stack-gap);justify-content:center;min-height:100%;}
 .cover-logo{display:flex;align-items:center;gap:14px;}
 .cover-logo svg{width:clamp(40px,3.4vw,58px);height:auto;}
 .cover-logo b{font-family:var(--ff-logo);font-size:clamp(15px,1.3vw,21px);font-weight:600;letter-spacing:.2em;color:var(--ink-0);}
@@ -1128,7 +1146,7 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
 .logos{gap:48px;}
   .logo-item{height:32px;}
   /* okładka */
-.cover{gap:40px;}
+.cover{--stack-gap:40px;gap:40px;}
   .cover-logo svg{width:54.4px;}
   .cover-logo b{font-size:20.8px;}
   .cover-meta{gap:38.4px;padding-top:30px;}
