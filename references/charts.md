@@ -45,7 +45,16 @@ po drugi kolor wyłącznie tam, gdzie pozycja naprawdę jest innego rodzaju: `--
 dla „Pozostałe” (worek, nie kategoria), `--dv-neg` dla wartości ujemnej, gradient
 `.is-hi` dla prognozy obok faktów.
 
-**7. Dwa wykresy obok siebie to jeden układ.** Owiń je w `.split.split--viz` — krótszy
+**7. Tekst wykresu chodzi po skali decku.** Sufit rozmiaru to zawsze token —
+`var(--fs-body)` dla etykiet i wartości, `var(--fs-small)` dla numerów i osi — nigdy
+wpisana liczba. Wykres z własną skalą rozjeżdża się przy pierwszej zmianie `--fs-*`
+i czyta się jak wklejony z innej prezentacji: etykieta 11 px obok leadu 20 px.
+Podpis `.viz-cap` zostaje najcichszy — musi być mniejszy od etykiet, nie odwrotnie.
+Jeśli dopisujesz własny komponent wykresu, trzymaj ten sam wzór:
+`clamp(12px, 2.6cqw, var(--fs-body))` — `cqw` zmniejsza pismo w wąskiej kolumnie,
+token pilnuje sufitu.
+
+**8. Dwa wykresy obok siebie to jeden układ.** Owiń je w `.split.split--viz` — krótszy
 rozciągnie się do wysokości dłuższego, a `.viz-cap` obu kolumn siądzie na wspólnej linii.
 Bez tego prawa kolumna kończy się w powietrzu i slajd czyta się jako wykres plus ozdobnik.
 
@@ -112,6 +121,12 @@ zwykle ostatni albo ten, o którym mówisz.
 
 Sortuj malejąco, zawsze. `.is-rest` szarzy pozycję „pozostałe” — ona nie jest osobną historią.
 Etykieta jest wyrównana do prawej, żeby przylegała do słupka i oko nie skakało przez pustkę.
+
+Kolumna etykiet bierze domyślnie 34% szerokości wykresu; zmienisz to przez `--lbl`
+na `.c-rank`. Etykiety pisz krótkie — „Regularne użycie GenAI w ≥1 funkcji" łamie się
+na dwie linie nawet przy 34%, a każda złamana etykieta rozsuwa wiersze i psuje rytm
+wykresu. Kiedy nazwy muszą być długie, oddaj rankingowi całą szerokość slajdu zamiast
+kolumny splitu.
 
 ## 3. `.c-meter` — mierniki udziału
 

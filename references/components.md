@@ -109,7 +109,7 @@ gdy obie strony faktycznie ważą tyle samo.
 
 `.split--viz` jest dla pary wykresów: krótszy rozciąga się do wysokości dłuższego,
 a `.viz-cap` obu kolumn siada na jednej linii. Bez tego kolumny kończą się na różnej
-wysokości i slajd rozpada się na wykres i ozdobnik — szczegóły w `charts.md`, zasada 7.
+wysokości i slajd rozpada się na wykres i ozdobnik — szczegóły w `charts.md`, zasada 8.
 
 Powyżej czterech kart na slajdzie tekst schodzi poniżej progu czytelności —
 `cards--5` jest dla haseł jednowyrazowych.

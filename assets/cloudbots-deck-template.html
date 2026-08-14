@@ -201,8 +201,14 @@ body.is-light .drawer-tab{
   box-shadow:inset 3px 0 0 var(--cb-cyan-deep), 0 8px 26px rgba(15,23,41,.10);
 }
 .drawer-tab:hover{background:var(--cb-primary);color:#04141a;}
-.drawer-tab-bars{display:block;width:15px;height:9px;border-top:1.5px solid currentColor;border-bottom:1.5px solid currentColor;position:relative;}
-.drawer-tab-bars::after{content:'';position:absolute;left:0;top:3px;width:100%;height:1.5px;background:currentColor;}
+/* Trzy kreski przez trzy tła na pozycjach 0/50%/100% — dzielą wysokość równo.
+   Dwa bordery plus ::after na top:3px dawały przerwy 3 px i 1,5 px. */
+.drawer-tab-bars{
+  display:block;width:16px;height:11px;
+  background:linear-gradient(currentColor 0 0) 0 0/100% 1.5px no-repeat,
+             linear-gradient(currentColor 0 0) 0 50%/100% 1.5px no-repeat,
+             linear-gradient(currentColor 0 0) 0 100%/100% 1.5px no-repeat;
+}
 .drawer-tab-label{
   font-family:var(--ff-mono);font-size:10px;font-weight:600;letter-spacing:.28em;
   writing-mode:vertical-rl;text-orientation:mixed;
@@ -577,9 +583,9 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
   padding:clamp(13px,1.5vw,22px) 0;border-bottom:1px solid var(--line-2);
 }
 .toc-row:last-child{border-bottom:0;}
-.toc-n{font-family:var(--ff-display);font-size:clamp(24px,2.4vw,42px);font-weight:600;line-height:1;letter-spacing:-.04em;color:var(--accent);opacity:.85;}
+.toc-n{font-family:var(--ff-display);font-size:clamp(20px,1.8vw,30px);font-weight:600;line-height:1;letter-spacing:-.04em;color:var(--accent);opacity:.85;}
 .toc-t{font-family:var(--ff-display);font-size:var(--fs-display-s);font-weight:500;color:var(--ink-0);line-height:1.24;}
-.toc-d{font-size:var(--fs-small);line-height:1.55;color:var(--ink-2);}
+.toc-d{font-size:var(--fs-body);line-height:1.55;color:var(--ink-2);}
 
 /* kontakt */
 .contact{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(26px,3.6vw,64px);align-items:center;}
@@ -596,7 +602,13 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 /* ── 11. WYKRESY ──────────────────────────────────────────────────────────── */
 /* Każdy wykres żyje w .viz — kontener zapytań. Rozmiary wewnętrzne liczą się
    od szerokości .viz (cqw), nie od okna, więc ten sam markup działa w kolumnie
-   splitu i na całą szerokość slajdu. */
+   splitu i na całą szerokość slajdu.
+
+   Tekst wykresu należy do skali typograficznej decku: sufit każdego clampa to
+   token (--fs-body dla etykiet i wartości, --fs-small dla numerów i osi), nigdy
+   wpisana liczba. Inaczej podniesienie --fs-* zostawia wykresy w tyle — etykieta
+   11 px obok leadu 20 px. Mnożnik cqw dobija do tokenu przy ~650 px szerokości,
+   czyli przy każdej kolumnie splitu; węższy wykres nadal zmniejsza pismo. */
 .viz{container-type:inline-size;width:100%;max-width:100%;min-width:0;}
 .viz-cap{
   margin-top:10px;font-family:var(--ff-mono);font-size:calc(var(--fs-small)*.88);
@@ -622,26 +634,27 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
   gap:0;align-items:end;
 }
 .c-bars .b{display:grid;grid-template-rows:auto var(--h) auto;justify-items:center;gap:7px;min-width:0;}
-.c-bars .bv{font-family:var(--ff-mono);font-size:clamp(11px,2cqw,16px);font-weight:600;color:var(--ink-0);align-self:end;}
+.c-bars .bv{font-family:var(--ff-mono);font-size:clamp(12px,2.6cqw,var(--fs-body));font-weight:600;color:var(--ink-0);align-self:end;}
 /* Szerokość słupka mierzymy komórką siatki, nie kontenerem: przy cqw zwężenie
    kolumny zwężało słupek razem z nią, więc przerwa zostawała ta sama i dominowała
    nad danymi. 56% komórki trzyma słupek szerszy od przerwy przy każdej liczbie słupków. */
 .c-bars .bar{align-self:end;width:100%;max-width:min(84px,56%);height:var(--v,50%);
   background:var(--c,var(--dv-1));transition:height .8s var(--ease);}
-.c-bars .bx{font-family:var(--ff-mono);font-size:clamp(9.5px,1.6cqw,13px);letter-spacing:.08em;color:var(--ink-3);
+.c-bars .bx{font-family:var(--ff-mono);font-size:clamp(10px,2.2cqw,var(--fs-small));letter-spacing:.08em;color:var(--ink-3);
   text-align:center;line-height:1.35;border-top:1px solid var(--line);padding-top:7px;width:100%;}
 .c-bars .b.is-rest .bar{background:var(--dv-rest);}
 .c-bars .b.is-hi .bar{background:linear-gradient(180deg,var(--cb-primary),var(--cb-cyan-deep));}
 
 /* słupki poziome z rankingiem */
 .c-rank{display:flex;flex-direction:column;gap:clamp(6px,1.1cqw,13px);}
-.c-rank .r{display:grid;grid-template-columns:auto minmax(0,var(--lbl,26%)) minmax(0,1fr) auto;gap:clamp(8px,1.4cqw,16px);align-items:center;}
-.c-rank .rn{font-family:var(--ff-mono);font-size:clamp(10px,1.5cqw,13px);color:var(--ink-3);letter-spacing:.06em;}
+.c-rank .r{display:grid;grid-template-columns:auto minmax(0,var(--lbl,34%)) minmax(0,1fr) auto;gap:clamp(8px,1.4cqw,16px);align-items:center;}
+.c-rank .rn{font-family:var(--ff-mono);font-size:clamp(10px,2.2cqw,var(--fs-small));color:var(--ink-3);letter-spacing:.06em;}
 /* etykieta wyrównana do prawej — przylega do słupka, oko nie skacze przez pustkę */
-.c-rank .rl{font-size:clamp(11px,1.6cqw,15px);color:var(--ink-1);line-height:1.3;overflow-wrap:anywhere;text-align:right;}
+.c-rank .rl{font-size:clamp(12px,2.6cqw,var(--fs-body));color:var(--ink-1);line-height:1.3;overflow-wrap:anywhere;
+  text-align:right;text-wrap:balance;}
 .c-rank .rt{height:clamp(16px,2.6cqw,28px);background:var(--dv-track);position:relative;}
 .c-rank .rf{position:absolute;inset:0 auto 0 0;width:var(--v,50%);background:var(--c,var(--dv-1));transition:width .8s var(--ease);}
-.c-rank .rv{font-family:var(--ff-mono);font-size:clamp(11px,1.8cqw,16px);font-weight:600;color:var(--ink-0);
+.c-rank .rv{font-family:var(--ff-mono);font-size:clamp(12px,2.6cqw,var(--fs-body));font-weight:600;color:var(--ink-0);
   font-variant-numeric:tabular-nums;min-width:3.2em;text-align:right;}
 .c-rank .r.is-rest .rf{background:var(--dv-rest);}
 .c-rank .r.is-neg .rf{background:var(--dv-neg);}
@@ -650,7 +663,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .c-meter{display:flex;flex-direction:column;gap:clamp(10px,1.6cqw,18px);}
 .c-meter .m{display:flex;flex-direction:column;gap:6px;}
 .c-meter .mh{display:flex;justify-content:space-between;align-items:baseline;gap:14px;
-  font-size:clamp(11px,1.6cqw,15px);color:var(--ink-1);}
+  font-size:clamp(12px,2.6cqw,var(--fs-body));color:var(--ink-1);}
 .c-meter .mh b{font-family:var(--ff-mono);font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums;}
 /* 5px obok słupka wysokiego na 180px czytało się jak linijka, nie jak dane */
 .c-meter .mt{height:clamp(7px,1.2cqw,11px);background:var(--dv-track);position:relative;}
@@ -664,7 +677,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .c-donut::after{content:'';position:absolute;inset:22%;border-radius:50%;background:var(--bg-0);}
 .c-donut .dc{position:absolute;inset:0;display:grid;place-content:center;text-align:center;z-index:1;gap:2px;}
 .c-donut .dv{font-family:var(--ff-display);font-size:clamp(24px,9cqw,44px);font-weight:600;letter-spacing:-.03em;color:var(--ink-0);line-height:1;}
-.c-donut .dl{font-family:var(--ff-mono);font-size:clamp(9px,2.2cqw,12px);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);}
+.c-donut .dl{font-family:var(--ff-mono);font-size:clamp(9px,2.2cqw,var(--fs-small));letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);}
 
 /* zmiana przed → po */
 .c-delta{display:grid;grid-template-columns:1fr auto 1fr;gap:clamp(12px,2.4cqw,30px);align-items:end;}
@@ -672,7 +685,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .c-delta .dv{font-family:var(--ff-mono);font-size:clamp(13px,2.6cqw,22px);font-weight:600;color:var(--ink-0);align-self:end;}
 .c-delta .db{align-self:end;width:100%;height:var(--v,50%);background:var(--c,var(--dv-rest));}
 .c-delta .d.is-after .db{background:linear-gradient(180deg,var(--cb-primary),var(--cb-cyan-deep));}
-.c-delta .dl{font-family:var(--ff-mono);font-size:clamp(9.5px,1.7cqw,13px);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);}
+.c-delta .dl{font-family:var(--ff-mono);font-size:clamp(10px,2.2cqw,var(--fs-small));letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);}
 .c-delta .darrow{align-self:center;display:flex;flex-direction:column;align-items:center;gap:4px;padding-bottom:clamp(24px,6cqw,50px);}
 .c-delta .darrow span{font-family:var(--ff-mono);font-size:clamp(12px,2.2cqw,19px);font-weight:600;color:var(--accent);white-space:nowrap;}
 .c-delta .darrow svg{width:clamp(20px,4cqw,34px);height:auto;color:var(--accent);}
@@ -680,8 +693,8 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 /* mapa ciepła */
 .c-heat{display:grid;gap:3px;}
 .c-heat .hc{aspect-ratio:1.6;display:grid;place-items:center;
-  font-family:var(--ff-mono);font-size:clamp(9px,1.5cqw,13px);font-variant-numeric:tabular-nums;}
-.c-heat .hh{background:none!important;color:var(--ink-3);letter-spacing:.09em;text-transform:uppercase;font-size:clamp(8.5px,1.3cqw,11.5px);}
+  font-family:var(--ff-mono);font-size:clamp(10px,2.2cqw,var(--fs-small));font-variant-numeric:tabular-nums;}
+.c-heat .hh{background:none!important;color:var(--ink-3);letter-spacing:.09em;text-transform:uppercase;font-size:clamp(9px,1.9cqw,calc(var(--fs-small)*.86));}
 /* Rampa podana wprost dla obu motywów, nie przez przezroczystość. Ten sam
    kolor z alfą daje nad czernią i nad bielą dwa różne kolory tła, a liczba na
    kafelku musi być czytelna w obu — przy alfie zawsze któryś stopień wypada.
@@ -714,8 +727,8 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .c-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(clamp(120px,26cqw,190px),1fr));gap:clamp(10px,1.6cqw,20px);}
 .c-kpi .k{display:flex;flex-direction:column;gap:4px;padding:clamp(12px,1.8cqw,20px);border:1px solid var(--line);border-left:3px solid var(--accent);}
 .c-kpi .kv{font-family:var(--ff-display);font-size:clamp(24px,5.4cqw,44px);font-weight:600;line-height:1;letter-spacing:-.035em;color:var(--ink-0);}
-.c-kpi .kl{font-size:clamp(11px,1.6cqw,14px);color:var(--ink-2);line-height:1.4;}
-.c-kpi .kd{font-family:var(--ff-mono);font-size:clamp(10px,1.4cqw,12.5px);letter-spacing:.08em;color:var(--ink-3);}
+.c-kpi .kl{font-size:clamp(12px,2.6cqw,var(--fs-body));color:var(--ink-2);line-height:1.4;}
+.c-kpi .kd{font-family:var(--ff-mono);font-size:clamp(10px,2.2cqw,var(--fs-small));letter-spacing:.08em;color:var(--ink-3);}
 .c-kpi .kd.up{color:var(--dv-pos);} .c-kpi .kd.down{color:var(--dv-neg);}
 
 /* linia / obszar — SVG, punkty liczone przy pisaniu slajdu */
@@ -731,7 +744,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 /* pasek 100% */
 .c-stack{display:flex;height:clamp(26px,4.4cqw,44px);width:100%;overflow:hidden;}
 .c-stack i{display:block;height:100%;width:var(--v,25%);background:var(--c,var(--dv-1));
-  display:grid;place-items:center;font-family:var(--ff-mono);font-size:clamp(9px,1.5cqw,12.5px);
+  display:grid;place-items:center;font-family:var(--ff-mono);font-size:clamp(10px,2.2cqw,var(--fs-small));
   font-weight:600;color:#04141a;font-style:normal;}
 
 /* ── 12. KROKI, ANIMACJE, TRYBY ───────────────────────────────────────────── */
