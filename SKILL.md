@@ -51,14 +51,28 @@ Zbierz materiał. Ustal krótko, jeśli nieznane: **cel**, **odbiorca**, **konte
 
 ### Krok 2 · Struktura
 Zaproponuj listę slajdów: tytuł + jednozdaniowy komunikat każdego. To jest jednocześnie
-spis nawigacji w wysuwanym menu. Jeden komunikat = jeden slajd. Typowy łuk oferty:
-okładka → spis treści → problem → liczby → moduły → jak pracujemy → separator sekcji →
-wycena → harmonogram → dowody → kontakt.
+spis nawigacji w wysuwanym menu. Jeden komunikat = jeden slajd.
+
+Podziel deck na **sekcje** (`data-group`) i **każdą otwórz przekładką** — ciemnym slajdem
+`.sect` z numerem sekcji, tezą i jednym zdaniem kontekstu. Typowy łuk oferty:
+
+```
+okładka → spis treści
+  ── 01 Kontekst ──   przekładka → problem → liczby
+  ── 02 Moduły ──     przekładka → moduł → jak pracujemy
+  ── 03 Warunki ──    przekładka → wycena → harmonogram
+  ── 04 Dowody ──     przekładka → opinie → kontakt
+```
+
+Pierwsza grupa (okładka + spis treści) przekładki nie potrzebuje — deck sam się nią otwiera.
+Numer na przekładce to numer SEKCJI, nie slajdu; numeracja slajdów generuje się sama,
+więc dołożenie przekładki nigdy nie wymaga przenumerowania niczego.
+
 **Przy prezentacji powyżej ~6 slajdów zatwierdź strukturę z użytkownikiem przed budową formy.**
 
 ### Krok 3 · Forma
-- Skopiuj `assets/cloudbots-deck-template.html` — ma gotowy szkielet i jedenaście
-  wzorcowych slajdów do podmiany treści.
+- Skopiuj `assets/cloudbots-deck-template.html` — ma gotowy szkielet i czternaście
+  wzorcowych slajdów do podmiany treści, w tym cztery przekładki sekcyjne.
 - Każdy slajd to `<section class="slide slide--dark|slide--light" data-theme="dark|light"
   data-nav="Nazwa w menu" data-group="Grupa w menu">`. Menu buduje się samo z tych atrybutów.
 - Wypełniaj komponentami z `references/components.md`. **Nie powtarzaj tego samego układu**
@@ -133,6 +147,8 @@ Galerie do oglądania (nie do czytania jako kod): `assets/cloudbots-charts.html`
 
 - **Nie zaczynaj od stylu.** Najpierw treść i struktura.
 - **Nie powielaj jednego layoutu** ani jednego motywu przez cały deck.
+- **Nie zaczynaj sekcji bez przekładki.** Grupa slajdów bez własnego separatora zlewa się
+  z poprzednią i odbiorca traci orientację, w której części rozmowy jest.
 - **Nie rysuj wykresu bez wartości.** Słupek „dla ozdoby” jest gorszy niż jego brak.
 - **Nie koloruj wykresów inline** tam, gdzie istnieje klasa (`.hm-0`…`.hm-5`, `--dv-1`…`--dv-5`) —
   inline'owy kolor przestaje działać na drugim motywie.

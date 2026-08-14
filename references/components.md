@@ -270,6 +270,20 @@ w monospace, w kolorze akcentu. `tr.is-total` dostaje linię akcentu nad sobą.
 
 Do stosów technologicznych i zakresów. `.is-on` wyróżnia to, co dotyczy klienta.
 
+**Pas domykający moduł.** Gdy `.chips` stoi bezpośrednio po `.cards` albo po `.split`,
+dostaje kreskę NAD sobą i staje się pasem domykającym ten moduł:
+
+```html
+<div class="stack">
+  <div class="cards cards--3">…</div>
+  <div class="chips">…</div>   <!-- kreska nad pasem dokłada się sama -->
+</div>
+```
+
+Kierunek kreski jest jeden dla całego systemu — **zawsze nad pasem**, tak samo jak
+szyna osi danych. Pas bez własnej krawędzi czyta się jak zabłąkane metadane albo
+druga linia stopki, bo używa tego samego kroju i wielkości co `chrome-bottom`.
+
 ---
 
 ## 10. Oś czasu
@@ -307,18 +321,38 @@ na nazwisko, podaj przynajmniej rolę i branżę.
 
 ---
 
-## 12. Separator sekcji
+## 12. Separator sekcji (przekładka)
 
 ```html
-<div class="sect">
-  <span class="sect-num">03</span>
-  <h2 class="sect-title">Warunki współpracy</h2>
-  <p class="lead">Trzy rzeczy do ustalenia: zakres, tempo i kto po stronie klienta decyduje.</p>
-</div>
+<section class="slide slide--dark" data-theme="dark"
+         data-nav="Sekcja: Warunki" data-group="Warunki">
+  <!-- chrome-top / hex-deco jak w każdym slajdzie -->
+  <div class="stage">
+    <div class="sect">
+      <span class="sect-num" data-step="0">03</span>
+      <h2 class="sect-title" data-step="1" style="max-width:20ch">Warunki współpracy</h2>
+      <p class="h-sub" data-step="2" style="max-width:48ch">
+        Trzy rzeczy do ustalenia: zakres, tempo i kto po stronie klienta decyduje.
+      </p>
+    </div>
+  </div>
+</section>
 ```
 
 Gigantyczny numer w konturze (`-webkit-text-stroke`). Zawsze na slajdzie ciemnym —
 to oddech przed nową częścią.
+
+**Każda sekcja decku zaczyna się przekładką.** Sekcje wyznacza atrybut `data-group`;
+jeśli grupa pojawia się w menu, musi mieć własną przekładkę z kolejnym numerem
+(`01`, `02`, `03`…). Wyjątkiem jest pierwsza grupa — okładka i spis treści same
+otwierają deck. Bez przekładek kolejne slajdy tej samej sekcji zlewają się w jeden
+ciąg i odbiorca traci orientację, w której części rozmowy jest.
+
+Numer przekładki jest numerem SEKCJI, nie slajdu — numeracja slajdów w `chrome-top`
+generuje się sama, więc wstawienie przekładki nigdy nie wymaga przenumerowania.
+
+Podtytuł przekładki to `.h-sub`, nie `.lead` — `.lead` ma inną skalę i zaburza
+drabinę odstępów tytuł → zdanie (przekładka 41 px, okładka 53 px, `.h-title` 24 px).
 
 ---
 

@@ -393,17 +393,22 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 /* przypis tuz pod kreska zamykajaca spis czytal sie jak nieoznaczony szosty
    wiersz; wlasny oddech i wezsza miara odrozniaja adnotacje od tresci */
 .toc+.note{margin-top:clamp(20px,2.2vw,36px);max-width:78ch;}
-/* pasek etykiet pod siatka kart bez wlasnej krawedzi czytal sie jak
-   zabladzone metadane; kreska nad nim domyka modul kart */
-.cards+.chips{padding-top:clamp(13px,1.3vw,20px);border-top:1px solid var(--line-2);}
+/* pas etykiet bez wlasnej krawedzi czytal sie jak zabladzone metadane.
+   Kreska zawsze NAD pasem — jeden kierunek domkniecia w calym systemie,
+   ten sam co szyna osi danych. */
+.cards+.chips,.split+.chips{padding-top:clamp(13px,1.3vw,20px);border-top:1px solid var(--line-2);}
 
 .head-row{
   display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(20px,3vw,56px);
   align-items:start;
 }
 .head-meta{
-  font-family:var(--ff-mono);font-size:var(--fs-small);line-height:1.95;
-  letter-spacing:.05em;color:var(--ink-3);text-align:right;white-space:nowrap;padding-top:6px;
+  /* metryczka i nadlinia stoja na tej samej belce naglowka, wiec musza dzielic
+     linie pisma; padding 6px przy line-height 1,95 spychal ja o 7px w dol */
+  /* ta sama interlinia co nadlinia po drugiej stronie belki naglowka: inaczej
+     polinterlinia spycha pierwszy wiersz metryczki o 7px ponizej linii pisma */
+  font-family:var(--ff-mono);font-size:var(--fs-small);line-height:1.72;
+  letter-spacing:.05em;color:var(--ink-3);text-align:right;white-space:nowrap;padding-top:0;
   border-left:1px solid var(--line);padding-left:18px;
 }
 .head-meta strong{color:var(--accent);font-weight:500;}
@@ -422,23 +427,14 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .split--38{grid-template-columns:minmax(0,.62fr) minmax(0,1fr);}
 .split--62{grid-template-columns:minmax(0,1fr) minmax(0,.62fr);}
 .split--center{align-items:center;}
-/* kolumny roznej dlugosci: zamiast wisiec u gory albo plywac w srodku,
-   krotsza kolumna trzyma gorna linie naglowkiem i dolna ostatnim elementem */
-.split--fill{align-items:stretch;}
-.split--fill>.split-col>:last-child{margin-top:auto;}
-/* kreska POD pasem, nie nad nim: wtedy obie kolumny konczy ta sama linia
-   na tej samej wysokosci, a pustka nad pasem czyta sie jak margines modulu */
-.split--fill>.split-col>.chips:last-child{
-  padding-bottom:clamp(13px,1.3vw,20px);border-bottom:1px solid var(--line-2);}
-/* pas domykający: slajd o rzadkiej treści dostaje dolną krawędź zamiast wiszącej
-   pustki — górny blok trzyma proporcje, ostatni element siada przy dole sceny */
-/* pas domykajacy musi konczyc sie wyraznie nad stopka: przy 10px zapasu
-   os danych i stopka czytaly sie jak jeden dwuwierszowy mebel strony */
-.stack--fill{min-height:100%;justify-content:center;padding-bottom:clamp(34px,6vh,58px);}
-/* blok główny bierze zapas TYLKO z góry, a przed pasem domykającym zostaje
-   ograniczony odstęp — inaczej między wykresem a osią rośnie pusty pas,
-   który odrywa oś od danych, które opisuje */
-.stack--fill>*:first-child{margin-top:auto;margin-bottom:clamp(24px,3.2vh,36px);}
+
+
+/* .stack--fill USUNIETY: regula "oddaj caly zapas gorze, pas domykajacy
+   przyklej do dolu sceny" dawala naraz trzy wady — 80px wyrwy przed osia,
+   54px preswitu nad stopka i jedyny slajd w talii poza wspolna osia pionowa
+   (srodek tresci 488,5 wobec 457,2 na wszystkich pozostalych). Slajd o rzadkiej
+   tresci centruje sie tak jak kazdy inny, a pas domykajacy trzyma rytm stosu. */
+
 /* rząd wykresów: podpisy obu kolumn siadają na jednej linii, a krótszy wykres
    rozciąga się do wysokości dłuższego. Bez tego prawa kolumna kończy się
    w powietrzu i dwa wykresy przestają czytać się jako jeden układ. */
@@ -460,8 +456,13 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 {margin-top:calc(clamp(12px,1.35vw,20px) - var(--stack-gap,0px));}
 /* Okladka ma wlasny, szerszy rytm. */
 .cover>.eyebrow+*{margin-top:0;}
-/* Podtytul oddycha, ale zostaje w bloku naglowka. */
-.h-title+.h-sub,.h-display+.h-sub,.sect-title+.h-sub{margin-top:clamp(8px,.85vw,13px);}
+/* Podtytul oddycha proporcjonalnie do stopnia tytulu: przekladka i okladka
+   niosa gap kontenera (41 i 53px), a .h-title stal w kontenerze bez gapa
+   i dostawal 13px — 3x ciasniej niz reszta talii przy tej samej relacji. */
+.h-display+.h-sub,.sect-title+.h-sub{margin-top:clamp(8px,.85vw,13px);}
+.h-title+.h-sub{margin-top:clamp(14px,1.5vw,24px);}
+.stack>.h-title+.h-sub,.split-col>.h-title+.h-sub,.closing-copy>.h-title+.h-sub
+{margin-top:calc(clamp(14px,1.5vw,24px) - var(--stack-gap,0px));}
 .split-col{--stack-gap:clamp(13px,1.4vw,22px);display:flex;flex-direction:column;gap:var(--stack-gap);min-width:0;}
 
 .cards{--cards-gap:clamp(13px,1.4vw,22px);display:grid;gap:var(--cards-gap);align-items:stretch;}
@@ -588,13 +589,14 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
   padding:clamp(13px,1.4vw,20px) clamp(15px,1.6vw,24px);border-top:1px solid var(--line);
 }
 .flow-node::before{
-  content:'';position:absolute;left:clamp(15px,1.6vw,24px);top:-4px;width:8px;height:9px;background:var(--accent);
+  /* znacznik na lewej krawedzi wezla = dokladnie na kresce rynny; gdy stal
+     na tekscie, pierwszy skok byl o 25,1px dluzszy od trzech pozostalych */
+  content:'';position:absolute;left:0;top:-4px;width:8px;height:9px;background:var(--accent);
   clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
 }
 .flow-node+.flow-node{border-left:1px solid var(--line-2);}
 /* pierwsza kolumna nie ma kreski w rynnie, wiec jej tresc siada na marginesie */
 .flow-node:first-child{padding-left:0;}
-.flow-node:first-child::before{left:0;}
 /* Szyna biegnie do prawego marginesu, bo jest gorna krawedzia piecioczlonowego
    modulu, a nie osia danych jak na slajdach 03 i 12 — urwana na ostatnim
    znaczniku zostawiala goly prawy gorny naroznik nad pelna kolumna. */
@@ -1006,12 +1008,12 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
 .split{gap:54.4px;}
   /* pas domykający: slajd o rzadkiej treści dostaje dolną krawędź zamiast wiszącej
    pustki — górny blok trzyma proporcje, ostatni element siada przy dole sceny */
-.stack--fill{padding-bottom:54px;}
   /* Jeden odstep nadlinia->tytul w calej talii, niezaleznie od kontenera. */
 /* Kontener bez wlasnego gap: pelny odstep. */
 .eyebrow+*{margin-top:20px;}
   /* Podtytul oddycha, ale zostaje w bloku naglowka. */
-.h-title+.h-sub,.h-display+.h-sub,.sect-title+.h-sub{margin-top:13px;}
+.h-display+.h-sub,.sect-title+.h-sub{margin-top:13px;}
+.h-title+.h-sub{margin-top:24px;}
   .split-col{--stack-gap:22px;}
   .cards{gap:22px;}
   /* ── 10. KOMPONENTY ───────────────────────────────────────────────────────── */
@@ -1059,7 +1061,8 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
 
   .eyebrow+*{margin-top:20px!important;}
   .cover>.eyebrow+*{margin-top:0!important;}
-  .h-title+.h-sub,.h-display+.h-sub,.sect-title+.h-sub{margin-top:13px!important;}
+  .h-display+.h-sub,.sect-title+.h-sub{margin-top:13px!important;}
+  .h-title+.h-sub{margin-top:24px!important;}
   body{overflow:visible;background:#fff;}
   .topbar,.drawer,.drawer-tab,.drawer-scrim,.vprog,.arrows,.grain,.lightbox{display:none!important;}
   .deck{height:auto;overflow:visible;scroll-snap-type:none;}
@@ -1259,6 +1262,31 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
 </section>
 
 <!-- ─── 03 · PROBLEM (split + liczba) ────────────────────────────────────── -->
+<section class="slide slide--dark" data-theme="dark" data-nav="Sekcja: Kontekst" data-nav-en="Section: Context" data-group="Kontekst" data-group-en="Context">
+  <div class="hex-deco">
+    <span style="width:340px;height:392px;top:-6%;right:-6%;opacity:.08;animation-delay:-2s"></span>
+    <span style="width:180px;height:208px;bottom:14%;right:16%;opacity:.06;animation-delay:-8s"></span>
+  </div>
+  <div class="chrome-top">
+    <span class="chrome-tag"><span class="chrome-tag-dot"></span>00</span>
+    <span class="chrome-progress"></span>
+  </div>
+
+  <div class="stage">
+    <div class="sect">
+      <span class="sect-num" data-step="0">01</span>
+      <h2 class="sect-title" data-step="1" style="max-width:20ch" data-en="Where the <em>conversation</em> starts.">Od czego zaczyna się <em>rozmowa</em>.</h2>
+      <p class="h-sub" data-step="2" style="max-width:48ch" data-en="Before a proposal, name the problem and show what the numbers say.">
+        Zanim padnie propozycja, warto nazwać problem i pokazać, co mówią liczby.
+      </p>
+    </div>
+  </div>
+
+  <div class="chrome-bottom">
+    <span class="chrome-tag" data-manual="1">CloudBots &middot; cloudbots.eu</span><span></span>
+  </div>
+</section>
+
 <section class="slide slide--dark" data-theme="dark" data-nav="Problem" data-group="Kontekst">
   <div class="grid-deco"></div>
   <div class="chrome-top">
@@ -1376,6 +1404,31 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
 </section>
 
 <!-- ─── 05 · KARTY (wzór modułu) ─────────────────────────────────────────── -->
+<section class="slide slide--dark" data-theme="dark" data-nav="Sekcja: Moduły" data-nav-en="Section: Modules" data-group="Moduły" data-group-en="Modules">
+  <div class="hex-deco">
+    <span style="width:340px;height:392px;top:-6%;right:-6%;opacity:.08;animation-delay:-4s"></span>
+    <span style="width:180px;height:208px;bottom:14%;right:16%;opacity:.06;animation-delay:-10s"></span>
+  </div>
+  <div class="chrome-top">
+    <span class="chrome-tag"><span class="chrome-tag-dot"></span>00</span>
+    <span class="chrome-progress"></span>
+  </div>
+
+  <div class="stage">
+    <div class="sect">
+      <span class="sect-num" data-step="0">02</span>
+      <h2 class="sect-title" data-step="1" style="max-width:18ch" data-en="What exactly you <em>get</em>.">Co dokładnie <em>dostajesz</em>.</h2>
+      <p class="h-sub" data-step="2" style="max-width:48ch" data-en="The modules are independent. Each one ends with an artefact that stays with the client.">
+        Moduły są niezależne. Każdy kończy się artefaktem, który zostaje u klienta.
+      </p>
+    </div>
+  </div>
+
+  <div class="chrome-bottom">
+    <span class="chrome-tag" data-manual="1">CloudBots &middot; cloudbots.eu</span><span></span>
+  </div>
+</section>
+
 <section class="slide slide--light" data-theme="light" data-nav="Moduł 01 · Discovery" data-group="Moduły">
   <div class="chrome-top">
     <span class="chrome-tag"><span class="chrome-tag-dot"></span>05</span>
@@ -1514,7 +1567,7 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
 <!-- ─── 07 · SEPARATOR SEKCJI ────────────────────────────────────────────── -->
 <section class="slide slide--dark" data-theme="dark" data-nav="Sekcja: Warunki" data-group="Warunki">
   <div class="hex-deco">
-    <span style="width:340px;height:392px;top:12%;right:-6%;opacity:.08"></span>
+    <span style="width:340px;height:392px;top:-6%;right:-6%;opacity:.08"></span>
     <span style="width:180px;height:208px;bottom:14%;right:16%;opacity:.06;animation-delay:-6s"></span>
   </div>
   <div class="chrome-top">
@@ -1652,6 +1705,31 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
 </section>
 
 <!-- ─── 10 · OPINIE ──────────────────────────────────────────────────────── -->
+<section class="slide slide--dark" data-theme="dark" data-nav="Sekcja: Dowody" data-nav-en="Section: Evidence" data-group="Dowody" data-group-en="Evidence">
+  <div class="hex-deco">
+    <span style="width:340px;height:392px;top:-6%;right:-6%;opacity:.08;animation-delay:-6s"></span>
+    <span style="width:180px;height:208px;bottom:14%;right:16%;opacity:.06;animation-delay:-12s"></span>
+  </div>
+  <div class="chrome-top">
+    <span class="chrome-tag"><span class="chrome-tag-dot"></span>00</span>
+    <span class="chrome-progress"></span>
+  </div>
+
+  <div class="stage">
+    <div class="sect">
+      <span class="sect-num" data-step="0">04</span>
+      <h2 class="sect-title" data-step="1" style="max-width:18ch" data-en="Who has <em>been through it</em>.">Kto już to <em>przerobił</em>.</h2>
+      <p class="h-sub" data-step="2" style="max-width:48ch" data-en="References, opinions and the people you will work with.">
+        Referencje, opinie i ludzie, z którymi będziesz pracować.
+      </p>
+    </div>
+  </div>
+
+  <div class="chrome-bottom">
+    <span class="chrome-tag" data-manual="1">CloudBots &middot; cloudbots.eu</span><span></span>
+  </div>
+</section>
+
 <section class="slide slide--light" data-theme="light" data-nav="Opinie" data-group="Dowody">
   <div class="chrome-top">
     <span class="chrome-tag"><span class="chrome-tag-dot"></span>10</span>
