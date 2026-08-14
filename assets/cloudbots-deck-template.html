@@ -390,6 +390,9 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .h-sub{font-size:var(--fs-lead);line-height:1.55;color:var(--ink-2);max-width:76ch;font-weight:300;text-wrap:balance;}
 .lead{font-size:var(--fs-lead);line-height:1.62;color:var(--ink-1);max-width:70ch;text-wrap:balance;}
 .note{font-size:var(--fs-small);line-height:1.62;color:var(--ink-3);max-width:100ch;text-wrap:pretty;}
+/* przypis tuz pod kreska zamykajaca spis czytal sie jak nieoznaczony szosty
+   wiersz; wlasny oddech i wezsza miara odrozniaja adnotacje od tresci */
+.toc+.note{margin-top:clamp(20px,2.2vw,36px);max-width:78ch;}
 
 .head-row{
   display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(20px,3vw,56px);
@@ -416,6 +419,10 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .split--38{grid-template-columns:minmax(0,.62fr) minmax(0,1fr);}
 .split--62{grid-template-columns:minmax(0,1fr) minmax(0,.62fr);}
 .split--center{align-items:center;}
+/* kolumny roznej dlugosci: zamiast wisiec u gory albo plywac w srodku,
+   krotsza kolumna trzyma gorna linie naglowkiem i dolna ostatnim elementem */
+.split--fill{align-items:stretch;}
+.split--fill>.split-col>:last-child{margin-top:auto;}
 /* pas domykający: slajd o rzadkiej treści dostaje dolną krawędź zamiast wiszącej
    pustki — górny blok trzyma proporcje, ostatni element siada przy dole sceny */
 .stack--fill{min-height:100%;justify-content:center;padding-bottom:clamp(6px,1.2vh,16px);}
@@ -796,13 +803,13 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
    wiersz negocjuje szerokość kolumn osobno i tory startują w różnych miejscach,
    przez co długości słupków przestają być porównywalne. */
 .c-rank{display:grid;grid-template-columns:auto minmax(0,var(--lbl,34%)) minmax(0,1fr) auto;
-  column-gap:clamp(14px,2.2cqw,26px);row-gap:clamp(6px,1.1cqw,13px);align-items:center;}
+  column-gap:clamp(14px,2.2cqw,26px);row-gap:clamp(10px,2.6cqw,22px);align-items:center;}
 .c-rank .r{display:contents;}
 .c-rank .rn{font-family:var(--ff-mono);font-size:clamp(12px,2.2cqw,var(--fs-small));color:var(--ink-2);letter-spacing:.03em;}
 /* etykieta wyrównana do prawej — przylega do słupka, oko nie skacze przez pustkę */
 .c-rank .rl{font-size:clamp(12px,2.6cqw,var(--fs-body));color:var(--ink-1);line-height:1.3;overflow-wrap:anywhere;
   text-align:right;text-wrap:balance;min-height:2lh;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;}
-.c-rank .rt{height:clamp(16px,2.6cqw,28px);background:var(--dv-track);position:relative;
+.c-rank .rt{height:clamp(18px,3.4cqw,30px);background:var(--dv-track);position:relative;
   box-shadow:inset 0 0 0 1px var(--dv-track-line);}
 .c-rank .rf{position:absolute;inset:0 auto 0 0;width:var(--v,50%);background:var(--c,var(--dv-1));transition:width .8s var(--ease);}
 .c-rank .rv{font-family:var(--ff-mono);font-size:clamp(12px,2.6cqw,var(--fs-body));font-weight:600;color:var(--ink-0);
