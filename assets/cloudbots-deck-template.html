@@ -468,6 +468,10 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .split--viz .split-col{flex:1;}
 .split--viz .viz{display:flex;flex-direction:column;flex:1;
   margin-top:clamp(28px,2.9vw,46px);}
+/* Podpisy pary wyrownuje rownajPodpisy(), nie CSS: siatka nie moze zrownac
+   wierszy miedzy kolumnami, bo slupki maja wysokosc procentowa i w wierszu
+   "auto" rosna do 251 px (slajd 05 spadal wtedy do skali 0,90 przy 1280).
+   Rezerwe bierze wyzszy podpis, wiec wysokosc kolumn sie nie zmienia. */
 .split--viz .viz-cap{margin-top:auto;padding-top:14px;}
 .split--viz .c-meter{flex:1;justify-content:space-between;}
 /* rankingu nie rozciągamy: pięć pozycji rozłożonych na 765 px czyta się jak
@@ -483,7 +487,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 /* Okladka ma wlasny, szerszy rytm MODULOW, ale nadlinia nalezy do tezy
    tak samo jak wszedzie indziej: 40 px na pierwszym slajdzie, ktory widzi
    klient, wobec 20 px na pozostalych pietnastu. */
-.cover>.eyebrow+*{margin-top:calc(clamp(12px,1.35vw,20px) - var(--stack-gap,0px));}
+.cover>.eyebrow+*,.cover>.cover-head+*{margin-top:calc(clamp(12px,1.35vw,20px) - var(--stack-gap,0px));}
 /* Podtytul oddycha proporcjonalnie do stopnia tytulu: przekladka i okladka
    niosa gap kontenera (41 i 53px), a .h-title stal w kontenerze bez gapa
    i dostawal 13px — 3x ciasniej niz reszta talii przy tej samej relacji. */
@@ -532,7 +536,9 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .cards--steps .card:nth-child(5){--step:100%;}
 .cards--steps .card+.card::before{
   content:'';position:absolute;top:-5px;left:calc(var(--cards-gap,18px)*-1);
-  width:calc(var(--cards-gap,18px) + 1px);height:5px;
+  /* bez naddatku 1 px: kreska karty ma alfe, wiec naklejony lacznik
+     podwajal ja i zostawial ciemniejszy tick w x=365, 662 i 960 */
+  width:var(--cards-gap,18px);height:5px;
   background:color-mix(in srgb,var(--accent) var(--step,20%),var(--line));
 }
 @media (prefers-reduced-motion:no-preference){
@@ -657,11 +663,11 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
    praktycznie znikaly i piec wezlow czytalo sie jak luzne kolumny pod
    dekoracyjna linia, a przy 100% jak piec osobnych pudelek */
 .flow-node+.flow-node{border-left:1px solid color-mix(in srgb,var(--line-2) 78%,transparent);}
-/* szyna konczy sie znacznikiem, tak jak drabina dojrzalosci: bez niego
-   ostatnie 293 px linii czytalo sie jak brakujacy szosty przystanek */
+/* koniec szyny, nie szosty przystanek: heksagon w tym miejscu dawal szesc
+   znacznikow na piec wezlow i — jako jedyny rownany do prawej — ostatni
+   odstep krotszy o 9,1 px. Zasuwka konczy linie i nie udaje etapu. */
 .flow-node:last-child::after{
-  content:'';position:absolute;right:0;top:-4px;width:8px;height:9px;background:var(--accent);
-  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
+  content:'';position:absolute;right:0;top:-4px;width:1px;height:9px;background:var(--accent);}
 /* pierwsza kolumna nie ma kreski w rynnie, wiec jej tresc siada na marginesie */
 .flow-node:first-child{padding-left:0;}
 /* Szyna biegnie do prawego marginesu, bo jest gorna krawedzia piecioczlonowego
@@ -695,8 +701,9 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 /* kreska grupujaca w srodku tabeli miala luminancje kreski NAGLOWKA
    (135,9 wobec 163,0 na separatorach wierszy), wiec nieopisany podzial
    czytal sie jak drugi naglowek albo artefakt */
-.tbl--signal tbody tr.is-split td{border-bottom:1px solid var(--line-2);padding-bottom:17px;}
-.tbl--signal tbody tr.is-split + tr td{padding-top:17px;}
+/* USUNIETE grupowanie is-split: po zrownaniu koloru separatora z pozostalymi
+   zostawal sam odstep 3 px — rytm 60/60/63/63/60 bez czytelnej przyczyny.
+   Grupa bez etykiety nie jest grupa, wiec tabela wraca do jednego rytmu. */
 /* jeden stopien w kolumnie liczbowej: trzy rozne wielkosci rozjezdzaly
    wyrownanie do prawej, a hierarchie i tak niesie waga */
 .tbl--signal tbody tr.is-key .t-price{font-weight:600;}
@@ -741,7 +748,11 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 /* kreska domykajaca ma szerokosc tego, co domyka: przy pelnej szerokosci
    byla o 594,5 px szersza od osi i zaczynala sie pod pusta kolumna.
    38,27% + reszta rynny = lewa krawedz prawej kolumny .split--38 */
-.split--38:has(.tl)+.chips{margin-left:calc(38.27% + clamp(26px,3.4vw,64px)*0.6173);}
+.split--38:has(.tl)+.chips{margin-left:calc(38.27% + clamp(26px,3.4vw,64px)*0.6173);
+  /* domkniecie listy nalezy do rytmu tej listy: przy rytmie MODULOW kreska
+     stala 61,6 px pod ostatnim wierszem wobec 22 px miedzy wierszami.
+     Zostaje samo dopelnienie wiersza osi, tak jak przy kazdym separatorze. */
+  margin-top:calc(10px - var(--stack-gap,0px));}
 .split-col>.tl:first-child{margin-top:0;}
 /* wspolna linia gorna liczy sie po tuszu, nie po pudelku: pierwszy wiersz osi
    nie wnosi gornego paddingu, wiec jego tekst startuje rowno z nadlinia obok */
@@ -1161,7 +1172,16 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
   .lb-frame{width:1200px;}
 
   .eyebrow+*{margin-top:20px!important;}
-  .cover>.eyebrow+*{margin-top:0!important;}
+  /* kompensacja gapa kontenera musi byc TEZ w druku: plaskie 20px!important
+     bilo reguly odejmujace --stack-gap i eksport PDF dawal cztery wartosci
+     nadlinia->teza (20 / 40 / 42 / 48 px) zamiast jednej */
+  .stack>.eyebrow+*,.split-col>.eyebrow+*,.sect>.eyebrow+*,.closing-copy>.eyebrow+*,
+  .cover>.eyebrow+*,.cover>.cover-head+*{margin-top:calc(20px - var(--stack-gap,0px))!important;}
+  .stack>.h-title+.h-sub,.split-col>.h-title+.h-sub,.closing-copy>.h-title+.h-sub
+  {margin-top:calc(24px - var(--stack-gap,0px))!important;}
+  /* odstep nad para wykresow liczony z vw: bez przeliczenia ten sam deck
+     dawal 29,7 px przy oknie 1024 i 46 px przy 1600 */
+  .split--viz .viz{margin-top:46px!important;}
   .h-display+.h-sub,.sect-title+.h-sub{margin-top:13px!important;}
   .h-title+.h-sub{margin-top:24px!important;}
   body{overflow:visible;background:#fff;}
@@ -1977,6 +1997,7 @@ function typografia(root){
   paraKoncowa(root);
   akcenty(root);
   ratunek(root);
+  rownajPodpisy(root);
 }
 
 /* Ostatnie slowo nalezy do ukladu, nie do typografii: jesli po wszystkich
@@ -2136,6 +2157,7 @@ function typografiaDruku(on){
   paraKoncowa(deck);
   akcenty(deck);
   ratunek(deck);
+  rownajPodpisy(deck);
   /* fitAll takze przy on: skala musi sie policzyc z wymiaru STRONY, inaczej
      przy waskim oknie ostatnie slowa slajdu wypadaja poza kadr PDF */
   fitAll();
@@ -2289,6 +2311,23 @@ let userZoom = parseFloat(localStorage.getItem('cbZoom')) || 1;
    i transform-origin w środku przeskalowana treść ląduje dokładnie na krawędziach
    sceny. Bez tego przy k<1 treść odsuwa się od marginesu, a przy k>1 wychodzi
    poza kadr. Pętla przelicza, bo zmiana szerokości zmienia zawijanie tekstu. */
+/* Para wykresow: podpisy maja zaczynac sie na jednej linii. CSS tego nie
+   zrobi — siatka nie zrowna wierszy miedzy kolumnami bez subgrida, a subgrid
+   wymusza na slupkach o wysokosci procentowej wiersz "auto" i wykresy rosna
+   do 251 px. Rezerwe wyznacza WYZSZY podpis, wiec wysokosc kolumn zostaje
+   ta sama, a nizszy podpis oddaje swojemu wykresowi tyle samo miejsca.
+   Wywolywane takze w trybie mierzy-druk, wiec PDF liczy rezerwe z szerokosci
+   STRONY, nie okna. */
+function rownajPodpisy(root){
+  root.querySelectorAll('.split--viz').forEach(para => {
+    const pod = [...para.querySelectorAll('.viz-cap')];
+    if(pod.length < 2) return;
+    pod.forEach(p => { p.style.minHeight = ''; });
+    const h = Math.max(...pod.map(p => p.offsetHeight));
+    pod.forEach(p => { p.style.minHeight = h + 'px'; });
+  });
+}
+
 function fitSlide(s){
   const stage = s.querySelector('.stage');
   const child = stage && stage.firstElementChild;
@@ -2365,12 +2404,12 @@ function fitSlide(s){
 }
 function fitAll(){ slides.forEach(fitSlide); }
 addEventListener('resize', ()=>{ clearTimeout(fitAll._t);
-  fitAll._t = setTimeout(()=>{ paraKoncowa(deck); akcenty(deck); ratunek(deck); fitAll(); }, 140); });
+  fitAll._t = setTimeout(()=>{ paraKoncowa(deck); akcenty(deck); ratunek(deck); rownajPodpisy(deck); fitAll(); }, 140); });
 /* Wszystkie decyzje typograficzne opieraja sie na pomiarze szerokosci, wiec
    musza zapasc na docelowym kroju. Uruchomione przed zaladowaniem fontow
    mierzyly krój zastepczy i straznicy przepuszczali przepelnienia. */
 if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>setTimeout(()=>{
-  paraKoncowa(deck); akcenty(deck); ratunek(deck); fitAll();
+  paraKoncowa(deck); akcenty(deck); ratunek(deck); rownajPodpisy(deck); fitAll();
 }, 60));
 
 const btnFit = document.getElementById('btnFit');
