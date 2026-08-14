@@ -398,9 +398,9 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .head-meta strong{color:var(--accent);font-weight:500;}
 
 /* ── 9. UKŁADY ────────────────────────────────────────────────────────────── */
-.stack{display:flex;flex-direction:column;gap:var(--gap);}
-.stack--tight{gap:clamp(11px,1.1vw,18px);}
-.stack--loose{gap:clamp(22px,2.6vw,44px);}
+.stack{--stack-gap:var(--gap);display:flex;flex-direction:column;gap:var(--stack-gap);}
+.stack--tight{--stack-gap:clamp(11px,1.1vw,18px);}
+.stack--loose{--stack-gap:clamp(22px,2.6vw,44px);}
 
 /* align-content:start trzyma wiersz przy górze sceny. Bez tego .stage (stretch)
    rozciągał siatkę na całą wysokość i .split--center spychał nagłówek na środek
@@ -429,7 +429,17 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
    rozsypane paski. Wykres trzyma proporcje, a dolną krawędź wyrównuje .viz-cap. */
 .split--viz .c-bars{flex:1;}
 .split--viz .c-list,.split--viz .c-units{flex:1;justify-content:space-between;}
-.split-col{display:flex;flex-direction:column;gap:clamp(13px,1.4vw,22px);min-width:0;}
+/* Jeden odstep nadlinia->tytul w calej talii, niezaleznie od kontenera. */
+/* Kontener bez wlasnego gap: pelny odstep. */
+.eyebrow+*{margin-top:clamp(12px,1.35vw,20px);}
+/* Kontener z gap: odejmujemy go, zeby suma byla ta sama. */
+.stack>.eyebrow+*,.split-col>.eyebrow+*,.sect>.eyebrow+*,.closing-copy>.eyebrow+*
+{margin-top:calc(clamp(12px,1.35vw,20px) - var(--stack-gap,0px));}
+/* Okladka ma wlasny, szerszy rytm. */
+.cover>.eyebrow+*{margin-top:0;}
+/* Podtytul oddycha, ale zostaje w bloku naglowka. */
+.h-title+.h-sub,.h-display+.h-sub{margin-top:clamp(8px,.85vw,13px);}
+.split-col{--stack-gap:clamp(13px,1.4vw,22px);display:flex;flex-direction:column;gap:var(--stack-gap);min-width:0;}
 
 .cards{display:grid;gap:clamp(13px,1.4vw,22px);align-items:stretch;}
 .cards--2{grid-template-columns:repeat(2,minmax(0,1fr));}
@@ -537,7 +547,8 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 }
 .flow-node+.flow-node{border-left:1px solid var(--line-2);}
 .flow-n{font-family:var(--ff-mono);font-size:var(--fs-small);letter-spacing:.16em;color:var(--accent);}
-.flow-t{font-family:var(--ff-display);font-size:calc(var(--fs-display-s)*.86);font-weight:500;line-height:1.25;color:var(--ink-0);}
+.flow-t{font-family:var(--ff-display);font-size:calc(var(--fs-display-s)*.86);font-weight:500;line-height:1.25;color:var(--ink-0);
+  min-height:2lh;}
 .flow-d{font-size:var(--fs-body);line-height:1.55;color:var(--ink-2);}
 
 /* tabela */
@@ -593,7 +604,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 
 /* separator sekcji */
 /* przekładka sekcji siedzi w środku kadru — .stage rozciąga, blok centruje sam */
-.sect{display:flex;flex-direction:column;justify-content:center;min-height:100%;gap:clamp(14px,1.8vw,28px);}
+.sect{--stack-gap:clamp(14px,1.8vw,28px);display:flex;flex-direction:column;justify-content:center;min-height:100%;gap:var(--stack-gap);}
 .sect-num{
   font-family:var(--ff-display);font-size:clamp(64px,9vw,168px);font-weight:600;line-height:.86;
   letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1.5px var(--accent);
@@ -1601,11 +1612,45 @@ sierotki(deck);
 
 /* Ostatnia para wyrazow w naglowku zostaje razem — inaczej pojedyncze slowo
    ladowalo samo w ostatnim wierszu i rozbijalo blok tytulowy. */
-deck.querySelectorAll('.h-title, .sect-title, .lead, .card-lead, .viz-cap').forEach(el=>{
-  const last = [...el.childNodes].reverse().find(n=>n.nodeType===3 && /\S/.test(n.nodeValue));
-  if(!last) return;
-  last.nodeValue = last.nodeValue.replace(/\s+(\S+)(\s*)$/, ' $1$2');
+deck.querySelectorAll('.h-title,.sect-title,.h-sub,.lead,.card-lead,.card-text,.card-foot span,.tl-d,.flow-d,.toc-d,.viz-cap,.stat-sub').forEach(el=>{
+  /* Szukamy ostatniej spacji w CAŁYM tekście elementu, także wewnątrz <em>.
+     Wersja działająca tylko na ostatnim węźle nie łapała tytułów zakończonych
+     akcentem, np. „… to <em>luka wdrożeniowa</em>.” */
+  const nodes = [];
+  const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  for(let n; (n = w.nextNode()); ) nodes.push(n);
+  const full = nodes.map(n=>n.nodeValue).join('');
+  const m = full.replace(/\s+$/,'').match(/[ 	]+(?=\S+$)/);
+  if(!m) return;
+  let idx = full.replace(/\s+$/,'').lastIndexOf(m[0]), off = 0;
+  for(const n of nodes){
+    const len = n.nodeValue.length;
+    if(idx >= off && idx < off + len){
+      const i = idx - off;
+      n.nodeValue = n.nodeValue.slice(0, i) + ' ' + n.nodeValue.slice(i + m[0].length);
+      break;
+    }
+    off += len;
+  }
 });
+
+/* Krótki akcent kolorystyczny rozcięty między wiersze rozbija myśl nagłówka. */
+deck.querySelectorAll('.h-title em, .sect-title em').forEach(em=>{
+  if(em.textContent.trim().split(/\s+/).length <= 3) em.style.whiteSpace = 'nowrap';
+});
+
+/* Pauza nie otwiera wiersza. */
+sierotkiPauza(deck);
+function sierotkiPauza(root){
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode: n => /^(SCRIPT|STYLE)$/.test(n.parentNode.nodeName)
+      ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
+  });
+  for(let n; (n = w.nextNode()); ){
+    const v = n.nodeValue.replace(/ (—|–) /g, ' $1 ');
+    if(v !== n.nodeValue) n.nodeValue = v;
+  }
+}
 
 /* ── menu wysuwane ──────────────────────────────────────────────────────── */
 const drawer = document.getElementById('drawer');
