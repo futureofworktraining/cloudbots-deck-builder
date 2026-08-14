@@ -548,7 +548,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 }
 
 /* liczby */
-.stats{display:grid;gap:clamp(18px,2.4vw,44px);grid-auto-flow:column;grid-auto-columns:1fr;
+.stats{display:grid;gap:clamp(18px,3.4vw,54px);grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);
   grid-template-rows:auto 1fr auto;}
 .stats--wrap{grid-auto-flow:row;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));}
 .stat{display:grid;grid-row:span 3;grid-template-rows:subgrid;gap:5px;min-width:0;}
@@ -571,13 +571,18 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
   padding:clamp(13px,1.4vw,20px) clamp(15px,1.6vw,24px);border-top:1px solid var(--line);
 }
 .flow-node::before{
-  content:'';position:absolute;left:0;top:-4px;width:8px;height:9px;background:var(--accent);
+  content:'';position:absolute;left:clamp(15px,1.6vw,24px);top:-4px;width:8px;height:9px;background:var(--accent);
   clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
 }
 .flow-node+.flow-node{border-left:1px solid var(--line-2);}
-/* pierwsza kolumna nie ma kreski, wiec nie ma czego odsuwac: bez tego jej
-   tresc stala 24px w prawo od marginesu, na ktorym stoi caly slajd */
+/* pierwsza kolumna nie ma kreski w rynnie, wiec jej tresc siada na marginesie */
 .flow-node:first-child{padding-left:0;}
+.flow-node:first-child::before{left:0;}
+/* szyna urywa sie na ostatnim znaczniku, tak samo jak osie na innych slajdach:
+   ostatnia kolumna dostaje tylko odcinek do swojego znacznika */
+.flow-node:last-child{border-top:0;}
+.flow-node:last-child::after{content:'';position:absolute;left:0;top:0;
+  width:clamp(15px,1.6vw,24px);height:1px;background:var(--line);}
 .flow-n{font-family:var(--ff-mono);font-size:var(--fs-small);letter-spacing:.16em;color:var(--accent);}
 .flow-t{font-family:var(--ff-display);font-size:calc(var(--fs-display-s)*.86);font-weight:500;line-height:1.25;color:var(--ink-0);
   min-height:2lh;display:flex;align-items:flex-start;}
@@ -640,11 +645,22 @@ body:not(.details-on) .tbl tbody tr:has(+ tr.detail:last-child) td{border-bottom
 
 /* separator sekcji */
 /* przekładka sekcji siedzi w środku kadru — .stage rozciąga, blok centruje sam */
-.sect{--stack-gap:clamp(14px,1.8vw,28px);display:flex;flex-direction:column;justify-content:center;min-height:100%;gap:var(--stack-gap);}
+/* Numer jako przeciwwaga po prawej, a nie znacznik nad tekstem: przy ukladzie
+   kolumnowym cala tresc siedziala w lewej polowie, prawa zostawala pusta,
+   a cyfra konkurowala z numerem strony w tym samym rogu. */
+.sect{--stack-gap:clamp(14px,1.8vw,28px);
+  display:grid;grid-template-columns:minmax(0,1fr) auto;
+  column-gap:clamp(32px,5vw,110px);row-gap:var(--stack-gap);
+  align-content:center;min-height:100%;}
+.sect>.sect-num{grid-column:2;grid-row:1/span 2;align-self:center;justify-self:end;
+  /* ujemny tracking wciaga pudelko, ale glif maluje sie dalej — bez kompensacji
+     cyfra wychodzi poza prawy margines slajdu */
+  margin-right:.05em;}
+.sect>.sect-title,.sect>.h-sub,.sect>.lead{grid-column:1;}
 .sect-num{
   font-family:var(--ff-display);font-size:clamp(64px,9vw,168px);font-weight:600;line-height:.86;
   letter-spacing:-.05em;color:transparent;
-  -webkit-text-stroke:1.2px color-mix(in srgb,var(--accent) 72%,transparent);
+  -webkit-text-stroke:1.6px color-mix(in srgb,var(--accent) 78%,transparent);
 }
 .sect-title{font-family:var(--ff-display);font-size:var(--fs-display-l);font-weight:500;line-height:1.1;letter-spacing:-.022em;color:var(--ink-0);text-wrap:balance;}
 
@@ -692,7 +708,7 @@ body:not(.details-on) .tbl tbody tr:has(+ tr.detail:last-child) td{border-bottom
   gap:clamp(16px,2.4vw,44px);align-items:baseline;
   padding:clamp(13px,1.5vw,22px) 0;border-bottom:1px solid var(--line-2);
 }
-.toc-row:last-child{border-bottom:0;}
+
 .toc-n{font-family:var(--ff-display);font-size:clamp(20px,1.8vw,30px);font-weight:600;line-height:1;letter-spacing:-.04em;color:var(--accent);}
 .toc-t{font-family:var(--ff-display);font-size:var(--fs-display-s);font-weight:500;color:var(--ink-0);line-height:1.24;}
 /* 62ch zostawialo 234px martwego pola przed prawym marginesem i lamalo krotkie
@@ -748,7 +764,7 @@ body:not(.details-on) .tbl tbody tr:has(+ tr.detail:last-child) td{border-bottom
   display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);
   gap:0;align-items:end;
 }
-.c-bars .b{display:grid;grid-template-rows:var(--h) auto;justify-items:center;gap:7px;min-width:0;}
+.c-bars .b{display:grid;grid-template-rows:var(--h) auto;justify-items:center;gap:0;min-width:0;}
 .c-bars .bv{grid-area:1/1;align-self:end;z-index:1;
   margin-bottom:calc(var(--h)*var(--v,.5) + 7px);
   font-family:var(--ff-mono);font-size:clamp(12px,2.6cqw,var(--fs-body));font-weight:600;color:var(--ink-0);}
@@ -758,7 +774,7 @@ body:not(.details-on) .tbl tbody tr:has(+ tr.detail:last-child) td{border-bottom
 .c-bars .bar{grid-area:1/1;align-self:end;width:100%;max-width:min(84px,56%);height:calc(var(--h)*var(--v,.5));
   background:var(--c,var(--dv-1));transition:height .8s var(--ease);}
 .c-bars .bx{font-family:var(--ff-mono);font-size:clamp(12px,2.2cqw,var(--fs-small));letter-spacing:.04em;color:var(--ink-2);
-  text-align:center;line-height:1.35;border-top:1px solid var(--line);padding-top:7px;width:100%;}
+  text-align:center;line-height:1.35;border-top:1px solid var(--line);padding-top:9px;width:100%;}
 .c-bars .b.is-hi .bar{background:var(--dv-1);}
 .c-bars .b:not(.is-hi) .bar{background:var(--dv-rest);}
 .c-bars .b:not(.is-hi) .bv{font-weight:500;color:var(--ink-2);}
@@ -1025,6 +1041,8 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
   .head-row{grid-template-columns:minmax(0,1fr);}
   .head-meta{border-left:0;padding-left:0;text-align:left;}
   .flow{grid-auto-flow:row;grid-auto-columns:auto;}
+  .sect{grid-template-columns:minmax(0,1fr);}
+  .sect>.sect-num{grid-column:1;grid-row:auto;}
   .flow-node+.flow-node{border-left:0;}
   .drawer{--drawer-w:min(86vw,326px);}
   .toc-row{grid-template-columns:auto minmax(0,1fr);}
