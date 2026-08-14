@@ -65,7 +65,7 @@
   --dv-1:var(--cb-primary); --dv-2:#0E7490; --dv-3:var(--cb-mint);
   --dv-4:#5B7FE0; --dv-5:#F2B441; --dv-rest:#94A3B8;
   --dv-pos:#10B981; --dv-neg:#E15566;
-  --dv-track:rgba(148,163,184,.42);
+  --dv-track:transparent; --dv-track-line:rgba(148,163,184,.60);
 }
 .slide--dark{
   --bg-0:var(--d-bg-0); --bg-1:var(--d-bg-1); --bg-2:var(--d-bg-2);
@@ -74,7 +74,7 @@
   --accent:var(--cb-primary); --accent-soft:var(--cb-cyan);
   /* --dv-rest na ciemnym niósł wypełnienie pasków „Pozostałe”: #5b6379 był tak
      bliski toru, że słupek czytał się jak brak danych, a nie jak wartość */
-  --dv-2:var(--cb-cyan); --dv-rest:#9aa3b8; --dv-track:rgba(255,255,255,.42);
+  --dv-2:var(--cb-cyan); --dv-rest:#9aa3b8; --dv-track:transparent; --dv-track-line:rgba(255,255,255,.46);
 }
 .slide--light{
   --bg-0:var(--l-bg-0); --bg-1:var(--l-bg-1); --bg-2:var(--l-bg-2);
@@ -86,7 +86,7 @@
   --accent:#0e7490; --accent-soft:var(--cb-primary);
   /* jasna mięta ma na białym kontrast 1,3:1 — pasek znika, więc na jasnym motywie
      schodzi o kilka stopni w dół, zostając w tej samej rodzinie koloru */
-  --dv-1:#0E7490; --dv-2:#0891B2; --dv-3:#3FBFA0; --dv-rest:#64748B; --dv-track:rgba(15,23,41,.42);
+  --dv-1:#0E7490; --dv-2:#0891B2; --dv-3:#3FBFA0; --dv-rest:#64748B; --dv-track:transparent; --dv-track-line:rgba(15,23,41,.55);
   /* gradient liczb KPI na jasnym: mięta→cyjan schodziła do 1,9:1 wobec tła */
   --grad-num:linear-gradient(120deg,#0E7490,#0F766E);
 }
@@ -185,7 +185,8 @@ body.is-light .grain{opacity:.025;mix-blend-mode:multiply;}
 
 /* ── 4. HEKSAGONY — sygnatura marki ───────────────────────────────────────── */
 .hex{clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
-.hex-deco{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0;}
+.hex-deco{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0;
+  -webkit-mask-image:linear-gradient(#000 0 78%,transparent 96%);mask-image:linear-gradient(#000 0 78%,transparent 96%);}
 .hex-deco>span{
   position:absolute;display:block;
   clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
@@ -383,8 +384,8 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 }
 .h-title--s{font-size:var(--fs-display-m);}
 .h-sub{font-size:var(--fs-lead);line-height:1.55;color:var(--ink-2);max-width:76ch;font-weight:300;}
-.lead{font-size:var(--fs-lead);line-height:1.62;color:var(--ink-1);max-width:70ch;}
-.note{font-size:var(--fs-small);line-height:1.62;color:var(--ink-3);max-width:100ch;}
+.lead{font-size:var(--fs-lead);line-height:1.62;color:var(--ink-1);max-width:70ch;text-wrap:pretty;}
+.note{font-size:var(--fs-small);line-height:1.62;color:var(--ink-3);max-width:100ch;text-wrap:pretty;}
 
 .head-row{
   display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(20px,3vw,56px);
@@ -537,10 +538,10 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .flow-node+.flow-node{border-left:1px solid var(--line-2);}
 .flow-n{font-family:var(--ff-mono);font-size:var(--fs-small);letter-spacing:.16em;color:var(--accent);}
 .flow-t{font-family:var(--ff-display);font-size:calc(var(--fs-display-s)*.86);font-weight:500;line-height:1.25;color:var(--ink-0);}
-.flow-d{font-size:var(--fs-small);line-height:1.55;color:var(--ink-2);}
+.flow-d{font-size:var(--fs-body);line-height:1.55;color:var(--ink-2);}
 
 /* tabela */
-.tbl{width:100%;border-collapse:collapse;font-size:var(--fs-small);}
+.tbl{width:100%;border-collapse:collapse;font-size:var(--fs-body);}
 .tbl th{
   padding:0 14px 10px 0;text-align:left;vertical-align:bottom;
   font-family:var(--ff-mono);font-size:calc(var(--fs-small)*.92);font-weight:500;
@@ -568,9 +569,9 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .chip.is-on{color:var(--accent);}
 
 /* oś czasu */
-.tl{display:flex;flex-direction:column;gap:0;}
+.tl{display:grid;grid-template-columns:minmax(86px,auto) 1fr;column-gap:clamp(16px,2vw,34px);}
 .tl-item{
-  display:grid;grid-template-columns:minmax(86px,auto) 1fr;gap:clamp(16px,2vw,34px);
+  display:grid;grid-column:span 2;grid-template-columns:subgrid;
   padding:clamp(12px,1.3vw,20px) 0;border-bottom:1px solid var(--line-2);position:relative;
 }
 .tl-item:last-child{border-bottom:0;}
@@ -597,7 +598,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
   font-family:var(--ff-display);font-size:clamp(64px,9vw,168px);font-weight:600;line-height:.86;
   letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1.5px var(--accent);
 }
-.sect-title{font-family:var(--ff-display);font-size:var(--fs-display-l);font-weight:500;line-height:1.1;letter-spacing:-.022em;color:var(--ink-0);}
+.sect-title{font-family:var(--ff-display);font-size:var(--fs-display-l);font-weight:500;line-height:1.1;letter-spacing:-.022em;color:var(--ink-0);text-wrap:balance;}
 
 /* logotypy klientów / narzędzi */
 .logos{display:flex;flex-wrap:wrap;align-items:center;gap:clamp(22px,3vw,54px);}
@@ -637,13 +638,13 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .toc{display:flex;flex-direction:column;}
 .toc-row{
   display:grid;grid-template-columns:minmax(56px,auto) minmax(0,1fr) minmax(0,1.35fr);
-  gap:clamp(16px,2.4vw,44px);align-items:baseline;
+  gap:clamp(16px,2.4vw,44px);align-items:center;
   padding:clamp(13px,1.5vw,22px) 0;border-bottom:1px solid var(--line-2);
 }
 .toc-row:last-child{border-bottom:0;}
 .toc-n{font-family:var(--ff-display);font-size:clamp(20px,1.8vw,30px);font-weight:600;line-height:1;letter-spacing:-.04em;color:var(--accent);}
 .toc-t{font-family:var(--ff-display);font-size:var(--fs-display-s);font-weight:500;color:var(--ink-0);line-height:1.24;}
-.toc-d{font-size:var(--fs-body);line-height:1.55;color:var(--ink-2);}
+.toc-d{font-size:var(--fs-body);line-height:1.55;color:var(--ink-2);max-width:62ch;text-wrap:pretty;}
 
 /* kontakt */
 .contact{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(26px,3.6vw,64px);align-items:center;}
@@ -669,8 +670,8 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
    czyli przy każdej kolumnie splitu; węższy wykres nadal zmniejsza pismo. */
 .viz{container-type:inline-size;width:100%;max-width:100%;min-width:0;}
 .viz-cap{
-  margin-top:10px;font-family:var(--ff-mono);font-size:calc(var(--fs-small)*.88);
-  letter-spacing:.06em;color:var(--ink-3);line-height:1.55;
+  margin-top:10px;font-family:var(--ff-mono);font-size:var(--fs-small);
+  letter-spacing:.02em;color:var(--ink-2);line-height:1.55;
 }
 
 /* legenda — zawsze klasą, nigdy inline'owym kolorem, żeby czytała się na obu motywach */
@@ -701,7 +702,8 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .c-bars .bx{font-family:var(--ff-mono);font-size:clamp(12px,2.2cqw,var(--fs-small));letter-spacing:.08em;color:var(--ink-3);
   text-align:center;line-height:1.35;border-top:1px solid var(--line);padding-top:7px;width:100%;}
 .c-bars .b.is-rest .bar{background:var(--dv-rest);}
-.c-bars .b.is-hi .bar{background:linear-gradient(180deg,var(--dv-3),var(--dv-1));}
+.c-bars .b.is-hi .bar{background:var(--dv-1);}
+.c-bars .b:not(.is-hi):not(.is-rest) .bar{background:var(--dv-rest);}
 
 /* słupki poziome z rankingiem */
 /* JEDEN grid na cały ranking, wiersze przez display:contents — inaczej każdy
@@ -714,7 +716,8 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 /* etykieta wyrównana do prawej — przylega do słupka, oko nie skacze przez pustkę */
 .c-rank .rl{font-size:clamp(12px,2.6cqw,var(--fs-body));color:var(--ink-1);line-height:1.3;overflow-wrap:anywhere;
   text-align:right;text-wrap:balance;}
-.c-rank .rt{height:clamp(16px,2.6cqw,28px);background:var(--dv-track);position:relative;}
+.c-rank .rt{height:clamp(16px,2.6cqw,28px);background:var(--dv-track);position:relative;
+  box-shadow:inset 0 0 0 1px var(--dv-track-line);}
 .c-rank .rf{position:absolute;inset:0 auto 0 0;width:var(--v,50%);background:var(--c,var(--dv-1));transition:width .8s var(--ease);}
 .c-rank .rv{font-family:var(--ff-mono);font-size:clamp(12px,2.6cqw,var(--fs-body));font-weight:600;color:var(--ink-0);
   font-variant-numeric:tabular-nums;min-width:3.2em;text-align:right;}
@@ -728,7 +731,8 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
   font-size:clamp(12px,2.6cqw,var(--fs-body));color:var(--ink-1);}
 .c-meter .mh b{font-family:var(--ff-mono);font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums;}
 /* 5px obok słupka wysokiego na 180px czytało się jak linijka, nie jak dane */
-.c-meter .mt{height:clamp(7px,1.2cqw,11px);background:var(--dv-track);position:relative;}
+.c-meter .mt{height:clamp(7px,1.2cqw,11px);background:var(--dv-track);position:relative;
+  box-shadow:inset 0 0 0 1px var(--dv-track-line);}
 .c-meter .mf{position:absolute;inset:0 auto 0 0;width:var(--v,50%);background:var(--c,var(--dv-1));transition:width .8s var(--ease);}
 
 /* kołowy / pierścieniowy — conic-gradient, wartości czytamy z legendy */
@@ -852,6 +856,13 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
 /* ── 14. WYDRUK / PDF ─────────────────────────────────────────────────────── */
 @page{size:1600px 900px;margin:0;}
 @media print{
+  /* Strona ma zawsze 1600x900, ale vw liczy sie z szerokosci OKNA — bez tego
+     ten sam deck daje inny PDF przy 1024 i przy 1920 (tytul 36 vs 60 px). */
+  :root{
+    --fs-display-xl:90px; --fs-display-l:60px; --fs-display-m:44px; --fs-display-s:31.5px;
+    --fs-lead:24px; --fs-body:19px; --fs-small:16.5px; --fs-mono:17.4px;
+    --pad-y:40px; --pad-x:67.2px;
+  }
   body{overflow:visible;background:#fff;}
   .topbar,.drawer,.drawer-tab,.drawer-scrim,.vprog,.arrows,.grain,.lightbox{display:none!important;}
   .deck{height:auto;overflow:visible;scroll-snap-type:none;}
@@ -1580,13 +1591,21 @@ function sierotki(root){
     acceptNode: n => /^(SCRIPT|STYLE|CODE|PRE)$/.test(n.parentNode.nodeName)
       ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
   });
-  const re = /(^|[\s(„"])([aiouwzAIOUWZ])\s+/g;
+  const re = /(^|[\s(„"])((?:[aiouwzAIOUWZ]|na|do|od|po|za|ze|we|to|Na|Do|Od|Po|Za|Ze|We|To))\s+/g;
   for(let n; (n = w.nextNode()); ){
     const v = n.nodeValue.replace(re, '$1$2 ');
     if(v !== n.nodeValue) n.nodeValue = v;
   }
 }
 sierotki(deck);
+
+/* Ostatnia para wyrazow w naglowku zostaje razem — inaczej pojedyncze slowo
+   ladowalo samo w ostatnim wierszu i rozbijalo blok tytulowy. */
+deck.querySelectorAll('.h-title, .sect-title, .lead, .card-lead, .viz-cap').forEach(el=>{
+  const last = [...el.childNodes].reverse().find(n=>n.nodeType===3 && /\S/.test(n.nodeValue));
+  if(!last) return;
+  last.nodeValue = last.nodeValue.replace(/\s+(\S+)(\s*)$/, ' $1$2');
+});
 
 /* ── menu wysuwane ──────────────────────────────────────────────────────── */
 const drawer = document.getElementById('drawer');
@@ -1734,6 +1753,7 @@ function fitSlide(s){
   const mode = FIT_MODES[fitIdx].id;
 
   child.style.width = '100%';
+  child.style.height = '';
   child.style.setProperty('--fit', 1);
 
   let k = userZoom;
@@ -1753,6 +1773,14 @@ function fitSlide(s){
   }
   child.style.width = (100 / k) + '%';
   child.style.setProperty('--fit', k.toFixed(4));
+  /* transform nie zmienia wysokosci w layoucie — podajemy ja jawnie, zeby
+     centrowanie sceny liczylo sie z tego, co widac, a nie z pelnej skali */
+  if(mode !== 'off' && Math.abs(k - 1) > 0.001){
+    child.style.minHeight = '0';
+    const h = child.offsetHeight;
+    child.style.minHeight = '';
+    child.style.height = (h * k) + 'px';
+  }
 }
 function fitAll(){ slides.forEach(fitSlide); }
 addEventListener('resize', ()=>{ clearTimeout(fitAll._t); fitAll._t = setTimeout(fitAll, 140); });
