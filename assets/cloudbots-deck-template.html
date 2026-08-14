@@ -396,6 +396,13 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .h-sub{font-size:var(--fs-lead);line-height:1.62;color:var(--ink-2);max-width:76ch;font-weight:300;text-wrap:balance;}
 .lead{font-size:var(--fs-lead);line-height:1.62;color:var(--ink-1);max-width:70ch;text-wrap:balance;}
 .note{font-size:var(--fs-small);line-height:1.62;color:var(--ink-3);max-width:100ch;text-wrap:pretty;}
+/* szyna etapow pod wykresem to adnotacja narracyjna, nie drugi zestaw danych:
+   z pelnym rytmem 41,6 px czytala sie jak niezalezna os obok pieciu slupkow */
+.split+.maturity-track{margin-top:calc(22px - var(--stack-gap,0px));}
+/* przypis zrodlowy pod pasem domykajacym opisuje dane NAD nim, a nie stanowi
+   kolejnego modulu — trzyma sie go tak samo jak .viz-cap trzyma sie wykresu.
+   Pelny rytm 41,6 px robil z niego rownorzedny mebel i wypychal slajd poza scene. */
+.punch+.note{margin-top:calc(20px - var(--stack-gap,0px));}
 /* przypis tuz pod kreska zamykajaca spis czytal sie jak nieoznaczony szosty
    wiersz; wezsza miara odroznia adnotacje od tresci. Wlasnego marginesu NIE
    dokladamy: z gapem stosu dawal trzecia wartosc odstepu w talii (60,8 px). */
@@ -481,8 +488,17 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
    narastajaca gorna krawedz — ten sam jezyk, co pasek postepu w belce — plus
    lacznik miedzy kartami. Bez tego jedynym sygnalem progresji bylo obramowanie
    ostatniej karty. */
-.cards--steps .card,.cards--steps .card.is-quiet{position:relative;
-  border-top-color:color-mix(in srgb,var(--accent) var(--step,20%),var(--line));}
+.cards--steps .card,.cards--steps .card.is-quiet,.cards--steps .card.is-accent{
+  position:relative;background:none;
+  border:0;border-top:3px solid color-mix(in srgb,var(--accent) var(--step,20%),var(--line));
+  padding-left:0;padding-right:clamp(16px,1.7vw,26px);}
+/* stan docelowy dostaje znacznik systemu, a nie osobne tlo: samo wypelnienie
+   robilo z ostatniej karty inny mebel, zamiast konca tej samej drogi */
+.cards--steps .card.is-accent::after{
+  content:'';position:absolute;top:-6px;right:clamp(16px,1.7vw,26px);width:9px;height:10px;
+  background:var(--accent);filter:drop-shadow(0 0 6px rgba(0,206,209,.5));
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
+.cards--steps .card.is-accent .card-title{color:var(--accent);}
 .cards--steps .card:nth-child(1){--step:14%;}
 .cards--steps .card:nth-child(2){--step:35%;}
 .cards--steps .card:nth-child(3){--step:56%;}
@@ -490,7 +506,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .cards--steps .card:nth-child(5){--step:100%;}
 .cards--steps .card+.card::before{
   content:'';position:absolute;top:-3px;left:calc(var(--cards-gap,18px)*-1);
-  width:var(--cards-gap,18px);height:3px;
+  width:calc(var(--cards-gap,18px) + 1px);height:3px;
   background:color-mix(in srgb,var(--accent) var(--step,20%),var(--line));
 }
 @media (prefers-reduced-motion:no-preference){
@@ -584,6 +600,11 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
   -webkit-background-clip:text;background-clip:text;color:transparent;
 }
 .stat-num sup{font-size:.44em;vertical-align:super;letter-spacing:0;}
+/* .stats--band: cztery liczby jako pas podsumowania, a nie czwarty rownorzedny
+   modul danych. Na slajdzie z para wykresow szesc obiektow o zblizonym ciezarze
+   konkurowalo o pierwszy odczyt i nie bylo wiadomo, co jest teza slajdu. */
+.stats--band{gap:clamp(20px,2.4vw,44px);}
+.stats--band .stat-num{font-size:clamp(26px,2.3vw,38px);}
 .stat-lab{font-size:var(--fs-small);line-height:1.5;color:var(--ink-2);}
 .stat-sub{font-family:var(--ff-mono);font-size:calc(var(--fs-small)*.9);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);}
 
@@ -601,7 +622,9 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
   content:'';position:absolute;left:0;top:-4px;width:8px;height:9px;background:var(--accent);
   clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
 }
-.flow-node+.flow-node{border-left:1px solid var(--line-2);}
+/* rynny ciszej: przy pelnej kresce piec wezlow czytalo sie jak piec osobnych
+   pudelek, a to ma byc jedna szyna z pieciu przystankow */
+.flow-node+.flow-node{border-left:1px solid color-mix(in srgb,var(--line-2) 55%,transparent);}
 /* pierwsza kolumna nie ma kreski w rynnie, wiec jej tresc siada na marginesie */
 .flow-node:first-child{padding-left:0;}
 /* Szyna biegnie do prawego marginesu, bo jest gorna krawedzia piecioczlonowego
@@ -633,13 +656,15 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
    i ciezsza typografia zamiast tla czy kolorowej belki, ktore czytaly sie
    jako artefakt albo nieoznaczone zaznaczenie. */
 .tbl--signal tbody tr.is-split td{border-bottom:1px solid var(--line);}
-.tbl--signal tbody tr.is-key .t-price{font-size:calc(var(--fs-small)*1.15);font-weight:600;}
+/* jeden stopien w kolumnie liczbowej: trzy rozne wielkosci rozjezdzaly
+   wyrownanie do prawej, a hierarchie i tak niesie waga */
+.tbl--signal tbody tr.is-key .t-price{font-weight:600;}
 .tbl--signal tbody tr.is-hero{background:transparent;}
 .tbl--signal tbody tr.is-hero td{color:var(--ink-0);}
 .tbl--signal tbody tr.is-hero td:first-child{font-weight:600;}
 /* wyzsza specyficznosc reguly wyzej zjadala akcent liczbie i wiersz-puenta
    czytal sie jako mniej wazny od pozostalych */
-.tbl--signal tbody tr.is-hero .t-price{color:var(--accent);font-size:calc(var(--fs-small)*1.15);font-weight:700;}
+.tbl--signal tbody tr.is-hero .t-price{color:var(--accent);font-weight:700;}
 .tbl--signal tbody tr.detail{opacity:.72;}
 
 /* chipy */
@@ -694,14 +719,22 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
    kolumnowym cala tresc siedziala w lewej polowie, prawa zostawala pusta,
    a cyfra konkurowala z numerem strony w tym samym rogu. */
 .sect{--stack-gap:clamp(14px,1.8vw,28px);
-  display:grid;grid-template-columns:minmax(0,1fr) auto;
-  column-gap:clamp(32px,5vw,110px);row-gap:var(--stack-gap);
-  align-content:center;min-height:100%;}
-.sect>.sect-num{grid-column:2;grid-row:1/-1;align-self:center;justify-self:end;
-  /* oddech od krawedzi: na samym marginesie cyfra czytala sie jak obcieta
-     kadrem, a nie jak swiadomy znacznik sekcji */
-  margin-right:clamp(24px,3.6vw,64px);}
-.sect>.eyebrow,.sect>.sect-title,.sect>.h-sub,.sect>.lead{grid-column:1;}
+  position:relative;
+  display:grid;grid-template-columns:minmax(0,1fr);row-gap:var(--stack-gap);
+  align-content:center;min-height:100%;
+  /* miejsce na kotwice numeru, ktora stoi teraz poza ukladem wierszy */
+  padding-right:clamp(170px,17.6vw,282px);}
+.sect>.sect-num{
+  /* poza siatka wierszy: jako element rozpiety na wszystkie wiersze rozdmuchiwal
+     je do wlasnej wysokosci — pudelko nadlinii mialo 123,8 px, jej tekst byl w nim
+     wysrodkowany i wisial 65 px nad teza zamiast systemowych 20. Kotwica stoi
+     teraz w osi SCENY, wiec nie skacze o 30,9 px miedzy przekladkami
+     o tezie jedno- i dwuwierszowej. */
+  /* centrowanie flexem, NIE translateY(-50%): .sect-num ma data-step, a regula
+     odslaniania kroku ustawia wlasny transform i kasowala korekte — numer siadal
+     82 px ponizej osi tekstu, ktora ma trzymac */
+  position:absolute;top:0;bottom:0;right:clamp(24px,3.6vw,64px);
+  display:flex;align-items:center;}
 .sect-num{
   font-family:var(--ff-display);font-size:clamp(64px,9vw,168px);font-weight:600;line-height:.86;
   letter-spacing:-.05em;color:transparent;
@@ -790,6 +823,9 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .viz-cap{
   margin-top:10px;font-family:var(--ff-mono);font-size:var(--fs-small);
   letter-spacing:.01em;color:var(--ink-2);line-height:1.55;
+  /* ostatni wiersz trzyciowierszowego podpisu spadal do 25% dlugosci wiersza
+     najdluzszego — jedyna wiszaca koncowka w calej talii */
+  text-wrap:pretty;
 }
 
 /* legenda — zawsze klasą, nigdy inline'owym kolorem, żeby czytała się na obu motywach */
@@ -1048,7 +1084,8 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
 .tq{padding:28px;}
   /* separator sekcji */
 /* przekładka sekcji siedzi w środku kadru — .stage rozciąga, blok centruje sam */
-.sect{--stack-gap:28px;}
+.sect{--stack-gap:28px;padding-right:281.6px;}
+  .sect>.sect-num{right:57.6px;}
   .sect-num{font-size:144px;}
   /* logotypy klientów / narzędzi */
 .logos{gap:48px;}
@@ -1468,9 +1505,9 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
           <span class="card-num" data-en="Session 1 · 3 h">Sesja 1 · 3 h</span>
           <h3 class="card-title card-title--s" data-en="RPA platform and current state">Platforma RPA i stan obecny</h3>
           <div class="blist blist--tight">
-            <div class="bitem bitem--s" data-en="Automation architecture, environments and the real duration of the project lifecycle">Architektura automatyzacji, środowiska i realne czasy cyklu życia projektu</div>
-            <div class="bitem bitem--s" data-en="AI already in production: what runs, how it was built, what it costs">AI już produkcyjne: co działa, jak zbudowane, ile kosztuje</div>
-            <div class="bitem bitem--s" data-en="Whether RPA robots can serve as tools for AI agents, and under which model">Czy roboty RPA mogą być narzędziami dla agentów AI i w jakim modelu</div>
+            <div class="bitem bitem--s" data-en="Automation architecture and environments">Architektura automatyzacji i środowiska</div>
+            <div class="bitem bitem--s" data-en="AI in production: what runs, what it costs">AI produkcyjne: co działa i ile kosztuje</div>
+            <div class="bitem bitem--s" data-en="Whether RPA robots can serve AI agents">Czy roboty RPA mogą być narzędziami agentów</div>
           </div>
           <div class="card-foot" data-en="RPA / automation, IT, data, process owners">RPA / automatyzacja, IT, dane, właściciele procesów</div>
         </div>
@@ -1479,9 +1516,9 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
           <span class="card-num" data-en="Session 2 · 3 h">Sesja 2 · 3 h</span>
           <h3 class="card-title card-title--s" data-en="Architectural patterns and governance">Wzorce architektoniczne i governance</h3>
           <div class="blist blist--tight">
-            <div class="bitem bitem--s" data-en="Infrastructure reviewed against five patterns: Prompt Chain, RAG, Assistant, AI + RPA, Agent">Infrastruktura pod pięć wzorców: Prompt Chain, RAG, Asystent, AI + RPA, Agent</div>
-            <div class="bitem bitem--s" data-en="Approval path for an AI project and how long it really takes">Ścieżka zatwierdzania projektu AI i jej realny czas trwania</div>
-            <div class="bitem bitem--s" data-en="EU AI Act, GDPR, group policies — what constrains which pattern">EU AI Act, RODO, polityki grupowe — co ogranicza który wzorzec</div>
+            <div class="bitem bitem--s" data-en="Infrastructure against five delivery patterns">Infrastruktura pod pięć wzorców wdrożenia</div>
+            <div class="bitem bitem--s" data-en="Approval path and how long it really takes">Ścieżka zatwierdzania i jej realny czas</div>
+            <div class="bitem bitem--s" data-en="EU AI Act, GDPR and group policies">EU AI Act, RODO i polityki grupowe</div>
           </div>
           <div class="card-foot" data-en="CoE, security, IT, transformation team">CoE, bezpieczeństwo, IT, zespół transformacji</div>
         </div>
@@ -1490,23 +1527,23 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
           <span class="card-num" data-en="Session 3 · 3 h">Sesja 3 · 3 h</span>
           <h3 class="card-title card-title--s" data-en="IT and cloud team">Zespół IT i chmury</h3>
           <div class="blist blist--tight">
-            <div class="bitem bitem--s" data-en="Cloud stack, regions, data residency; model access — quotas, private endpoints">Stos chmurowy, regiony, rezydencja danych; dostęp do modeli — kwoty, prywatne endpointy</div>
-            <div class="bitem bitem--s" data-en="Identity, permissions and secrets: the scope an agent may act in">Tożsamość, uprawnienia i sekrety: zakres, w którym agent może działać</div>
-            <div class="bitem bitem--s" data-en="Environments, CI/CD and the cost model: token billing, budgets, chargeback">Środowiska, CI/CD i model kosztowy: rozliczanie tokenów, budżety, chargeback</div>
+            <div class="bitem bitem--s" data-en="Cloud stack, regions and data residency">Stos chmurowy, regiony, rezydencja danych</div>
+            <div class="bitem bitem--s" data-en="Identity, permissions and agent secrets">Tożsamość, uprawnienia i sekrety agenta</div>
+            <div class="bitem bitem--s" data-en="Environments, CI/CD and the cost model">Środowiska, CI/CD i model kosztowy</div>
           </div>
           <div class="card-foot" data-en="IT, cloud, network, infrastructure security">IT, chmura, sieć, bezpieczeństwo infrastruktury</div>
         </div>
       </div>
 
       <div class="punch" data-step="2">
-        <span class="punch-text" data-en="The <em>final report</em> contains: the AS-IS state, a gap analysis with priorities, a use case catalogue with feasibility ratings and a 12-month roadmap.">
-          <em>Raport końcowy</em> zawiera: stan AS-IS, gap analysis z priorytetami, katalog use case’ów z oceną wykonalności i roadmapę 12-miesięczną.
+        <span class="punch-text" data-en="The <em>final report</em>: the AS-IS state, a prioritised gap analysis and a 12-month roadmap.">
+          <em>Raport końcowy</em>: stan AS-IS, gap analysis z priorytetami i roadmapa 12-miesięczna.
         </span>
         <span class="punch-tag" data-en="Questionnaire before the sessions<br>Report in 10 working days">Kwestionariusz przed sesjami<br>Raport w 10 dni roboczych</span>
       </div>
 
-      <p class="note" data-step="2" data-en="Reference delivery: a consumer finance bank in Poland — an AS-IS report identifying <strong>a dozen-odd gaps organised into a priority list</strong>, documentation of the architectural patterns and decks for management. NDA signed before the first session as standard.">
-        Realizacja referencyjna: bank z sektora consumer finance w Polsce — raport AS-IS wskazujący <strong>kilkanaście luk uporządkowanych w listę priorytetów</strong>, dokumentacja wzorców architektonicznych i prezentacje dla managementu. NDA podpisywane standardowo przed pierwszą sesją.
+      <p class="note" data-step="2" data-en="Reference delivery: a consumer finance bank in Poland — an AS-IS report with <strong>a dozen-odd gaps in a priority list</strong>. NDA signed before the first session.">
+        Realizacja referencyjna: bank consumer finance w Polsce — raport AS-IS z <strong>kilkunastoma lukami w liście priorytetów</strong>. NDA podpisywane przed pierwszą sesją.
       </p>
     </div>
   </div>
@@ -2243,6 +2280,21 @@ function fitSlide(s){
       k = kk;
       child.style.width = (100 / k) + '%';
       child.style.setProperty('--fit', k.toFixed(4));
+    }
+
+    /* i w gore: petla stalopunktowa oscyluje, gdy tresc nie miesci sie przy
+       width 100%, ale miesci przy 105% — kolejne przebiegi skacza i funkcja
+       konczy na tym, na czym akurat stanela. Zmierzone: slajd siedzial na
+       0,9642, majac 728 px przy scenie 742. Podnosimy skale, dopoki tresc
+       nadal sie miesci, zeby zaden slajd nie byl mniejszy, niz musi. */
+    const sufit = (mode === 'fit' ? 1 : FIT_MAX) * userZoom;
+    for(let podn = 0; podn < 8 && k < sufit - 0.001; podn++){
+      const kk = Math.min(sufit, k * 1.015);
+      const wSt = child.style.width, fSt = child.style.getPropertyValue('--fit');
+      child.style.width = (100 / kk) + '%';
+      child.style.setProperty('--fit', kk.toFixed(4));
+      if(child.offsetHeight * kk <= stage.clientHeight + 0.5){ k = kk; }
+      else { child.style.width = wSt; child.style.setProperty('--fit', fSt); break; }
     }
   }
   /* transform nie zmienia wysokosci w layoucie — podajemy ja jawnie, zeby
