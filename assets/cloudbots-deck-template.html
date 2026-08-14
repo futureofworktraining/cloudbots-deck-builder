@@ -488,7 +488,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
   letter-spacing:-.05em;color:var(--accent);opacity:.14;
 }
 /* rynna tylko pod pierwszym akapitem — niższe wiersze biorą pełną szerokość karty */
-.card--ghost .card-lead{padding-right:calc(var(--ghost)*1.5 + 26px);}
+.card--ghost .card-lead,.card--ghost .card-foot{padding-right:calc(var(--ghost)*1.6 + 30px);}
 .card-lead{font-size:var(--fs-body);line-height:1.6;color:var(--ink-1);}
 
 /* lista punktowana — blok, nie grid: inline <strong> nie może stać się osobnym elementem */
@@ -548,7 +548,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .flow-node+.flow-node{border-left:1px solid var(--line-2);}
 .flow-n{font-family:var(--ff-mono);font-size:var(--fs-small);letter-spacing:.16em;color:var(--accent);}
 .flow-t{font-family:var(--ff-display);font-size:calc(var(--fs-display-s)*.86);font-weight:500;line-height:1.25;color:var(--ink-0);
-  min-height:2lh;}
+  min-height:2lh;display:flex;align-items:flex-end;}
 .flow-d{font-size:var(--fs-body);line-height:1.55;color:var(--ink-2);}
 
 /* tabela */
