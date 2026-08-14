@@ -198,6 +198,13 @@ body.mierzy-druk .slide{width:1600px;height:900px;}
   opacity:.10;animation:hexfloat 13s ease-in-out infinite;
 }
 .slide--light .hex-deco>span{opacity:.16;}
+/* na okladce dekoracja gasnie przed pasem dowodowym: pas stracil plyte, wiec
+   krawedz heksagonu podkladala trzeci wiersz liczb (dL do 13/255 na 30,9%
+   powierzchni wiersza), a dwa pierwsze staly na czystym tle */
+.hex-deco--cover{
+  -webkit-mask-image:linear-gradient(#000 0 58%,transparent 84%),linear-gradient(90deg,#000 0 60%,transparent 68%);
+  mask-image:linear-gradient(#000 0 58%,transparent 84%),linear-gradient(90deg,#000 0 60%,transparent 68%);
+  -webkit-mask-composite:source-in;mask-composite:intersect;}
 @keyframes hexfloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
 @media (prefers-reduced-motion:reduce){.hex-deco>span{animation:none;}}
 /* eksport musi byc deterministyczny: bez tego kazdy slajd lapie inna faze
@@ -398,7 +405,12 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .note{font-size:var(--fs-small);line-height:1.62;color:var(--ink-3);max-width:100ch;text-wrap:pretty;}
 /* szyna etapow pod wykresem to adnotacja narracyjna, nie drugi zestaw danych:
    z pelnym rytmem 41,6 px czytala sie jak niezalezna os obok pieciu slupkow */
-.split+.maturity-track{margin-top:calc(22px - var(--stack-gap,0px));}
+/* zawezona do kolumny wykresu: przez cala szerokosc slajdu czytala sie jak
+   osobny modul danych, a nie adnotacja narracyjna do pieciu slupkow.
+   50% + polowa rynny = lewa krawedz prawej kolumny .split */
+.split+.maturity-track{
+  margin-top:calc(22px - var(--stack-gap,0px));
+  margin-left:calc(50% + clamp(26px,3.4vw,64px)/2);}
 /* przypis zrodlowy pod pasem domykajacym opisuje dane NAD nim, a nie stanowi
    kolejnego modulu — trzyma sie go tak samo jak .viz-cap trzyma sie wykresu.
    Pelny rytm 41,6 px robil z niego rownorzedny mebel i wypychal slajd poza scene. */
@@ -406,7 +418,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 /* przypis tuz pod kreska zamykajaca spis czytal sie jak nieoznaczony szosty
    wiersz; wezsza miara odroznia adnotacje od tresci. Wlasnego marginesu NIE
    dokladamy: z gapem stosu dawal trzecia wartosc odstepu w talii (60,8 px). */
-.toc+.note{max-width:78ch;}
+.toc+.note{max-width:78ch;margin-top:calc(20px - var(--stack-gap,0px));}
 /* pas etykiet bez wlasnej krawedzi czytal sie jak zabladzone metadane.
    Kreska zawsze NAD pasem — jeden kierunek domkniecia w calym systemie,
    ten sam co szyna osi danych. */
@@ -468,8 +480,10 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 /* Kontener z gap: odejmujemy go, zeby suma byla ta sama. */
 .stack>.eyebrow+*,.split-col>.eyebrow+*,.sect>.eyebrow+*,.closing-copy>.eyebrow+*
 {margin-top:calc(clamp(12px,1.35vw,20px) - var(--stack-gap,0px));}
-/* Okladka ma wlasny, szerszy rytm. */
-.cover>.eyebrow+*{margin-top:0;}
+/* Okladka ma wlasny, szerszy rytm MODULOW, ale nadlinia nalezy do tezy
+   tak samo jak wszedzie indziej: 40 px na pierwszym slajdzie, ktory widzi
+   klient, wobec 20 px na pozostalych pietnastu. */
+.cover>.eyebrow+*{margin-top:calc(clamp(12px,1.35vw,20px) - var(--stack-gap,0px));}
 /* Podtytul oddycha proporcjonalnie do stopnia tytulu: przekladka i okladka
    niosa gap kontenera (41 i 53px), a .h-title stal w kontenerze bez gapa
    i dostawal 13px — 3x ciasniej niz reszta talii przy tej samej relacji. */
@@ -490,23 +504,35 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
    ostatniej karty. */
 .cards--steps .card,.cards--steps .card.is-quiet,.cards--steps .card.is-accent{
   position:relative;background:none;
-  border:0;border-top:3px solid color-mix(in srgb,var(--accent) var(--step,20%),var(--line));
+  border:0;border-top:5px solid color-mix(in srgb,var(--accent) var(--step,20%),var(--line));
   padding-left:0;padding-right:clamp(16px,1.7vw,26px);}
+/* rampa samego koloru na kresce 3 px dawala ok. 4,5 jednostki luminancji na
+   odcinek — ponizej progu, przy ktorym widz uporzadkuje piec etapow. Piec
+   krokow zaczyna sie wyzej i konczy pelnym akcentem. */
+.cards--steps .card:nth-child(1){--step:24%;}
+.cards--steps .card:nth-child(2){--step:44%;}
+.cards--steps .card:nth-child(3){--step:62%;}
+.cards--steps .card:nth-child(4){--step:80%;}
 /* stan docelowy dostaje znacznik systemu, a nie osobne tlo: samo wypelnienie
    robilo z ostatniej karty inny mebel, zamiast konca tej samej drogi */
 .cards--steps .card.is-accent::after{
-  content:'';position:absolute;top:-6px;right:clamp(16px,1.7vw,26px);width:9px;height:10px;
+  /* na krancu WLASNEJ linii, nie na krancu tekstu: przy prawym paddingu
+     znacznik stal 26 px przed koncem kreski, gdy na szynie procesu ten sam
+     heksagon konczy kreske co do piksela */
+  content:'';position:absolute;top:-7px;right:0;width:9px;height:10px;
   background:var(--accent);filter:drop-shadow(0 0 6px rgba(0,206,209,.5));
   clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
-.cards--steps .card.is-accent .card-title{color:var(--accent);}
+/* drugi kanal roznicy dla stanu docelowego: sam kolor tytulu nie wystarczal */
+.cards--steps .card.is-accent .card-title{color:var(--accent);font-weight:600;}
+.cards--steps .card.is-accent .card-num{color:var(--accent);}
 .cards--steps .card:nth-child(1){--step:14%;}
 .cards--steps .card:nth-child(2){--step:35%;}
 .cards--steps .card:nth-child(3){--step:56%;}
 .cards--steps .card:nth-child(4){--step:78%;}
 .cards--steps .card:nth-child(5){--step:100%;}
 .cards--steps .card+.card::before{
-  content:'';position:absolute;top:-3px;left:calc(var(--cards-gap,18px)*-1);
-  width:calc(var(--cards-gap,18px) + 1px);height:3px;
+  content:'';position:absolute;top:-5px;left:calc(var(--cards-gap,18px)*-1);
+  width:calc(var(--cards-gap,18px) + 1px);height:5px;
   background:color-mix(in srgb,var(--accent) var(--step,20%),var(--line));
 }
 @media (prefers-reduced-motion:no-preference){
@@ -604,6 +630,10 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
    modul danych. Na slajdzie z para wykresow szesc obiektow o zblizonym ciezarze
    konkurowalo o pierwszy odczyt i nie bylo wiadomo, co jest teza slajdu. */
 .stats--band{gap:clamp(20px,2.4vw,44px);}
+/* kreska POD pasem: liczby stoja nad wykresami, ktore je rozwijaja, wiec
+   domkniecie nalezy do gory modulu wykresow, nie do dolu pasa liczb */
+.stats--band+*{padding-top:clamp(15px,1.5vw,24px);border-top:1px solid var(--line-2);
+  margin-top:calc(clamp(15px,1.6vw,26px) - var(--stack-gap,0px));}
 .stats--band .stat-num{font-size:clamp(26px,2.3vw,38px);}
 .stat-lab{font-size:var(--fs-small);line-height:1.5;color:var(--ink-2);}
 .stat-sub{font-family:var(--ff-mono);font-size:calc(var(--fs-small)*.9);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);}
@@ -622,9 +652,10 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
   content:'';position:absolute;left:0;top:-4px;width:8px;height:9px;background:var(--accent);
   clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
 }
-/* rynny ciszej: przy pelnej kresce piec wezlow czytalo sie jak piec osobnych
-   pudelek, a to ma byc jedna szyna z pieciu przystankow */
-.flow-node+.flow-node{border-left:1px solid color-mix(in srgb,var(--line-2) 55%,transparent);}
+/* rynny ciszej niz pelna kreska, ale nie do zaniku: przy 55% separatory
+   praktycznie znikaly i piec wezlow czytalo sie jak luzne kolumny pod
+   dekoracyjna linia, a przy 100% jak piec osobnych pudelek */
+.flow-node+.flow-node{border-left:1px solid color-mix(in srgb,var(--line-2) 78%,transparent);}
 /* pierwsza kolumna nie ma kreski w rynnie, wiec jej tresc siada na marginesie */
 .flow-node:first-child{padding-left:0;}
 /* Szyna biegnie do prawego marginesu, bo jest gorna krawedzia piecioczlonowego
@@ -664,7 +695,9 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .tbl--signal tbody tr.is-hero td:first-child{font-weight:600;}
 /* wyzsza specyficznosc reguly wyzej zjadala akcent liczbie i wiersz-puenta
    czytal sie jako mniej wazny od pozostalych */
-.tbl--signal tbody tr.is-hero .t-price{color:var(--accent);font-weight:700;}
+/* jeden poziom wyroznienia: krok 600->700 dawal +3,4% inku, a naturalny
+   rozrzut miedzy dwiema komorkami o wadze 400 wynosil +8,1% */
+.tbl--signal tbody tr.is-hero .t-price{color:var(--accent);font-weight:600;}
 .tbl--signal tbody tr.detail{opacity:.72;}
 
 /* chipy */
@@ -691,6 +724,10 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 }
 /* bez tego blok konczy sie w powietrzu: trzy kreski i nic pod ostatnim wierszem */
 .tl-item:last-child{border-bottom:1px solid var(--line-2);}
+/* gdy pod osia stoi pas etykiet, os nie domyka sie wlasna kreska: dwie
+   rownolegle hairline'y w odleglosci 43 px robily drabinke i pustke
+   miedzy modulami. Domkniecie nalezy do pasa, ktory stoi nizej. */
+.split:has(+.chips) .tl-item:last-child{border-bottom:0;}
 .split-col>.tl:first-child{margin-top:0;}
 /* wspolna linia gorna liczy sie po tuszu, nie po pudelku: pierwszy wiersz osi
    nie wnosi gornego paddingu, wiec jego tekst startuje rowno z nadlinia obok */
@@ -1206,7 +1243,7 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
 
 <!-- ─── 01 · OKŁADKA ─────────────────────────────────────────────────────── -->
 <section class="slide slide--dark" data-theme="dark" data-nav="Okładka" data-group="Wstęp">
-  <div class="hex-deco">
+  <div class="hex-deco hex-deco--cover">
     <span style="width:300px;height:346px;top:14%;right:9%;"></span>
     <span style="width:172px;height:198px;bottom:11%;right:24%;animation-delay:-4s;"></span>
     <span style="width:112px;height:129px;top:9%;right:29%;animation-delay:-8s;opacity:.06"></span>
