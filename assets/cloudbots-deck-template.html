@@ -393,6 +393,10 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 /* przypis tuz pod kreska zamykajaca spis czytal sie jak nieoznaczony szosty
    wiersz; wlasny oddech i wezsza miara odrozniaja adnotacje od tresci */
 .toc+.note{margin-top:clamp(20px,2.2vw,36px);max-width:78ch;}
+/* pasek etykiet pod siatka kart bez wlasnej krawedzi czytal sie jak
+   zabladzone metadane; kreska nad nim domyka modul kart */
+.cards+.chips{margin-top:clamp(16px,1.8vw,28px);padding-top:clamp(13px,1.3vw,20px);
+  border-top:1px solid var(--line-2);}
 
 .head-row{
   display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(20px,3vw,56px);
@@ -426,9 +430,10 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 /* pas domykający: slajd o rzadkiej treści dostaje dolną krawędź zamiast wiszącej
    pustki — górny blok trzyma proporcje, ostatni element siada przy dole sceny */
 .stack--fill{min-height:100%;justify-content:center;padding-bottom:clamp(6px,1.2vh,16px);}
-/* blok główny bierze cały zapas z góry i z dołu, więc siada w osi pionowej,
-   a pas domykający zostaje przy dolnej krawędzi */
-.stack--fill>*:first-child{margin-block:auto;}
+/* blok główny bierze zapas TYLKO z góry, a przed pasem domykającym zostaje
+   ograniczony odstęp — inaczej między wykresem a osią rośnie pusty pas,
+   który odrywa oś od danych, które opisuje */
+.stack--fill>*:first-child{margin-top:auto;margin-bottom:clamp(24px,3.2vh,36px);}
 /* rząd wykresów: podpisy obu kolumn siadają na jednej linii, a krótszy wykres
    rozciąga się do wysokości dłuższego. Bez tego prawa kolumna kończy się
    w powietrzu i dwa wykresy przestają czytać się jako jeden układ. */
@@ -645,6 +650,10 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 }
 /* bez tego blok konczy sie w powietrzu: trzy kreski i nic pod ostatnim wierszem */
 .tl-item:last-child{border-bottom:1px solid var(--line-2);}
+.split-col>.tl:first-child{margin-top:0;}
+/* wspolna linia gorna liczy sie po tuszu, nie po pudelku: pierwszy wiersz osi
+   nie wnosi gornego paddingu, wiec jego tekst startuje rowno z nadlinia obok */
+.split-col>.tl:first-child>.tl-item:first-child{padding-top:0;}
 .tl-when{font-family:var(--ff-mono);font-size:var(--fs-small);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);padding-top:3px;}
 .tl-what{display:flex;flex-direction:column;gap:5px;min-width:0;}
 .tl-t{font-family:var(--ff-display);font-size:calc(var(--fs-display-s)*.9);font-weight:500;color:var(--ink-0);line-height:1.28;}
@@ -678,7 +687,9 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .sect-num{
   font-family:var(--ff-display);font-size:clamp(64px,9vw,168px);font-weight:600;line-height:.86;
   letter-spacing:-.05em;color:transparent;
-  -webkit-text-stroke:1.6px color-mix(in srgb,var(--accent) 78%,transparent);
+  /* numer sekcji ma byc kotwica nawigacyjna, nie pierwszym odczytem:
+     cienszy obrys i slabszy akcent oddaja pierwszenstwo tezie */
+  -webkit-text-stroke:1.2px color-mix(in srgb,var(--accent) 54%,transparent);
 }
 .sect-title{font-family:var(--ff-display);font-size:var(--fs-display-l);font-weight:500;line-height:1.1;letter-spacing:-.022em;color:var(--ink-0);text-wrap:balance;}
 
