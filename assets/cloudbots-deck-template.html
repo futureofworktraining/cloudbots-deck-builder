@@ -28,12 +28,12 @@
      ink-2/ink-3 przesunięta w górę, żeby ink-3 trzymał 4,5:1 i zostawił ink-2
      wyraźnie nad sobą. */
   --d-ink-0:#f4f1e8; --d-ink-1:#c2c5d2; --d-ink-2:#aeb4c9; --d-ink-3:#9aa0b8;
-  --d-line:rgba(255,255,255,.30); --d-line-2:rgba(255,255,255,.19);
+  --d-line:rgba(255,255,255,.36); --d-line-2:rgba(255,255,255,.26);
 
   /* motyw jasny */
   --l-bg-0:#F8FAFC; --l-bg-1:#f1f5f9; --l-bg-2:#ffffff;
   --l-ink-0:#0f1729; --l-ink-1:#243043; --l-ink-2:#38455a; --l-ink-3:#4b5a70;
-  --l-line:rgba(15,23,41,.34); --l-line-2:rgba(15,23,41,.22);
+  --l-line:rgba(15,23,41,.40); --l-line-2:rgba(15,23,41,.30);
 
   /* aliasy przełączane przez .slide--dark / .slide--light */
   --bg-0:var(--d-bg-0); --bg-1:var(--d-bg-1); --bg-2:var(--d-bg-2);
@@ -460,9 +460,9 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .cards--steps .card:nth-child(4){--step:78%;}
 .cards--steps .card:nth-child(5){--step:100%;}
 .cards--steps .card+.card::before{
-  content:'';position:absolute;top:-2px;left:calc(var(--cards-gap,18px)*-1);
+  content:'';position:absolute;top:-3px;left:calc(var(--cards-gap,18px)*-1);
   width:var(--cards-gap,18px);height:3px;
-  background:color-mix(in srgb,var(--accent) var(--step,20%),transparent);
+  background:color-mix(in srgb,var(--accent) var(--step,20%),var(--line));
 }
 @media (prefers-reduced-motion:no-preference){
   .cards--steps .card{transition:border-top-color .5s var(--ease);}
@@ -491,7 +491,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 }
 .card.is-accent{border-color:var(--accent);background:linear-gradient(160deg,rgba(0,206,209,.10),transparent 70%),var(--bg-2);}
 .card.is-dark{
-  background:var(--d-bg-1);border-color:var(--d-line);
+  background:var(--d-bg-1);border-color:var(--d-line);border-top-color:var(--accent);
   --ink-0:var(--d-ink-0);--ink-1:var(--d-ink-1);--ink-2:var(--d-ink-1);--ink-3:var(--d-ink-2);
   --line:var(--d-line);--line-2:var(--d-line-2);--accent:var(--cb-primary);
   color:var(--d-ink-1);
@@ -1975,10 +1975,11 @@ function fireCountups(s){
     const suf = el.dataset.countSuffix || '';
     const pre = el.dataset.countPrefix || '';
     const dec = (el.dataset.countTo.split('.')[1]||'').length;
-    const t0 = performance.now(), dur = 950;
+    const t0 = performance.now(), dur = 620;
     (function tick(now){
       const p = Math.min(1,(now-t0)/dur), e = 1-Math.pow(1-p,3);
-      el.textContent = pre + (to*e).toFixed(dec).replace('.',',') + suf;
+      const sep = document.documentElement.lang === 'en' ? '.' : ',';
+      el.textContent = pre + (to*e).toFixed(dec).replace('.',sep) + suf;
       if(p<1) requestAnimationFrame(tick);
     })(t0);
   });
