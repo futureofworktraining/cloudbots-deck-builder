@@ -28,12 +28,12 @@
      ink-2/ink-3 przesunięta w górę, żeby ink-3 trzymał 4,5:1 i zostawił ink-2
      wyraźnie nad sobą. */
   --d-ink-0:#f4f1e8; --d-ink-1:#c2c5d2; --d-ink-2:#aeb4c9; --d-ink-3:#9aa0b8;
-  --d-line:rgba(255,255,255,.36); --d-line-2:rgba(255,255,255,.26);
+  --d-line:rgba(255,255,255,.46); --d-line-2:rgba(255,255,255,.34);
 
   /* motyw jasny */
   --l-bg-0:#F8FAFC; --l-bg-1:#f1f5f9; --l-bg-2:#ffffff;
   --l-ink-0:#0f1729; --l-ink-1:#243043; --l-ink-2:#38455a; --l-ink-3:#4b5a70;
-  --l-line:rgba(15,23,41,.40); --l-line-2:rgba(15,23,41,.30);
+  --l-line:rgba(15,23,41,.50); --l-line-2:rgba(15,23,41,.38);
 
   /* aliasy przełączane przez .slide--dark / .slide--light */
   --bg-0:var(--d-bg-0); --bg-1:var(--d-bg-1); --bg-2:var(--d-bg-2);
@@ -387,8 +387,8 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
   line-height:1.12;letter-spacing:-.022em;color:var(--ink-0);text-wrap:balance;
 }
 .h-title--s{font-size:var(--fs-display-m);}
-.h-sub{font-size:var(--fs-lead);line-height:1.55;color:var(--ink-2);max-width:76ch;font-weight:300;}
-.lead{font-size:var(--fs-lead);line-height:1.62;color:var(--ink-1);max-width:70ch;text-wrap:pretty;}
+.h-sub{font-size:var(--fs-lead);line-height:1.55;color:var(--ink-2);max-width:76ch;font-weight:300;text-wrap:balance;}
+.lead{font-size:var(--fs-lead);line-height:1.62;color:var(--ink-1);max-width:70ch;text-wrap:balance;}
 .note{font-size:var(--fs-small);line-height:1.62;color:var(--ink-3);max-width:100ch;text-wrap:pretty;}
 
 .head-row{
@@ -538,7 +538,10 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
   background:linear-gradient(100deg,rgba(0,206,209,.13),rgba(0,206,209,.03));
   border-left:3px solid var(--accent);
 }
-.punch-text{flex:1;font-size:var(--fs-lead);line-height:1.5;color:var(--ink-0);font-weight:300;}
+.punch-text{flex:1;font-size:var(--fs-lead);line-height:1.5;color:var(--ink-0);font-weight:300;
+  /* balance zamiast ogona: dwuwyrazowa koncowka pod pelnym wierszem czytala
+     sie jak urwanie, choc para jest zwiazana */
+  text-wrap:balance;}
 .punch-tag{
   flex:0 0 auto;font-family:var(--ff-mono);font-size:var(--fs-small);line-height:1.75;
   letter-spacing:.08em;text-transform:uppercase;color:var(--accent);text-align:right;
@@ -1838,7 +1841,7 @@ function paraKoncowa(root){
     /* W waskiej kolumnie karty zwiazana para prawie zawsze dokłada wiersz.
        Karta ma jednak zapas wysokosci, a wdowa kosztuje wiecej niz wiersz. */
     const luzny = el.classList.contains('card-text') || el.classList.contains('flow-d')
-                || el.classList.contains('bitem');
+                || el.classList.contains('bitem') || el.classList.contains('card-lead');
     const przed = ragProfil(el);
     const orig = target.nodeValue;
     target.nodeValue = orig.slice(0, i) + ' ' + orig.slice(i + m[0].length);
@@ -1853,8 +1856,15 @@ function paraKoncowa(root){
     const przepelnia = boks > 0 &&
       (el.scrollWidth > boks + 1 || (po && po.szer > boks + 1));
     /* po bywa null (element bez prostokatow) — czytamy je dopiero za strazikiem */
+    /* Karty w siatce ciagna sie do najwyzszej, wiec dodatkowy wiersz w jednej
+       z nich bywa darmowy — ale tylko wtedy, gdy pojemnik go faktycznie miesci.
+       Sprawdzamy to pomiarem, a nie zalozeniem. */
+    const pojemnik = el.closest('.card,.flow-node,.tl-item');
+    const miesciSie = !pojemnik || pojemnik.scrollHeight <= pojemnik.clientHeight + 1;
+    const dodatkowy = po && przed && po.n > przed.n &&
+      !(luzny && po.n === przed.n + 1 && miesciSie);
     const gorzej = przed && po && (
-      po.n > przed.n ||                                   /* dodatkowy wiersz */
+      dodatkowy ||
       po.srodek < Math.min(przed.srodek, 0.62) ||         /* dziura w srodku */
       po.ost < Math.min(przed.ost, luzny ? 0.30 : 0.62)); /* zbyt krotki ogon */
     if(!przed || !po || przepelnia || gorzej) target.nodeValue = orig;
