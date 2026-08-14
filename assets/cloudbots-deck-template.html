@@ -28,12 +28,12 @@
      ink-2/ink-3 przesunięta w górę, żeby ink-3 trzymał 4,5:1 i zostawił ink-2
      wyraźnie nad sobą. */
   --d-ink-0:#f4f1e8; --d-ink-1:#c2c5d2; --d-ink-2:#a2a8bf; --d-ink-3:#8d93ad;
-  --d-line:rgba(255,255,255,.15); --d-line-2:rgba(255,255,255,.085);
+  --d-line:rgba(255,255,255,.30); --d-line-2:rgba(255,255,255,.19);
 
   /* motyw jasny */
   --l-bg-0:#F8FAFC; --l-bg-1:#f1f5f9; --l-bg-2:#ffffff;
   --l-ink-0:#0f1729; --l-ink-1:#243043; --l-ink-2:#3f4c60; --l-ink-3:#54637a;
-  --l-line:rgba(15,23,41,.17); --l-line-2:rgba(15,23,41,.10);
+  --l-line:rgba(15,23,41,.34); --l-line-2:rgba(15,23,41,.22);
 
   /* aliasy przełączane przez .slide--dark / .slide--light */
   --bg-0:var(--d-bg-0); --bg-1:var(--d-bg-1); --bg-2:var(--d-bg-2);
@@ -488,7 +488,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
   letter-spacing:-.05em;color:var(--accent);opacity:.26;
 }
 /* rynna tylko pod pierwszym akapitem — niższe wiersze biorą pełną szerokość karty */
-.card--ghost .card-lead,.card--ghost .card-foot{padding-right:calc(var(--ghost)*1.6 + 30px);}
+.card--ghost .card-lead{padding-right:calc(var(--ghost)*1.35 + 24px);}
 .card-lead{font-size:var(--fs-body);line-height:1.6;color:var(--ink-1);}
 .card-lead,.card-text,.flow-d,.tl-d,.toc-d,.stat-lab{overflow-wrap:break-word;}
 
@@ -716,7 +716,8 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .c-bars .bx{font-family:var(--ff-mono);font-size:clamp(12px,2.2cqw,var(--fs-small));letter-spacing:.08em;color:var(--ink-3);
   text-align:center;line-height:1.35;border-top:1px solid var(--line);padding-top:7px;width:100%;}
 .c-bars .b.is-hi .bar{background:var(--dv-1);}
-.c-bars .b:not(.is-hi) .bar{background:transparent;box-shadow:inset 0 0 0 2px var(--dv-rest);}
+.c-bars .b:not(.is-hi) .bar{background:color-mix(in srgb,var(--dv-rest) 34%,transparent);
+  box-shadow:inset 0 0 0 1.5px var(--dv-rest);}
 .c-bars .b:not(.is-hi) .bv{font-weight:500;color:var(--ink-2);}
 
 /* słupki poziome z rankingiem */
@@ -1696,6 +1697,7 @@ function typografia(root){
 
 /* Jedno- i dwuliterowe spojniki nie zostaja na koncu wiersza. */
 function spojniki(root){
+  if(document.documentElement.lang === 'en') return;
   const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode: n => /^(SCRIPT|STYLE|CODE|PRE)$/.test(n.parentNode.nodeName)
       ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
