@@ -505,11 +505,11 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 /* Rozmiar cyfry i rynna pod nią liczą się z jednej zmiennej. Przy sztywnych
    88px i padding-right:74px cyfra była szersza niż rynna i wchodziła w tekst —
    zmierzone odstępy spadały do 7 px. */
-.card--ghost{position:relative;overflow:hidden;--ghost:clamp(56px,4.4vw,84px);}
+.card--ghost{position:relative;overflow:hidden;--ghost:clamp(46px,3.6vw,68px);}
 .card-ghost{font-variant-numeric:tabular-nums;
   position:absolute;top:9px;right:clamp(15px,1.5vw,24px);pointer-events:none;user-select:none;
   font-family:var(--ff-display);font-size:var(--ghost);font-weight:500;line-height:.8;
-  letter-spacing:-.05em;color:var(--accent);opacity:.30;
+  letter-spacing:-.05em;color:var(--accent);opacity:.26;
 }
 /* rynna tylko pod pierwszym akapitem — niższe wiersze biorą pełną szerokość karty */
 .card--ghost .card-lead{padding-right:calc(var(--ghost)*1.35 + 24px);}
@@ -536,7 +536,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
   background:linear-gradient(100deg,rgba(0,206,209,.13),rgba(0,206,209,.03));
   border-left:3px solid var(--accent);
 }
-.punch-text{font-size:var(--fs-lead);line-height:1.5;color:var(--ink-0);font-weight:300;}
+.punch-text{flex:1;font-size:var(--fs-lead);line-height:1.5;color:var(--ink-0);font-weight:300;}
 .punch-tag{
   flex:0 0 auto;font-family:var(--ff-mono);font-size:var(--fs-small);line-height:1.75;
   letter-spacing:.08em;text-transform:uppercase;color:var(--accent);text-align:right;
@@ -613,7 +613,8 @@ body:not(.details-on) .tbl tbody tr:has(+ tr.detail:last-child) td{border-bottom
   display:grid;grid-column:span 2;grid-template-columns:subgrid;
   padding:clamp(12px,1.3vw,20px) 0;border-bottom:1px solid var(--line-2);position:relative;
 }
-.tl-item:last-child{border-bottom:0;}
+/* bez tego blok konczy sie w powietrzu: trzy kreski i nic pod ostatnim wierszem */
+.tl-item:last-child{border-bottom:1px solid var(--line-2);}
 .tl-when{font-family:var(--ff-mono);font-size:var(--fs-small);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);padding-top:3px;}
 .tl-what{display:flex;flex-direction:column;gap:5px;min-width:0;}
 .tl-t{font-family:var(--ff-display);font-size:calc(var(--fs-display-s)*.9);font-weight:500;color:var(--ink-0);line-height:1.28;}
@@ -714,8 +715,8 @@ body:not(.details-on) .tbl tbody tr:has(+ tr.detail:last-child) td{border-bottom
 /* Podpis niesie mianownik wykresu — czytany z dystansu, wiec nie schodzi
    ponizej reszty drobnej typografii ani na najslabszy odcien. */
 .viz-cap{
-  margin-top:10px;font-family:var(--ff-mono);font-size:calc(var(--fs-small)*1.05);
-  letter-spacing:.02em;color:var(--ink-1);line-height:1.55;
+  margin-top:10px;font-family:var(--ff-mono);font-size:var(--fs-small);
+  letter-spacing:.01em;color:var(--ink-2);line-height:1.55;
 }
 
 /* legenda — zawsze klasą, nigdy inline'owym kolorem, żeby czytała się na obu motywach */
@@ -743,7 +744,7 @@ body:not(.details-on) .tbl tbody tr:has(+ tr.detail:last-child) td{border-bottom
    nad danymi. 56% komórki trzyma słupek szerszy od przerwy przy każdej liczbie słupków. */
 .c-bars .bar{align-self:end;width:100%;max-width:min(84px,56%);height:var(--v,50%);
   background:var(--c,var(--dv-1));transition:height .8s var(--ease);}
-.c-bars .bx{font-family:var(--ff-mono);font-size:clamp(12px,2.2cqw,var(--fs-small));letter-spacing:.08em;color:var(--ink-3);
+.c-bars .bx{font-family:var(--ff-mono);font-size:clamp(12px,2.2cqw,var(--fs-small));letter-spacing:.04em;color:var(--ink-2);
   text-align:center;line-height:1.35;border-top:1px solid var(--line);padding-top:7px;width:100%;}
 .c-bars .b.is-hi .bar{background:var(--dv-1);}
 .c-bars .b:not(.is-hi) .bar{background:var(--dv-rest);}
@@ -756,7 +757,7 @@ body:not(.details-on) .tbl tbody tr:has(+ tr.detail:last-child) td{border-bottom
 .c-rank{display:grid;grid-template-columns:auto minmax(0,var(--lbl,34%)) minmax(0,1fr) auto;
   column-gap:clamp(14px,2.2cqw,26px);row-gap:clamp(6px,1.1cqw,13px);align-items:center;}
 .c-rank .r{display:contents;}
-.c-rank .rn{font-family:var(--ff-mono);font-size:clamp(12px,2.2cqw,var(--fs-small));color:var(--ink-3);letter-spacing:.06em;}
+.c-rank .rn{font-family:var(--ff-mono);font-size:clamp(12px,2.2cqw,var(--fs-small));color:var(--ink-2);letter-spacing:.03em;}
 /* etykieta wyrównana do prawej — przylega do słupka, oko nie skacze przez pustkę */
 .c-rank .rl{font-size:clamp(12px,2.6cqw,var(--fs-body));color:var(--ink-1);line-height:1.3;overflow-wrap:anywhere;
   text-align:right;text-wrap:balance;min-height:2lh;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;}
