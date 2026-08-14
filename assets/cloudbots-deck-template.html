@@ -86,7 +86,7 @@
   --accent:#0e7490; --accent-soft:var(--cb-primary);
   /* jasna mięta ma na białym kontrast 1,3:1 — pasek znika, więc na jasnym motywie
      schodzi o kilka stopni w dół, zostając w tej samej rodzinie koloru */
-  --dv-1:#0E7490; --dv-2:#0891B2; --dv-3:#3FBFA0; --dv-rest:#64748B; --dv-track:transparent; --dv-track-line:rgba(15,23,41,.55);
+  --dv-1:#0E7490; --dv-2:#0891B2; --dv-3:#3FBFA0; --dv-rest:#78879C; --dv-track:transparent; --dv-track-line:rgba(15,23,41,.55);
   /* gradient liczb KPI na jasnym: mięta→cyjan schodziła do 1,9:1 wobec tła */
   --grad-num:linear-gradient(120deg,#0E7490,#0F766E);
 }
@@ -438,7 +438,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 /* Okladka ma wlasny, szerszy rytm. */
 .cover>.eyebrow+*{margin-top:0;}
 /* Podtytul oddycha, ale zostaje w bloku naglowka. */
-.h-title+.h-sub,.h-display+.h-sub{margin-top:clamp(8px,.85vw,13px);}
+.h-title+.h-sub,.h-display+.h-sub,.sect-title+.h-sub{margin-top:clamp(8px,.85vw,13px);}
 .split-col{--stack-gap:clamp(13px,1.4vw,22px);display:flex;flex-direction:column;gap:var(--stack-gap);min-width:0;}
 
 .cards{display:grid;gap:clamp(13px,1.4vw,22px);align-items:stretch;}
@@ -485,11 +485,12 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .card-ghost{font-variant-numeric:tabular-nums;
   position:absolute;top:8px;right:12px;pointer-events:none;user-select:none;
   font-family:var(--ff-display);font-size:var(--ghost);font-weight:500;line-height:.8;
-  letter-spacing:-.05em;color:var(--accent);opacity:.14;
+  letter-spacing:-.05em;color:var(--accent);opacity:.26;
 }
 /* rynna tylko pod pierwszym akapitem — niższe wiersze biorą pełną szerokość karty */
 .card--ghost .card-lead,.card--ghost .card-foot{padding-right:calc(var(--ghost)*1.6 + 30px);}
 .card-lead{font-size:var(--fs-body);line-height:1.6;color:var(--ink-1);}
+.card-lead,.card-text,.flow-d,.tl-d,.toc-d,.stat-lab{overflow-wrap:break-word;}
 
 /* lista punktowana — blok, nie grid: inline <strong> nie może stać się osobnym elementem */
 .blist{display:block;}
@@ -538,7 +539,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
   grid-template-rows:auto auto 1fr;}
 .flow-node{
   /* subgrid: tytuł łamiący się na dwa wiersze przesuwał opis tylko w swojej kolumnie */
-  position:relative;display:grid;grid-row:span 3;grid-template-rows:subgrid;gap:7px;min-width:0;
+  position:relative;display:grid;grid-row:span 3;grid-template-rows:subgrid;gap:clamp(7px,.75vw,12px);min-width:0;
   padding:clamp(13px,1.4vw,20px) clamp(15px,1.6vw,24px);border-top:1px solid var(--line);
 }
 .flow-node::before{
@@ -714,9 +715,9 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
   background:var(--c,var(--dv-1));transition:height .8s var(--ease);}
 .c-bars .bx{font-family:var(--ff-mono);font-size:clamp(12px,2.2cqw,var(--fs-small));letter-spacing:.08em;color:var(--ink-3);
   text-align:center;line-height:1.35;border-top:1px solid var(--line);padding-top:7px;width:100%;}
-.c-bars .b.is-rest .bar{background:var(--dv-rest);}
 .c-bars .b.is-hi .bar{background:var(--dv-1);}
-.c-bars .b:not(.is-hi):not(.is-rest) .bar{background:var(--dv-rest);}
+.c-bars .b:not(.is-hi) .bar{background:transparent;box-shadow:inset 0 0 0 2px var(--dv-rest);}
+.c-bars .b:not(.is-hi) .bv{font-weight:500;color:var(--ink-2);}
 
 /* słupki poziome z rankingiem */
 /* JEDEN grid na cały ranking, wiersze przez display:contents — inaczej każdy
@@ -871,11 +872,96 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
 @media print{
   /* Strona ma zawsze 1600x900, ale vw liczy sie z szerokosci OKNA — bez tego
      ten sam deck daje inny PDF przy 1024 i przy 1920 (tytul 36 vs 60 px). */
-  :root{
-    --fs-display-xl:90px; --fs-display-l:60px; --fs-display-m:44px; --fs-display-s:31.5px;
-    --fs-lead:24px; --fs-body:19px; --fs-small:16.5px; --fs-mono:17.4px;
-    --pad-y:40px; --pad-x:67.2px;
-  }
+  /* Tokeny druku sa czescia generowanego bloku nizej — recznie wpisane
+     wartosci rozjezdzaly sie z tym, co deck pokazuje przy 1600px. */
+  .stage>*{--fit:1!important;width:100%!important;height:auto!important;transform:none!important;}
+
+  /* Strona ma zawsze 1600x900, ale vw/vh licza sie z OKNA. Ponizsze reguly
+     to te same deklaracje przeliczone dla 1600x900 — bez nich ten sam deck
+     daje inny PDF przy oknie 1280 i przy 2560. Blok generowany. */
+  /* ═══════════════════════════════════════════════════════════════════════════
+   CLOUDBOTS DECK — szablon prezentacji
+   System wizualny: Kingfisher / cloudbots.eu
+   Silnik: scroll-snap + IntersectionObserver, menu wysuwane z lewej krawędzi
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. TOKENY ────────────────────────────────────────────────────────────── */
+:root{--fs-display-xl:79.36px;--fs-display-l:55.2px;--fs-display-m:40.64px;--fs-display-s:29.12px;--fs-lead:22.24px;--fs-body:19.04px;--fs-small:16.48px;--fs-mono:17.44px;--pad-x:67.2px;--gap:25.6px;}
+  /* ── 3. DECK I SLAJD ──────────────────────────────────────────────────────── */
+.deck{width:1600px;height:900px;}
+  .slide{width:1600px;height:900px;}
+  /* prawa rezerwa: kreska postępu kończy się przed sterowaniem, stopka przed strzałkami */
+.chrome-top{padding-bottom:30.6px;padding-right:416px;}
+  .chrome-bottom{padding-top:16.2px;padding-right:112px;}
+  .drawer{height:900px;}
+  /* ── 6. TOPBAR — sterowanie ───────────────────────────────────────────────── */
+.topbar{max-width:760px;}
+  /* ── 7. PASEK POSTĘPU I STRZAŁKI ──────────────────────────────────────────── */
+.vprog{height:288px;}
+  .head-row{gap:48px;}
+  .stack--tight{--stack-gap:17.6px;}
+  .stack--loose{--stack-gap:41.6px;}
+  /* align-content:start trzyma wiersz przy górze sceny. Bez tego .stage (stretch)
+   rozciągał siatkę na całą wysokość i .split--center spychał nagłówek na środek
+   kadru — ten sam slajd zaczynał się 200 px niżej niż sąsiedzi. align-items
+   nadal wyrównuje kolumny między sobą, więc .split--viz działa jak działał. */
+.split{gap:54.4px;}
+  /* pas domykający: slajd o rzadkiej treści dostaje dolną krawędź zamiast wiszącej
+   pustki — górny blok trzyma proporcje, ostatni element siada przy dole sceny */
+.stack--fill{padding-bottom:10.8px;}
+  /* Jeden odstep nadlinia->tytul w calej talii, niezaleznie od kontenera. */
+/* Kontener bez wlasnego gap: pelny odstep. */
+.eyebrow+*{margin-top:20px;}
+  /* Podtytul oddycha, ale zostaje w bloku naglowka. */
+.h-title+.h-sub,.h-display+.h-sub,.sect-title+.h-sub{margin-top:13px;}
+  .split-col{--stack-gap:22px;}
+  .cards{gap:22px;}
+  /* ── 10. KOMPONENTY ───────────────────────────────────────────────────────── */
+/* karta */
+.card{padding:24px;}
+  /* karta z numerem-znakiem wodnym — tylko dla treści, w której kolejność coś znaczy
+   (etapy procesu, kroki wdrożenia). Do listy równorzędnych tez numer nie pasuje. */
+/* Rozmiar cyfry i rynna pod nią liczą się z jednej zmiennej. Przy sztywnych
+   88px i padding-right:74px cyfra była szersza niż rynna i wchodziła w tekst —
+   zmierzone odstępy spadały do 7 px. */
+.card--ghost{--ghost:70.4px;}
+  /* wyróżnik */
+.punch{gap:38.4px;padding:22px 28px;}
+  /* liczby */
+.stats{gap:38.4px;}
+  .stat-num{font-size:57.6px;}
+  .flow-node{gap:12px;padding:20px 24px;}
+  .tbl .t-name{padding-right:35.2px;}
+  /* oś czasu */
+.tl{column-gap:32px;}
+  .tl-item{padding:20px 0;}
+  /* cytat / opinia */
+.tq{padding:28px;}
+  /* separator sekcji */
+/* przekładka sekcji siedzi w środku kadru — .stage rozciąga, blok centruje sam */
+.sect{--stack-gap:28px;}
+  .sect-num{font-size:144px;}
+  /* logotypy klientów / narzędzi */
+.logos{gap:48px;}
+  .logo-item{height:32px;}
+  /* okładka */
+.cover{gap:40px;}
+  .cover-logo svg{width:54.4px;}
+  .cover-logo b{font-size:20.8px;}
+  .cover-meta{gap:38.4px;padding-top:30px;}
+  .toc-row{gap:38.4px;padding:22px 0;}
+  .toc-n{font-size:28.8px;}
+  /* kontakt */
+.contact{gap:57.6px;}
+  /* domyślnie stoi tu znak firmowy — sam jest heksagonem, więc trzyma kompozycję
+   bez pustego kadru. Ze zdjęciem: podmień <svg> na <img class="contact-photo" src="…">. */
+.contact-mark{width:144px;}
+  .contact-photo{width:190px;}
+  .lb-frame{width:1200px;}
+
+  .eyebrow+*{margin-top:20px!important;}
+  .cover>.eyebrow+*{margin-top:0!important;}
+  .h-title+.h-sub,.h-display+.h-sub,.sect-title+.h-sub{margin-top:13px!important;}
   body{overflow:visible;background:#fff;}
   .topbar,.drawer,.drawer-tab,.drawer-scrim,.vprog,.arrows,.grain,.lightbox{display:none!important;}
   .deck{height:auto;overflow:visible;scroll-snap-type:none;}
@@ -1633,8 +1719,9 @@ function pauzy(root){
   }
 }
 
-const PARA_SEL = '.h-title,.sect-title,.h-sub,.lead,.card-lead,.card-text,.card-foot span,' +
-                 '.tl-d,.flow-d,.toc-d,.viz-cap,.stat-sub,.stat-lab';
+const PARA_SEL = '.h-display,.h-title,.sect-title,.h-sub,.lead,.card-lead,.card-text,' +
+                 '.card-foot span,.punch-text,.tl-d,.flow-d,.toc-d,.viz-cap,.stat-sub,' +
+                 '.stat-lab,.c-rank .rl';
 
 /* Liczy wiersze i najkrotszy z nich wzgledem najszerszego — sluzy do oceny,
    czy wiazanie poprawilo, czy popsulo rag. */
@@ -1659,7 +1746,12 @@ function ragProfil(el){
 /* Ostatnia para wyrazow zostaje razem — inaczej pojedyncze slowo laduje samo
    w ostatnim wierszu. W waskiej kolumnie zwiazana para bywa jednak dluzsza niz
    resztka wiersza i rozwala rag mocniej, niz naprawia; wtedy wycofujemy zmiane. */
+/* Wiazania trzeba umiec cofnac: przy zmianie szerokosci okna para, ktora
+   miescila sie w kolumnie, przestaje sie miescic (albo odwrotnie). */
+const PARA_UNDO = [];
+
 function paraKoncowa(root){
+  for(const [n, v] of PARA_UNDO.splice(0)) n.nodeValue = v;
   root.querySelectorAll(PARA_SEL).forEach(el => {
     const nodes = [];
     const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
@@ -1680,7 +1772,12 @@ function paraKoncowa(root){
     const orig = target.nodeValue;
     target.nodeValue = orig.slice(0, i) + ' ' + orig.slice(i + m[0].length);
     const po = ragProfil(el);
-    if(przed && po && (po.n > przed.n || po.min < Math.min(przed.min, 0.62))) target.nodeValue = orig;
+    /* Nierozlaczna para szersza od kolumny wychodzi poza karte i nachodzi na
+       sasiednia — to gorsze niz wdowa, wiec przepelnienie cofa wiazanie zawsze. */
+    const przepelnia = el.scrollWidth > el.clientWidth + 1;
+    if(przed && po && (przepelnia || po.n > przed.n || po.min < Math.min(przed.min, 0.62)))
+      target.nodeValue = orig;
+    else PARA_UNDO.push([target, orig]);
   });
 }
 
@@ -1845,6 +1942,7 @@ function fitSlide(s){
 
   child.style.width = '100%';
   child.style.height = '';
+  child.style.marginBottom = '';
   child.style.setProperty('--fit', 1);
 
   let k = userZoom;
@@ -1867,14 +1965,17 @@ function fitSlide(s){
   /* transform nie zmienia wysokosci w layoucie — podajemy ja jawnie, zeby
      centrowanie sceny liczylo sie z tego, co widac, a nie z pelnej skali */
   if(mode !== 'off' && Math.abs(k - 1) > 0.001){
-    child.style.minHeight = '0';
-    const h = child.offsetHeight;
-    child.style.minHeight = '';
-    child.style.height = (h * k) + 'px';
+    /* transform:scale nie zmienia miejsca, ktore element zajmuje w ukladzie, wiec
+       .stage centrowalby go po wysokosci sprzed skalowania i tresc jechalaby w gore.
+       Ujemny margines domyka roznice: w flexie liczy sie rozmiar zewnetrzny, a ten
+       jest teraz rowny realnie widocznej wysokosci. Ustawianie height zamiast
+       marginesu sciskalo zawartosc, bo dziecko jest kontenerem flex. */
+    child.style.marginBottom = (-child.offsetHeight * (1 - k)) + 'px';
   }
 }
 function fitAll(){ slides.forEach(fitSlide); }
-addEventListener('resize', ()=>{ clearTimeout(fitAll._t); fitAll._t = setTimeout(fitAll, 140); });
+addEventListener('resize', ()=>{ clearTimeout(fitAll._t);
+  fitAll._t = setTimeout(()=>{ paraKoncowa(deck); akcenty(deck); fitAll(); }, 140); });
 if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>setTimeout(fitAll,60));
 
 const btnFit = document.getElementById('btnFit');
