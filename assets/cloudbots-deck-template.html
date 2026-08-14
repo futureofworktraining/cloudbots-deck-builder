@@ -578,11 +578,9 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 /* pierwsza kolumna nie ma kreski w rynnie, wiec jej tresc siada na marginesie */
 .flow-node:first-child{padding-left:0;}
 .flow-node:first-child::before{left:0;}
-/* szyna urywa sie na ostatnim znaczniku, tak samo jak osie na innych slajdach:
-   ostatnia kolumna dostaje tylko odcinek do swojego znacznika */
-.flow-node:last-child{border-top:0;}
-.flow-node:last-child::after{content:'';position:absolute;left:0;top:0;
-  width:clamp(15px,1.6vw,24px);height:1px;background:var(--line);}
+/* Szyna biegnie do prawego marginesu, bo jest gorna krawedzia piecioczlonowego
+   modulu, a nie osia danych jak na slajdach 03 i 12 — urwana na ostatnim
+   znaczniku zostawiala goly prawy gorny naroznik nad pelna kolumna. */
 .flow-n{font-family:var(--ff-mono);font-size:var(--fs-small);letter-spacing:.16em;color:var(--accent);}
 .flow-t{font-family:var(--ff-display);font-size:calc(var(--fs-display-s)*.86);font-weight:500;line-height:1.25;color:var(--ink-0);
   min-height:2lh;display:flex;align-items:flex-start;}
@@ -653,9 +651,9 @@ body:not(.details-on) .tbl tbody tr:has(+ tr.detail:last-child) td{border-bottom
   column-gap:clamp(32px,5vw,110px);row-gap:var(--stack-gap);
   align-content:center;min-height:100%;}
 .sect>.sect-num{grid-column:2;grid-row:1/span 2;align-self:center;justify-self:end;
-  /* ujemny tracking wciaga pudelko, ale glif maluje sie dalej — bez kompensacji
-     cyfra wychodzi poza prawy margines slajdu */
-  margin-right:.05em;}
+  /* oddech od krawedzi: na samym marginesie cyfra czytala sie jak obcieta
+     kadrem, a nie jak swiadomy znacznik sekcji */
+  margin-right:clamp(24px,3.6vw,64px);}
 .sect>.sect-title,.sect>.h-sub,.sect>.lead{grid-column:1;}
 .sect-num{
   font-family:var(--ff-display);font-size:clamp(64px,9vw,168px);font-weight:600;line-height:.86;
