@@ -65,7 +65,7 @@
   --dv-1:var(--cb-primary); --dv-2:#0E7490; --dv-3:var(--cb-mint);
   --dv-4:#5B7FE0; --dv-5:#F2B441; --dv-rest:#94A3B8;
   --dv-pos:#10B981; --dv-neg:#E15566;
-  --dv-track:transparent; --dv-track-line:rgba(148,163,184,.60);
+  --dv-track:rgba(15,23,41,.09); --dv-track-line:rgba(148,163,184,.60);
 }
 .slide--dark{
   --bg-0:var(--d-bg-0); --bg-1:var(--d-bg-1); --bg-2:var(--d-bg-2);
@@ -74,7 +74,7 @@
   --accent:var(--cb-primary); --accent-soft:var(--cb-cyan);
   /* --dv-rest na ciemnym niósł wypełnienie pasków „Pozostałe”: #5b6379 był tak
      bliski toru, że słupek czytał się jak brak danych, a nie jak wartość */
-  --dv-2:var(--cb-cyan); --dv-rest:#9aa3b8; --dv-track:transparent; --dv-track-line:rgba(255,255,255,.46);
+  --dv-2:var(--cb-cyan); --dv-rest:#9aa3b8; --dv-track:rgba(255,255,255,.12); --dv-track-line:rgba(255,255,255,.46);
 }
 .slide--light{
   --bg-0:var(--l-bg-0); --bg-1:var(--l-bg-1); --bg-2:var(--l-bg-2);
@@ -86,7 +86,7 @@
   --accent:#0e7490; --accent-soft:var(--cb-primary);
   /* jasna mięta ma na białym kontrast 1,3:1 — pasek znika, więc na jasnym motywie
      schodzi o kilka stopni w dół, zostając w tej samej rodzinie koloru */
-  --dv-1:#0E7490; --dv-2:#0891B2; --dv-3:#3FBFA0; --dv-rest:#78879C; --dv-track:transparent; --dv-track-line:rgba(15,23,41,.55);
+  --dv-1:#0E7490; --dv-2:#0891B2; --dv-3:#3FBFA0; --dv-rest:#78879C; --dv-track:rgba(15,23,41,.09); --dv-track-line:rgba(15,23,41,.55);
   /* gradient liczb KPI na jasnym: mięta→cyjan schodziła do 1,9:1 wobec tła */
   --grad-num:linear-gradient(120deg,#0E7490,#0F766E);
 }
@@ -507,7 +507,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
    zmierzone odstępy spadały do 7 px. */
 .card--ghost{position:relative;overflow:hidden;--ghost:clamp(56px,4.4vw,84px);}
 .card-ghost{font-variant-numeric:tabular-nums;
-  position:absolute;top:10px;right:18px;pointer-events:none;user-select:none;
+  position:absolute;top:9px;right:clamp(15px,1.5vw,24px);pointer-events:none;user-select:none;
   font-family:var(--ff-display);font-size:var(--ghost);font-weight:500;line-height:.8;
   letter-spacing:-.05em;color:var(--accent);opacity:.30;
 }
@@ -677,14 +677,16 @@ body:not(.details-on) .tbl tbody tr:has(+ tr.detail:last-child) td{border-bottom
 /* spis treści */
 .toc{display:flex;flex-direction:column;}
 .toc-row{
-  display:grid;grid-template-columns:minmax(56px,auto) minmax(0,1fr) minmax(0,1.35fr);
+  display:grid;grid-template-columns:minmax(56px,auto) minmax(0,.42fr) minmax(0,1.35fr);
   gap:clamp(16px,2.4vw,44px);align-items:baseline;
   padding:clamp(13px,1.5vw,22px) 0;border-bottom:1px solid var(--line-2);
 }
 .toc-row:last-child{border-bottom:0;}
 .toc-n{font-family:var(--ff-display);font-size:clamp(20px,1.8vw,30px);font-weight:600;line-height:1;letter-spacing:-.04em;color:var(--accent);}
 .toc-t{font-family:var(--ff-display);font-size:var(--fs-display-s);font-weight:500;color:var(--ink-0);line-height:1.24;}
-.toc-d{font-size:var(--fs-body);line-height:1.55;color:var(--ink-2);max-width:62ch;text-wrap:pretty;}
+/* 62ch zostawialo 234px martwego pola przed prawym marginesem i lamalo krotkie
+   opisy na dwa wiersze bez powodu; kolumna ma 80ch, wiec tyle wolno zajac */
+.toc-d{font-size:var(--fs-body);line-height:1.55;color:var(--ink-2);max-width:80ch;text-wrap:pretty;}
 
 /* kontakt */
 .contact{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(26px,3.6vw,64px);align-items:center;}
@@ -744,8 +746,7 @@ body:not(.details-on) .tbl tbody tr:has(+ tr.detail:last-child) td{border-bottom
 .c-bars .bx{font-family:var(--ff-mono);font-size:clamp(12px,2.2cqw,var(--fs-small));letter-spacing:.08em;color:var(--ink-3);
   text-align:center;line-height:1.35;border-top:1px solid var(--line);padding-top:7px;width:100%;}
 .c-bars .b.is-hi .bar{background:var(--dv-1);}
-.c-bars .b:not(.is-hi) .bar{background:color-mix(in srgb,var(--dv-rest) 34%,transparent);
-  box-shadow:inset 0 0 0 1.5px var(--dv-rest);}
+.c-bars .b:not(.is-hi) .bar{background:var(--dv-rest);}
 .c-bars .b:not(.is-hi) .bv{font-weight:500;color:var(--ink-2);}
 
 /* słupki poziome z rankingiem */
@@ -1749,8 +1750,11 @@ function spojniki(root){
       ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
   });
   const re = /(^|[\s(„"])((?:[aiouwzAIOUWZ]|na|do|od|po|za|ze|we|to|Na|Do|Od|Po|Za|Ze|We|To))\s+/g;
+  /* Liczba i to, co liczy, to jedna informacja: „90 dni", „3 bramki", „8,4% firm".
+     Rozdzielone koncem wiersza czytaja sie jak dwa osobne fakty. */
+  const reL = /(\d[\d .,%]*)\s+(?=[\p{L}])/gu;
   for(let n; (n = w.nextNode()); ){
-    const v = n.nodeValue.replace(re, '$1$2 ');
+    const v = n.nodeValue.replace(re, '$1$2 ').replace(reL, '$1 ');
     if(v !== n.nodeValue) n.nodeValue = v;
   }
 }
@@ -1768,7 +1772,7 @@ function pauzy(root){
 }
 
 const PARA_SEL = '.h-display,.h-title,.sect-title,.h-sub,.lead,.card-lead,.card-text,' +
-                 '.card-foot span,.punch-text,.tl-d,.flow-d,.toc-d,.viz-cap,.stat-sub,' +
+                 '.card-foot span,.punch-text,.tl-d,.flow-d,.toc-d,.viz-cap,.stat-sub,.bitem,' +
                  '.stat-lab,.c-rank .rl';
 
 /* Liczy wiersze i najkrotszy z nich wzgledem najszerszego — sluzy do oceny,
@@ -1818,7 +1822,8 @@ function paraKoncowa(root){
     if(!target) return;
     /* W waskiej kolumnie karty zwiazana para prawie zawsze dokłada wiersz.
        Karta ma jednak zapas wysokosci, a wdowa kosztuje wiecej niz wiersz. */
-    const luzny = el.classList.contains('card-text') || el.classList.contains('flow-d');
+    const luzny = el.classList.contains('card-text') || el.classList.contains('flow-d')
+                || el.classList.contains('bitem');
     const przed = ragProfil(el);
     const orig = target.nodeValue;
     target.nodeValue = orig.slice(0, i) + ' ' + orig.slice(i + m[0].length);
