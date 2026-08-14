@@ -330,6 +330,7 @@ na nazwisko, podaj przynajmniej rolę i branżę.
   <div class="stage">
     <div class="sect">
       <span class="sect-num" data-step="0">03</span>
+      <p class="eyebrow" data-step="0">Warunki</p>
       <h2 class="sect-title" data-step="1" style="max-width:20ch">Warunki współpracy</h2>
       <p class="h-sub" data-step="2" style="max-width:48ch">
         Trzy rzeczy do ustalenia: zakres, tempo i kto po stronie klienta decyduje.
@@ -351,8 +352,18 @@ ciąg i odbiorca traci orientację, w której części rozmowy jest.
 Numer przekładki jest numerem SEKCJI, nie slajdu — numeracja slajdów w `chrome-top`
 generuje się sama, więc wstawienie przekładki nigdy nie wymaga przenumerowania.
 
+**Nadlinia stoi w DOM tuż przed tytułem, za `.sect-num`.** Nazwa sekcji w nadlinii
+to jedyny czytelny łącznik ze spisem treści — numer w konturze jest kotwicą, nie
+etykietą. Kolejność ma znaczenie: reguła `.sect>.eyebrow+*` odejmuje `row-gap`
+siatki, więc nadlinia postawiona przed `.sect-num` trafia w numer i przekładka
+dostaje 28 px zamiast systemowych 20 px nadlinia → tytuł.
+
 Podtytuł przekładki to `.h-sub`, nie `.lead` — `.lead` ma inną skalę i zaburza
 drabinę odstępów tytuł → zdanie (przekładka 41 px, okładka 53 px, `.h-title` 24 px).
+
+**Przed przekładką stawiaj slajd o przeciwnym motywie.** Przekładka jest ciemna,
+więc poprzedzający ją slajd treściowy powinien być jasny — bez cięcia motywu
+separator czyta się jak ciąg dalszy poprzedniej sekcji, a nie jak cezura.
 
 ---
 

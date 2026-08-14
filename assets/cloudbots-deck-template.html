@@ -200,6 +200,10 @@ body.mierzy-druk .slide{width:1600px;height:900px;}
 .slide--light .hex-deco>span{opacity:.16;}
 @keyframes hexfloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
 @media (prefers-reduced-motion:reduce){.hex-deco>span{animation:none;}}
+/* eksport musi byc deterministyczny: bez tego kazdy slajd lapie inna faze
+   ruchu i te same heksagony stoja w PDF na piecu roznych wysokosciach */
+@media print{.hex-deco>span{animation:none;}}
+body.is-clean .hex-deco>span{animation:none;}
 
 /* siatka tła — druga warstwa atmosfery, dyskretna */
 .grid-deco{
@@ -387,12 +391,15 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
   line-height:1.12;letter-spacing:-.022em;color:var(--ink-0);text-wrap:balance;
 }
 .h-title--s{font-size:var(--fs-display-m);}
-.h-sub{font-size:var(--fs-lead);line-height:1.55;color:var(--ink-2);max-width:76ch;font-weight:300;text-wrap:balance;}
+/* ten sam stopien pisma = ta sama interlinia: .h-sub i .lead roznily sie
+   o 1,5px w wierszu, wiec ten sam podtytul mial dwie wysokosci */
+.h-sub{font-size:var(--fs-lead);line-height:1.62;color:var(--ink-2);max-width:76ch;font-weight:300;text-wrap:balance;}
 .lead{font-size:var(--fs-lead);line-height:1.62;color:var(--ink-1);max-width:70ch;text-wrap:balance;}
 .note{font-size:var(--fs-small);line-height:1.62;color:var(--ink-3);max-width:100ch;text-wrap:pretty;}
 /* przypis tuz pod kreska zamykajaca spis czytal sie jak nieoznaczony szosty
-   wiersz; wlasny oddech i wezsza miara odrozniaja adnotacje od tresci */
-.toc+.note{margin-top:clamp(20px,2.2vw,36px);max-width:78ch;}
+   wiersz; wezsza miara odroznia adnotacje od tresci. Wlasnego marginesu NIE
+   dokladamy: z gapem stosu dawal trzecia wartosc odstepu w talii (60,8 px). */
+.toc+.note{max-width:78ch;}
 /* pas etykiet bez wlasnej krawedzi czytal sie jak zabladzone metadane.
    Kreska zawsze NAD pasem — jeden kierunek domkniecia w calym systemie,
    ten sam co szyna osi danych. */
@@ -666,7 +673,9 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
 .tl-when{font-family:var(--ff-mono);font-size:var(--fs-small);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);padding-top:3px;}
 .tl-what{display:flex;flex-direction:column;gap:5px;min-width:0;}
 .tl-t{font-family:var(--ff-display);font-size:calc(var(--fs-display-s)*.9);font-weight:500;color:var(--ink-0);line-height:1.28;}
-.tl-d{font-size:calc(var(--fs-body)*.95);line-height:1.62;color:var(--ink-2);}
+/* text-wrap:pretty — przy waskim oknie ostatni wiersz opisu spadal do 20%
+   dlugosci wiersza najdluzszego i czytal sie jak wdowa */
+.tl-d{font-size:calc(var(--fs-body)*.95);line-height:1.62;color:var(--ink-2);text-wrap:pretty;}
 
 /* cytat / opinia */
 .tq{position:relative;padding:clamp(16px,1.8vw,28px);border:1px solid var(--line);background:var(--bg-2);overflow:hidden;}
@@ -688,11 +697,11 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
   display:grid;grid-template-columns:minmax(0,1fr) auto;
   column-gap:clamp(32px,5vw,110px);row-gap:var(--stack-gap);
   align-content:center;min-height:100%;}
-.sect>.sect-num{grid-column:2;grid-row:1/span 2;align-self:center;justify-self:end;
+.sect>.sect-num{grid-column:2;grid-row:1/-1;align-self:center;justify-self:end;
   /* oddech od krawedzi: na samym marginesie cyfra czytala sie jak obcieta
      kadrem, a nie jak swiadomy znacznik sekcji */
   margin-right:clamp(24px,3.6vw,64px);}
-.sect>.sect-title,.sect>.h-sub,.sect>.lead{grid-column:1;}
+.sect>.eyebrow,.sect>.sect-title,.sect>.h-sub,.sect>.lead{grid-column:1;}
 .sect-num{
   font-family:var(--ff-display);font-size:clamp(64px,9vw,168px);font-weight:600;line-height:.86;
   letter-spacing:-.05em;color:transparent;
@@ -700,7 +709,7 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
      cienszy obrys i slabszy akcent oddaja pierwszenstwo tezie */
   -webkit-text-stroke:1.2px color-mix(in srgb,var(--accent) 54%,transparent);
 }
-.sect-title{font-family:var(--ff-display);font-size:var(--fs-display-l);font-weight:500;line-height:1.1;letter-spacing:-.022em;color:var(--ink-0);text-wrap:balance;}
+.sect-title{font-family:var(--ff-display);font-size:var(--fs-display-l);font-weight:500;line-height:1.12;letter-spacing:-.022em;color:var(--ink-0);text-wrap:balance;}
 
 /* logotypy klientów / narzędzi */
 .logos{display:flex;flex-wrap:wrap;align-items:center;gap:clamp(22px,3vw,54px);}
@@ -1216,7 +1225,7 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
   </div>
 
   <div class="stage">
-    <div class="stack">
+    <div class="stack stack--loose">
       <div data-step="0">
         <p class="eyebrow" data-en="Contents">Spis treści</p>
         <h2 class="h-title" style="margin-top:14px" data-en="Five threads of this conversation.">Pięć wątków tej rozmowy.</h2>
@@ -1275,6 +1284,7 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
   <div class="stage">
     <div class="sect">
       <span class="sect-num" data-step="0">01</span>
+      <p class="eyebrow" data-step="0" data-en="Context">Kontekst</p>
       <h2 class="sect-title" data-step="1" style="max-width:20ch" data-en="Where the <em>conversation</em> starts.">Od czego zaczyna się <em>rozmowa</em>.</h2>
       <p class="h-sub" data-step="2" style="max-width:48ch" data-en="Before a proposal, name the problem and show what the numbers say.">
         Zanim padnie propozycja, warto nazwać problem i pokazać, co mówią liczby.
@@ -1417,6 +1427,7 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
   <div class="stage">
     <div class="sect">
       <span class="sect-num" data-step="0">02</span>
+      <p class="eyebrow" data-step="0" data-en="Modules">Moduły</p>
       <h2 class="sect-title" data-step="1" style="max-width:18ch" data-en="What exactly you <em>get</em>.">Co dokładnie <em>dostajesz</em>.</h2>
       <p class="h-sub" data-step="2" style="max-width:48ch" data-en="The modules are independent. Each one ends with an artefact that stays with the client.">
         Moduły są niezależne. Każdy kończy się artefaktem, który zostaje u klienta.
@@ -1436,7 +1447,7 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
   </div>
 
   <div class="stage">
-    <div class="stack">
+    <div class="stack stack--loose">
       <div class="head-row" data-step="0">
         <div>
           <p class="eyebrow" data-en="Module 01 · AI Discovery">Moduł 01 · AI Discovery</p>
@@ -1578,6 +1589,7 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
   <div class="stage">
     <div class="sect">
       <span class="sect-num" data-step="0">03</span>
+      <p class="eyebrow" data-step="0" data-en="Conditions">Warunki</p>
       <h2 class="sect-title" data-step="1" style="max-width:18ch" data-en="Terms, scope and what it costs.">Warunki, zakres i ile to kosztuje.</h2>
       <p class="h-sub" data-step="2" style="max-width:48ch" data-en="Rates are a starting point for the conversation, not a price list.">
         Stawki są punktem wyjścia do rozmowy, nie cennikiem.
@@ -1598,7 +1610,7 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
   </div>
 
   <div class="stage">
-    <div class="stack">
+    <div class="stack stack--loose">
       <div class="head-row" data-step="0">
         <div>
           <p class="eyebrow" data-en="Pricing">Wycena</p>
@@ -1718,6 +1730,7 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
   <div class="stage">
     <div class="sect">
       <span class="sect-num" data-step="0">04</span>
+      <p class="eyebrow" data-step="0" data-en="Evidence">Dowody</p>
       <h2 class="sect-title" data-step="1" style="max-width:18ch" data-en="Who has <em>been through it</em>.">Kto już to <em>przerobił</em>.</h2>
       <p class="h-sub" data-step="2" style="max-width:48ch" data-en="References, opinions and the people you will work with.">
         Referencje, opinie i ludzie, z którymi będziesz pracować.
@@ -2212,6 +2225,26 @@ function fitSlide(s){
   }
   child.style.width = (100 / k) + '%';
   child.style.setProperty('--fit', k.toFixed(4));
+
+  /* Petla wyzej liczy wspolczynnik z wysokosci mierzonej przed ustawieniem
+     finalnej szerokosci i przy zdjetym min-height. Uklady, ktore rosna dopiero
+     po przywroceniu obu (dluzszy tekst EN + wlaczone szczegoly w waskim oknie),
+     dostawaly przez to --fit=1 mimo realnego wystawania poza scene. Mierzymy
+     stan KONCOWY i zbijamy wspolczynnik, dopoki tresc nie wejdzie w kadr. */
+  if(mode !== 'off'){
+    for(let popr = 0; popr < 4; popr++){
+      /* offsetHeight, nie getBoundingClientRect: transform ma przejscie CSS,
+         wiec gBCR tuz po zmianie --fit zwraca skale w polowie animacji
+         (zmierzone: 581,3 zamiast 600,1) i warunek nigdy nie zadzialal */
+      const uklad = child.offsetHeight;
+      if(uklad * k <= stage.clientHeight + 0.5) break;
+      const kk = Math.max(FIT_MIN, (stage.clientHeight / uklad) * 0.995);
+      if(kk >= k - 0.0005) break;
+      k = kk;
+      child.style.width = (100 / k) + '%';
+      child.style.setProperty('--fit', k.toFixed(4));
+    }
+  }
   /* transform nie zmienia wysokosci w layoucie — podajemy ja jawnie, zeby
      centrowanie sceny liczylo sie z tego, co widac, a nie z pelnej skali */
   if(mode !== 'off' && Math.abs(k - 1) > 0.001){

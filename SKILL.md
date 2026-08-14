@@ -148,7 +148,12 @@ Galerie do oglądania (nie do czytania jako kod): `assets/cloudbots-charts.html`
 - **Nie zaczynaj od stylu.** Najpierw treść i struktura.
 - **Nie powielaj jednego layoutu** ani jednego motywu przez cały deck.
 - **Nie zaczynaj sekcji bez przekładki.** Grupa slajdów bez własnego separatora zlewa się
-  z poprzednią i odbiorca traci orientację, w której części rozmowy jest.
+  z poprzednią i odbiorca traci orientację, w której części rozmowy jest. Przekładka jest
+  ciemna, więc slajd bezpośrednio przed nią rób jasny — bez cięcia motywu separator
+  czyta się jak ciąg dalszy, a nie jak cezura.
+- **Nie mieszaj dwóch rytmów odstępu w jednej talii.** Moduły dzieli jedna wartość
+  (`.stack--loose`, 41,6 px przy 1600 px). Dwa rytmy obok siebie — ten sam pas domykający
+  raz 41,6, raz 25,6 px pod modułem — czytają się jak niedokończona korekta.
 - **Nie rysuj wykresu bez wartości.** Słupek „dla ozdoby” jest gorszy niż jego brak.
 - **Nie koloruj wykresów inline** tam, gdzie istnieje klasa (`.hm-0`…`.hm-5`, `--dv-1`…`--dv-5`) —
   inline'owy kolor przestaje działać na drugim motywie.
