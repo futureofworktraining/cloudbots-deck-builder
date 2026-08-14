@@ -426,9 +426,15 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
    krotsza kolumna trzyma gorna linie naglowkiem i dolna ostatnim elementem */
 .split--fill{align-items:stretch;}
 .split--fill>.split-col>:last-child{margin-top:auto;}
+/* kreska POD pasem, nie nad nim: wtedy obie kolumny konczy ta sama linia
+   na tej samej wysokosci, a pustka nad pasem czyta sie jak margines modulu */
+.split--fill>.split-col>.chips:last-child{
+  padding-bottom:clamp(13px,1.3vw,20px);border-bottom:1px solid var(--line-2);}
 /* pas domykający: slajd o rzadkiej treści dostaje dolną krawędź zamiast wiszącej
    pustki — górny blok trzyma proporcje, ostatni element siada przy dole sceny */
-.stack--fill{min-height:100%;justify-content:center;padding-bottom:clamp(6px,1.2vh,16px);}
+/* pas domykajacy musi konczyc sie wyraznie nad stopka: przy 10px zapasu
+   os danych i stopka czytaly sie jak jeden dwuwierszowy mebel strony */
+.stack--fill{min-height:100%;justify-content:center;padding-bottom:clamp(34px,6vh,58px);}
 /* blok główny bierze zapas TYLKO z góry, a przed pasem domykającym zostaje
    ograniczony odstęp — inaczej między wykresem a osią rośnie pusty pas,
    który odrywa oś od danych, które opisuje */
@@ -633,7 +639,9 @@ body.is-light .arrows button{background:rgba(255,255,255,.72);border-color:var(-
    i szukał, w co kliknąć. Separator zamiast obwódki mówi „to wyliczenie”. */
 .chips{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;}
 .chip{
-  display:inline-flex;align-items:center;gap:14px;padding:0;border:0;color:var(--ink-3);
+  /* ten sam krój, wielkość i kolor co stopka sprawialy, ze pas etykiet czytal
+     sie jak jej druga linia; jeden stopien mocniejszy tusz go rozdziela */
+  display:inline-flex;align-items:center;gap:14px;padding:0;border:0;color:var(--ink-2);
   font-family:var(--ff-mono);font-size:calc(var(--fs-small)*.94);letter-spacing:.09em;text-transform:uppercase;
 }
 .chip:not(:last-child)::after{content:'·';color:var(--line);}
@@ -998,7 +1006,7 @@ body.anim-adv .slide.is-active .card{animation:riseIn .6s var(--ease) both;anima
 .split{gap:54.4px;}
   /* pas domykający: slajd o rzadkiej treści dostaje dolną krawędź zamiast wiszącej
    pustki — górny blok trzyma proporcje, ostatni element siada przy dole sceny */
-.stack--fill{padding-bottom:10.8px;}
+.stack--fill{padding-bottom:54px;}
   /* Jeden odstep nadlinia->tytul w calej talii, niezaleznie od kontenera. */
 /* Kontener bez wlasnego gap: pelny odstep. */
 .eyebrow+*{margin-top:20px;}
